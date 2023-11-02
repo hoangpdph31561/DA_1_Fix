@@ -1,0 +1,46 @@
+﻿<MudNavMenu Color="Color.Primary">
+    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+
+    <MudNavMenu>
+        <MudNavGroup Icon="@Icons.Material.Filled.Settings" Title="System">
+            <MudNavLink Href="/system/config">System Configuration</MudNavLink>
+            <MudNavLink Href="/system/web-config">Website Configuration</MudNavLink>
+        </MudNavGroup>
+    </MudNavMenu>
+
+    <MudNavMenu>
+        <MudNavGroup Icon="@Icons.Material.Filled.PeopleAlt" Title="User">
+            <MudNavLink Href="/user/list">List</MudNavLink>
+        </MudNavGroup>
+    </MudNavMenu>
+
+    <MudNavMenu>
+        <MudNavGroup Icon="@Icons.Material.Filled.Article" Title="Content">
+            <MudNavLink Href="/content/artical-list">List</MudNavLink>
+        </MudNavGroup>
+    </MudNavMenu>
+
+    <MudNavMenu>
+        <MudNavGroup Icon="@Icons.Material.Filled.Security" Title="Permission">
+            <MudNavLink Href="/permission/list">Permission List</MudNavLink>
+            <MudNavLink Href="/permission/role/list">Role List</MudNavLink>
+        </MudNavGroup>
+    </MudNavMenu>
+</MudNavMenu>
+
+@code {
+    private MudTheme _customTheme = new()
+        {
+            Palette = new Palette()
+            {
+                Primary = "#F97E0C"
+            }
+        };
+
+    private async Task HandleNavLinkClick()
+    {
+        // Perform any necessary logic before navigation
+        // Prevent the default behavior
+        await Task.CompletedTask;
+    }
+}

@@ -1,0 +1,48 @@
+﻿@using BaseSolution.BlazorServer.Extensions;
+@inherits LayoutComponentBase
+
+<MudThemeProvider Theme="_customTheme" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Color="Color.Primary" Elevation="0">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudSpacer />
+        <div class="col-auto">
+            <div class="row">
+                <MudText Color="Color.Surface" Typo="Typo.subtitle1">Hello, Admin</MudText>
+            </div>
+        </div>
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
+        <MudDrawerHeader>
+            <MudText Color="Color.Primary" Typo="Typo.h6">BaseSolution</MudText>
+        </MudDrawerHeader>
+        <NavMenu />
+    </MudDrawer>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-2 pt-8">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}
+
+@code {
+    private MudTheme _customTheme = new()
+        {
+            Palette = new Palette()
+            {
+                Primary = CustomPalette.MainColor
+            }
+        };
+}

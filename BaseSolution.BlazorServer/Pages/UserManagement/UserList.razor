@@ -1,0 +1,208 @@
+﻿@page "/user/list"
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.User;
+@using System.Net.Http.Json
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.User.Request;
+@using static SatoLab.Admin.Blazor.Data.ValueObjects.Common.QueryConstant;
+
+<h3>User List</h3>
+
+<MudGrid>
+    <MudItem xs="12" md="3" lg="2">
+        <MudText Color="Color.Primary" Typo="Typo.h6">FILTER BY</MudText>
+    </MudItem>
+    <MudItem xs="12" md="3" lg="2">
+    </MudItem>
+    <MudItem xs="12" md="3" lg="2">
+    </MudItem>
+    <MudItem xs="12" md="3" lg="2">
+    </MudItem>
+    <MudItem xs="12" md="3" lg="2">
+    </MudItem>
+    <MudItem xs="12" md="3" lg="2">
+        <MudText Color="Color.Primary" Typo="Typo.h6">SORT BY</MudText>
+
+    </MudItem>
+</MudGrid>
+
+<MudGrid>
+    <MudItem xs="12" md="3" lg="2">
+        <MudTextField @bind-Value="request.SearchModel!.SearchValue" Label="Key Word" Variant="Variant.Outlined"></MudTextField>
+    </MudItem>
+    <MudItem xs="12" md="3" lg="2">
+        <MudSelect @bind-Value="request.SearchModel!.MatchType" Label="Match Type" Variant="Variant.Outlined">
+            <MudSelectItem Value="@(MatchTypes.Contain)">Contain</MudSelectItem>
+            <MudSelectItem Value="@(MatchTypes.Equal)">Equal</MudSelectItem>
+        </MudSelect>
+    </MudItem>
+    <MudItem xs="12" md="3" lg="2">
+        <MudSelect @bind-Value="request.SearchModel!.SearchFieldName" Label="Where" Variant="Variant.Outlined">
+            <MudSelectItem Value="@(nameof(UserDto.Email))" />
+            <MudSelectItem Value="@(nameof(UserDto.InviteCode))" />
+            <MudSelectItem Value="@(nameof(UserDto.ParentCode))" />
+        </MudSelect>
+    </MudItem>
+    <MudItem xs="12" md="3" lg="2">
+        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="From Date" DateFormat="dd/MM/yyyy" Date="@(new System.DateTime(2023,07,15))" />
+    </MudItem>
+    <MudItem xs="12" md="3" lg="2">
+        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="To Date" DateFormat="dd/MM/yyyy" Date="@(new System.DateTime(2023,12,15))" />
+    </MudItem>
+    <MudItem xs="12" md="3" lg="2">
+        <MudSelect @bind-Value="request.SortByField!.ColName" Label="By" Variant="Variant.Outlined">
+            <MudSelectItem Value="@(nameof(UserDto.Email))" />
+            <MudSelectItem Value="@(nameof(UserDto.InviteCode))" />
+            <MudSelectItem Value="@(nameof(UserDto.ParentCode))" />
+        </MudSelect>
+    </MudItem>
+</MudGrid>
+
+<MudGrid>
+    <MudItem xs="12" md="3" lg="2">
+        <MudSelect @bind-Value="request.CountryISO" Label="National" Variant="Variant.Outlined">
+            <MudSelectItem Value="@(nameof(UserDto.Email))" />
+            <MudSelectItem Value="@(nameof(UserDto.InviteCode))" />
+            <MudSelectItem Value="@(nameof(UserDto.ParentCode))" />
+        </MudSelect>
+    </MudItem>
+    <MudItem xs="12" md="3" lg="2">
+        <MudSelect @bind-Value="request.SignUpType" Label="SignUp Type" Variant="Variant.Outlined">
+            <MudSelectItem Value="@("Google")">Google</MudSelectItem>
+            <MudSelectItem Value="@("Facebook")">Facebook</MudSelectItem>
+            <MudSelectItem Value="@("Apple")">Apple</MudSelectItem>
+            <MudSelectItem Value="@("None")">None</MudSelectItem>
+            <MudSelectItem Value="@("All")">All</MudSelectItem>
+        </MudSelect>
+    </MudItem>
+    <MudItem xs="12" md="3" lg="2">
+        <MudSelect @bind-Value="request.IsLast24h" Label="Last24h" Variant="Variant.Outlined">
+            <MudSelectItem Value="true">ON</MudSelectItem>
+            <MudSelectItem Value="false">OFF</MudSelectItem>
+        </MudSelect>
+    </MudItem>
+    <MudItem xs="12" md="3" lg="2">
+        <MudSelect @bind-Value="request.CashBalanceComparisonOperator" Label="About Cash Balance" Variant="Variant.Outlined">
+            <MudSelectItem Value="@OperatorTypes.GreaterThan">@OperatorTypes.GreaterThan</MudSelectItem>
+            <MudSelectItem Value="@OperatorTypes.GreaterThanOrEqual">@OperatorTypes.GreaterThanOrEqual</MudSelectItem>
+            <MudSelectItem Value="@OperatorTypes.Equal">@OperatorTypes.Equal</MudSelectItem>
+            <MudSelectItem Value="@OperatorTypes.LessThanOrEqual">@OperatorTypes.LessThanOrEqual</MudSelectItem>
+            <MudSelectItem Value="@OperatorTypes.LessThan">@OperatorTypes.LessThan</MudSelectItem>
+        </MudSelect>
+    </MudItem>
+    <MudItem xs="12" md="3" lg="2">
+        <MudTextField T="long" @bind-Value="request.CashBalance" Label="Value" Variant="Variant.Outlined"></MudTextField>
+    </MudItem>
+    <MudItem xs="12" md="3" lg="2">
+        <MudSelect @bind-Value="request.SortByField!.SortDirection" Label="Value" Variant="Variant.Outlined">
+            <MudSelectItem Value="@("desc")">A->Z</MudSelectItem>
+            <MudSelectItem Value="@("asc")">Z->A</MudSelectItem>
+        </MudSelect>
+    </MudItem>
+</MudGrid>
+
+<MudTable Items="@_listUser" Hover="true" Striped="true">
+    <HeaderContent>
+        <MudTh>Id Index</MudTh>
+        <MudTh>Avatar</MudTh>
+        <MudTh>Username</MudTh>
+        <MudTh>SignUp Type</MudTh>
+        <MudTh>Email</MudTh>
+        <MudTh>Phone Number</MudTh>
+        <MudTh>Joined Time</MudTh>
+        <MudTh>User Invite Code</MudTh>
+        <MudTh>Parent Code</MudTh>
+        <MudTh>F1 (vol)</MudTh>
+        <MudTh>F2 (vol)</MudTh>
+        <MudTh>Cash Balance</MudTh>
+        <MudTh>Last 24h</MudTh>
+        <MudTh>Control</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id Index">@(_listUser.IndexOf(context) + 1)</MudTd>
+        <MudTd DataLabel="Avatar"><MudAvatar Image="@context.AvatarUrl"></MudAvatar></MudTd>
+        <MudTd DataLabel="Username">@string.Concat(context.FirstName," ", context.LastName)</MudTd>
+        <MudTd DataLabel="SignUp Type">@context.SignUpType</MudTd>
+        <MudTd DataLabel="Email">@context.Email</MudTd>
+        <MudTd DataLabel="Phone Number">0123456789</MudTd>
+        <MudTd DataLabel="Joined Time">@context.CreatedTime.Date.ToShortDateString() <MudText Color="Color.Primary" Typo="Typo.inherit">@context.CreatedTime.ToString("hh:mm tt")</MudText></MudTd>
+        <MudTd DataLabel="User Invite Code">@context.InviteCode</MudTd>
+        <MudTd DataLabel="Parent Code">@context.ParentCode</MudTd>
+        <MudTd DataLabel="F1 (vol)">0</MudTd>
+        <MudTd DataLabel="F2 (vol)">0</MudTd>
+        <MudTd DataLabel="Cash Balance">@context.ClaimCash</MudTd>
+        <MudTd DataLabel="Last 24h">OFF</MudTd>
+        <MudTd DataLabel="Control"><MudIconButton Icon="@Icons.Material.Filled.DisplaySettings"></MudIconButton></MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private List<UserDto> _listUser = new()
+    {
+        new()
+        {
+            AvatarUrl = "https://cdn-icons-png.flaticon.com/512/168/168726.png",
+            FirstName = "BASE",
+            LastName = "LAB",
+            SignUpType = "Google",
+            Email = "base.lab@gmail.com",
+            CreatedTime = DateTime.UtcNow.AddDays(-2),
+            InviteCode = "BASE",
+            ParentCode = "",
+            ClaimCash = 1000,
+        },
+        new()
+        {
+            AvatarUrl = "https://cdn-icons-png.flaticon.com/512/168/168734.png",
+            FirstName = "BASE",
+            LastName = "LAB",
+            SignUpType = "Google",
+            Email = "base.lab@gmail.com",
+            CreatedTime = DateTime.UtcNow.AddDays(-2),
+            InviteCode = "BASE",
+            ParentCode = "",
+            ClaimCash = 1000,
+        },
+        new()
+        {
+            AvatarUrl = "https://cdn-icons-png.flaticon.com/512/168/168726.png",
+            FirstName = "BASE",
+            LastName = "LAB",
+            SignUpType = "Google",
+            Email = "base.lab@gmail.com",
+            CreatedTime = DateTime.UtcNow.AddDays(-2),
+            InviteCode = "BASE",
+            ParentCode = "",
+            ClaimCash = 1000,
+        },
+        new()
+        {
+            AvatarUrl = "https://cdn-icons-png.flaticon.com/512/168/168734.png",
+            FirstName = "BASE",
+            LastName = "LAB",
+            SignUpType = "Google",
+            Email = "base.lab@gmail.com",
+            CreatedTime = DateTime.UtcNow.AddDays(-2),
+            InviteCode = "BASE",
+            ParentCode = "",
+            ClaimCash = 1000,
+        },
+        new()
+        {
+            AvatarUrl = "https://cdn-icons-png.flaticon.com/512/168/168726.png",
+            FirstName = "BASE",
+            LastName = "LAB",
+            SignUpType = "Google",
+            Email = "base.lab@gmail.com",
+            CreatedTime = DateTime.UtcNow.AddDays(-2),
+            InviteCode = "BASE",
+            ParentCode = "",
+            ClaimCash = 1000,
+        },
+    };
+}
+
+@code {
+    public ViewUsersWithPaginationRequest request { get; set; } = new();
+}

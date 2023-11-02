@@ -1,0 +1,42 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Web
+
+<h3>Home</h3>
+
+<MudText Color="Color.Dark" Typo="Typo.subtitle1">Basic Bar Chart Example</MudText>
+<MudPaper Elevation="4">
+    <div id="basic-bar-chart"></div>
+</MudPaper>
+
+<MudDivider Class="my-4"></MudDivider>
+
+<MudText Color="Color.Dark" Typo="Typo.subtitle1">Basic Pie Chart Example</MudText>
+<MudPaper Elevation="4">
+    <div id="basic-pie-chart"></div>
+</MudPaper>
+
+<MudDivider Class="my-4"></MudDivider>
+
+<MudText Color="Color.Dark" Typo="Typo.subtitle1">Basic Pie Chart Example</MudText>
+<MudPaper Elevation="4">
+    <div id="data-label-bar-chart"></div>
+</MudPaper>
+
+@code {
+    [Inject]
+    public IJSRuntime JSRuntime { get; set; } = null!;
+
+    private string ChartName { get; set; } = "Example";
+    private List<string> Category { get; set; } = new (){ "Data1", "Data2", "Data3", "Data4", "Data5" };
+    private List<int> ChartData { get; set; } = new List<int> { 10, 20, 60, 40, 50 };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("createBasicBarChart", ChartName, Category, ChartData);
+            await JSRuntime.InvokeVoidAsync("createBasicPieChart", ChartName, Category, ChartData);
+            await JSRuntime.InvokeVoidAsync("createDataLabelBarChart", ChartName, Category, ChartData);
+        }
+    }
+}

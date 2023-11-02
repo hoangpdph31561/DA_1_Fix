@@ -12,7 +12,7 @@ namespace BaseSolution.Domain.Entities
     {
         public Guid Id { get; set; }
         public decimal Price { get; set; }
-        public int Number { get; set; }
+        public int Amount { get; set; }
         public Guid ServiceId { get; set; }
         public Guid ServiceOrderId { get; set; }
         public EntityStatus Status { get; set; } = EntityStatus.Active;

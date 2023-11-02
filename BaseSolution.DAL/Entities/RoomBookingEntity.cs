@@ -11,7 +11,7 @@ namespace BaseSolution.Domain.Entities
     public class RoomBookingEntity : IEntityBase
     {
         public Guid Id { get; set; }
-        public int CodeBooking { get; set; }
+        public string CodeBooking { get; set; } = string.Empty;
         public BookingType BookingType { get; set; }
         public Guid CustomerId { get; set; }
         public Guid? UserId { get; set; }

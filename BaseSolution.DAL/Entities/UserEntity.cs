@@ -27,6 +27,6 @@ namespace BaseSolution.Domain.Entities
         public Guid? DeletedBy { get; set; }
         public DateTimeOffset DeletedTime { get; set; }
         public UserRoleEntity UserRole { get; set; }
-
+        public List<RoomBookingEntity> RoomBookings { get; set; }
     }
 }

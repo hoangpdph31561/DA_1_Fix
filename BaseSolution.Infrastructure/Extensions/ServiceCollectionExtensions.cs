@@ -1,5 +1,9 @@
-﻿using BaseSolution.Application.Interfaces.Services;
+﻿using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
+using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
+using BaseSolution.Application.Interfaces.Services;
 using BaseSolution.Infrastructure.Database.AppDbContext;
+using BaseSolution.Infrastructure.Implements.Repositories.ReadOnly;
+using BaseSolution.Infrastructure.Implements.Repositories.ReadWrite;
 using BaseSolution.Infrastructure.Implements.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -37,6 +41,8 @@ namespace BaseSolution.Infrastructure.Extensions
             #endregion
 
             services.AddTransient<ILocalizationService, LocalizationService>();
+            services.AddTransient<IBuildingReadOnlyRespository, BuildingReadOnlyRespository>();
+            services.AddTransient<IBuildingReadWriteRespository, BuildingReadWriteRespository>();
 
             return services;
         }

@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 
 namespace BaseSolution.Infrastructure.ViewModels.Building
 {
-    public class BuildingListWithPaginationViewModel : ViewModelBase<ViewBuildingWithPaginationRequest>
+    public class BuildingListWithPaginationByAdminViewModel : ViewModelBase<ViewBuildingWithPaginationRequest>
     {
         private readonly IBuildingReadOnlyRespository _buildingReadOnlyRespository;
         private readonly ILocalizationService _localizationService;
-        public BuildingListWithPaginationViewModel(IBuildingReadOnlyRespository buildingReadOnlyRespository, ILocalizationService localizationService)
+        public BuildingListWithPaginationByAdminViewModel(IBuildingReadOnlyRespository buildingReadOnlyRespository, ILocalizationService localizationService)
         {
             _buildingReadOnlyRespository = buildingReadOnlyRespository;
             _localizationService = localizationService;

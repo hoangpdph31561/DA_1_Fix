@@ -14,5 +14,6 @@ namespace BaseSolution.Application.Interfaces.Repositories.ReadOnly
     {
         Task<RequestResult<BuildingDTO?>> GetBuildingByIdAsync(Guid idBuilding, CancellationToken cancellationToken);
         Task<RequestResult<PaginationResponse<BuildingDTO>>> GetBuildingWithPaginationByAdminAsync (ViewBuildingWithPaginationRequest request, CancellationToken cancellationToken);
+        Task<RequestResult<PaginationResponse<BuildingDTO>>> GetBuildingWithPaginationByOtherAsync (ViewBuildingWithPaginationRequest request, CancellationToken cancellationToken);
     }
 }

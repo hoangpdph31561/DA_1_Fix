@@ -32,14 +32,14 @@ namespace BaseSolution.API.Controllers
             return Ok(vm);
         }
         [HttpGet("getBillsByAdmin")]
-        public async Task<IActionResult> GetBillsByAdmin(ViewBillWithPaginationRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetBillsByAdmin([FromQuery]ViewBillWithPaginationRequest request, CancellationToken cancellationToken)
         {
             BillListWithPaginationByAdminViewModel vm = new(_billReadOnlyRespository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
             return Ok(vm);
         }
         [HttpGet("getBillByOther")]
-        public async Task<IActionResult> GetBillsByOther(ViewBillWithPaginationRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetBillsByOther([FromQuery]ViewBillWithPaginationRequest request, CancellationToken cancellationToken)
         {
             BillListWithPaginationByOtherViewModel vm = new(_billReadOnlyRespository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);

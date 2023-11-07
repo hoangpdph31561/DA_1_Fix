@@ -32,7 +32,7 @@ namespace BaseSolution.Infrastructure.ViewModels.Example
                 Message = result.Message;
                 return;
             }
-            catch (Exception)
+            catch 
             {
                 Success = false;
                 ErrorItems = new[]

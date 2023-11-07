@@ -43,7 +43,7 @@ namespace BaseSolution.Infrastructure.Extensions
             services.AddTransient<ILocalizationService, LocalizationService>();
             services.AddTransient<IBuildingReadOnlyRespository, BuildingReadOnlyRespository>();
             services.AddTransient<IBuildingReadWriteRespository, BuildingReadWriteRespository>();
-            
+
             return services;
         }
     }

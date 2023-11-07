@@ -79,5 +79,33 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 });
             }
         }
+
+        public async Task<RequestResult<PaginationResponse<BuildingDTO>>> GetBuildingWithPaginationByOtherAsync(ViewBuildingWithPaginationRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                IQueryable<BuildingEntity> queryable = _dbContext.Buildings.AsNoTracking().AsQueryable();
+                var result = await _dbContext.Buildings.AsNoTracking().Where(x => !x.Deleted).PaginateAsync<BuildingEntity, BuildingDTO>(request, _mapper, cancellationToken);
+                return RequestResult<PaginationResponse<BuildingDTO>>.Succeed(new PaginationResponse<BuildingDTO>
+                {
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize,
+                    HasNext = result.HasNext,
+                    Data = result.Data
+                });
+            }
+            catch (Exception e)
+            {
+
+                return RequestResult<PaginationResponse<BuildingDTO>>.Fail(_localizationService["List of building are not found"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error= e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "list of building"
+                    }
+                });
+            }
+        }
     }
 }

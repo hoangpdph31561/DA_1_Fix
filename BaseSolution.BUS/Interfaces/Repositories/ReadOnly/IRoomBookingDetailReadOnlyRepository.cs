@@ -1,0 +1,13 @@
+﻿using BaseSolution.Application.ValueObjects.Response;
+using BaseSolution.Application.DataTransferObjects.RoomBookingDetail;
+using BaseSolution.Application.ValueObjects.Pagination;
+using BaseSolution.Application.DataTransferObjects.RoomBookingDetail.Request;
+
+namespace BaseSolution.Application.Interfaces.Repositories.ReadOnly
+{
+    public interface IRoomBookingDetailReadOnlyRepository
+    {
+        Task<RequestResult<RoomBookingDetailDTO?>> GetRoomBookingDetailByIdAsync(Guid idRoomBookingDetail, CancellationToken cancellationToken);
+        Task<RequestResult<PaginationResponse<RoomBookingDetailDTO>>> GetRoomBookingDetailWithPaginationByAdminAsync(ViewRoomBookingDetailWithPaginationRequest request, CancellationToken cancellationToken);
+    }
+}

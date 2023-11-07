@@ -47,6 +47,10 @@ namespace BaseSolution.Infrastructure.Extensions
             services.AddTransient<IFloorReadWriteRespository, FloorReadWriteRespository>();
             services.AddTransient<IBillReadOnlyRespository, BillReadOnlyRespository>();
             services.AddTransient<IBillReadWriteRespository, BillReadWriteRespository>();
+            services.AddTransient<IServiceOrderReadOnlyRespository, ServiceOrderReadOnlyRespository>();
+            services.AddTransient<IServiceOrderReadWriteRespository, ServiceOrderReadWriteRespository>();
+            services.AddTransient<IServiceOrderDetailReadOnlyRespository, ServiceOrderDetailReadOnlyRespository>();
+            services.AddTransient<IServiceOrderDetailReadWriteRespository, ServiceOrderDetailReadWriteRespository>();
             return services;
         }
     }

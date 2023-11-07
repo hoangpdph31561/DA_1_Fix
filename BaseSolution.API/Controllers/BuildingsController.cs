@@ -28,10 +28,17 @@ namespace BaseSolution.API.Controllers
             _mapper = mapper;
             _localizationService = localizationService;
         }
-        [HttpGet]
+        [HttpGet("getBuildingsByAdmin")]
         public async Task<IActionResult> GetListBuildingByAdmin([FromQuery] ViewBuildingWithPaginationRequest request, CancellationToken cancellationToken)
         {
-            BuildingListWithPaginationViewModel vm = new(_buildingReadOnlyRespository, _localizationService);
+            BuildingListWithPaginationByAdminViewModel vm = new(_buildingReadOnlyRespository, _localizationService);
+            await vm.HandleAsync(request, cancellationToken);
+            return Ok(vm);
+        }
+        [HttpGet("getBuildingsByOther")]
+        public async Task<IActionResult> GetListBuildingByOther([FromQuery] ViewBuildingWithPaginationRequest request, CancellationToken cancellationToken)
+        {
+            BuildingListWithPaginationByOtherViewModel vm = new(_buildingReadOnlyRespository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
             return Ok(vm);
         }

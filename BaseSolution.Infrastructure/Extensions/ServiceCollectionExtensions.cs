@@ -43,6 +43,36 @@ namespace BaseSolution.Infrastructure.Extensions
             services.AddTransient<ILocalizationService, LocalizationService>();
             services.AddTransient<IBuildingReadOnlyRespository, BuildingReadOnlyRespository>();
             services.AddTransient<IBuildingReadWriteRespository, BuildingReadWriteRespository>();
+            services.AddTransient<IFloorReadOnlyRespository, FloorReadOnlyRespository>();
+            services.AddTransient<IFloorReadWriteRespository, FloorReadWriteRespository>();
+            services.AddTransient<IBillReadOnlyRespository, BillReadOnlyRespository>();
+            services.AddTransient<IBillReadWriteRespository, BillReadWriteRespository>();
+            services.AddTransient<IServiceOrderReadOnlyRespository, ServiceOrderReadOnlyRespository>();
+            services.AddTransient<IServiceOrderReadWriteRespository, ServiceOrderReadWriteRespository>();
+            services.AddTransient<IServiceOrderDetailReadOnlyRespository, ServiceOrderDetailReadOnlyRespository>();
+            services.AddTransient<IServiceOrderDetailReadWriteRespository, ServiceOrderDetailReadWriteRespository>();
+            services.AddTransient<ICustomerReadOnlyRepository, CustomerReadOnlyRepository>();
+            services.AddTransient<ICustomerReadWriteRepository, CustomerReadWriteRepository>();
+            services.AddTransient<IRoomDetailReadOnlyRepository, RoomDetailReadOnlyRepository>();
+            services.AddTransient<IRoomDetailReadWriteRepository, RoomDetailReadWriteRepository>();
+            services.AddTransient<IServiceReadOnlyRepository, ServiceReadOnlyRepository>();
+            services.AddTransient<IServicesReadWriteRepository, ServiceReadWriteRepository>();
+            services.AddTransient<IServiceTypeReadOnlyRepository, ServiceTypeReadOnlyRepository>();
+            services.AddTransient<IServiceTypeReadWriteRepository, ServiceTypeReadWriteRepository>();
+            services.AddTransient<IAmenityReadOnlyRepository, AmenityReadOnlyRepository>();
+            services.AddTransient<IAmenityReadWriteRepository, AmenityReadWriteRepository>();
+            services.AddTransient<IAmenityRoomDetailReadOnlyRepository, AmenityRoomDetailReadOnlyRepository>();
+            services.AddTransient<IAmenityRoomDetailReadWriteRepository, AmenityRoomDetailReadWriteRepository>();
+            services.AddTransient<IRoomTypeReadOnlyRepository, RoomTypeReadOnlyRepository>();
+            services.AddTransient<IRoomTypeReadWriteRepository, RoomTypeReadWriteRepository>();
+            services.AddTransient<IRoomBookingDetailReadOnlyRepository, RoomBookingDetailReadOnlyRepository>();
+            services.AddTransient<IRoomBookingDetailReadWriteRepository, RoomBookingDetailReadWriteRepository>();
+            services.AddTransient<IRoombookingReadOnlyRepository, RoombookingReadOnlyRepository>();
+            services.AddTransient<IRoombookingReadWriteRepository, RoombookingReadWriteRepository>();
+            services.AddTransient<IRoleReadOnlyRepository, RoleReadOnlyRepository>();
+            services.AddTransient<IRoleReadWriteRepository, RoleReadWriteRepository>();
+            services.AddTransient<IUserReadOnlyRepository, UserReadOnlyRepository>();
+            services.AddTransient<IUserReadWriteRepository, UserReadWriteRepository>();
 
             return services;
         }

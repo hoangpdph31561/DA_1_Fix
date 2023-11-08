@@ -89,10 +89,11 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
 
                 // Update value to existed Service
                 Service!.Name = string.IsNullOrWhiteSpace(entity.Name) ? Service.Name : entity.Name;
-
+                Service.Description = entity.Description;
+                Service.Unit = entity.Unit;
                 Service.ModifiedBy = entity.ModifiedBy;
                 Service.ModifiedTime = DateTimeOffset.UtcNow;
-
+                Service.ServiceTypeId = entity.ServiceTypeId;
                 _dbContext.Services.Update(Service);
                 await _dbContext.SaveChangesAsync(cancellationToken);
 

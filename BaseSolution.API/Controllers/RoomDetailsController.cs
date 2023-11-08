@@ -20,7 +20,7 @@ namespace BaseSolution.API.Controllers
         private readonly ILocalizationService _localizationService;
         private readonly IMapper _mapper;
 
-  
+
         public RoomDetailsController(IRoomDetailReadOnlyRepository RoomDetailReadOnlyRepository, IRoomDetailReadWriteRepository RoomDetailReadWriteRepository, ILocalizationService localizationService, IMapper mapper)
         {
             _RoomDetailReadOnlyRepository = RoomDetailReadOnlyRepository;
@@ -37,6 +37,16 @@ namespace BaseSolution.API.Controllers
 
             return Ok(vm);
         }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get([FromQuery] Guid id, CancellationToken cancellationToken)
+        {
+            RoomDetailViewModel vm = new(_RoomDetailReadOnlyRepository, _localizationService);
+
+            await vm.HandleAsync(id, cancellationToken);
+
+            return Ok(vm);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post(RoomDetailCreateRequest request, CancellationToken cancellationToken)
         {

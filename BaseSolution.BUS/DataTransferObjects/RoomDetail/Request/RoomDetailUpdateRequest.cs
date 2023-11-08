@@ -15,5 +15,7 @@ namespace BaseSolution.Application.DataTransferObjects.RoomDetail.Request
         public string Description { get; set; } = string.Empty;
         public double RoomSize { get; set; }
         public List<string> Images { get; set; } = new List<string>();
+        public Guid FloorId { get; set; }
+        public Guid RoomTypeId { get; set; }
     }
 }

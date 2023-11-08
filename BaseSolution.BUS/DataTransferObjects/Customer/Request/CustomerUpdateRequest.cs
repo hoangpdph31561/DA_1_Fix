@@ -15,5 +15,7 @@ namespace BaseSolution.Application.DataTransferObjects.Customer.Request
         public string Email { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
         public CustomerType CustomerType { get; set; }
+        public Guid? ModifiedBy { get; set; }
+
     }
 }

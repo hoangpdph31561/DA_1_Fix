@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BaseSolution.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,5 +13,8 @@ namespace BaseSolution.Application.DataTransferObjects.Services.Request
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public decimal Price { get; set; }
+        public UnitType Unit { get; set; }
+        public Guid? ModifiedBy { get; set; }
+        public Guid ServiceTypeId { get; set; }
     }
 }

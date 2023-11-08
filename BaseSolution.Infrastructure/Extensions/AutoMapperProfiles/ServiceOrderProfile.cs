@@ -16,8 +16,8 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
         {
             CreateMap<ServiceOrderEntity, ServiceOrderDTO>().ForMember(
                 dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer.Name));
-            CreateMap<ServiceOrderCreateRequest, ServiceEntity>();
-            CreateMap<ServiceOrderUpdateRequest, ServiceEntity>();
+            CreateMap<ServiceOrderCreateRequest, ServiceOrderEntity>();
+            CreateMap<ServiceOrderUpdateRequest, ServiceOrderEntity>();
         }
     }
 }

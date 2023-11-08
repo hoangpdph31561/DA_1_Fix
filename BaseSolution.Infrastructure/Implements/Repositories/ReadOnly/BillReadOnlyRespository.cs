@@ -60,7 +60,11 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 IQueryable<BillEntity> queryable = _appReadOnlyDbContext.Bills.AsNoTracking().AsQueryable();
                 var result = await _appReadOnlyDbContext.Bills.AsNoTracking()
                     .PaginateAsync<BillEntity, BillDTO>(request, _mapper, cancellationToken);
-
+                foreach (var item in result.Data!)
+                {
+                    var userCreated = await _appReadOnlyDbContext.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == item.CreatedBy, cancellationToken) == null ? "N/A" : _appReadOnlyDbContext.Users.AsNoTracking().First(x => x.Id == item.CreatedBy)!.Name;
+                    item.CreatedUserName = userCreated;
+                }
                 return RequestResult<PaginationResponse<BillDTO>>.Succeed(new PaginationResponse<BillDTO>()
                 {
                     PageNumber = request.PageNumber,

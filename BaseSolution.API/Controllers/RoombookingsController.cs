@@ -24,7 +24,7 @@ public class RoombookingsController : ControllerBase
         _localizationService = localizationService;
     }
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] ViewRoombookingWithPaginationRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetListRoomBookingDetailByAdmin([FromQuery] ViewRoombookingWithPaginationRequest request, CancellationToken cancellationToken)
     {
         RoombookingListWithPaginationViewModel vm = new(_roombookingrReadOnlyRespository, _localizationService);
         await vm.HandleAsync(request, cancellationToken);
@@ -33,7 +33,7 @@ public class RoombookingsController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> Get(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetRoomBookingDetailByAdmin(Guid id, CancellationToken cancellationToken)
     {
         RoombookingViewModel vm = new(_roombookingrReadOnlyRespository, _localizationService);
         await vm.HandleAsync(id, cancellationToken);

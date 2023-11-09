@@ -12,7 +12,7 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
             CreateMap<AmenityRoomDetailEntity, AmenityRoomDetailDTO>();
             CreateMap<AmenityRoomDetailCreateRequest, AmenityRoomDetailEntity>();
             CreateMap<AmenityRoomDetailUpdateRequest, AmenityRoomDetailEntity>();
-            CreateMap<AmenityRoomDetailCreateRequest, AmenityRoomDetailDTO>();
+            CreateMap<AmenityRoomDetailDeleteRequest, AmenityRoomDetailEntity>();
         }
     }
 }

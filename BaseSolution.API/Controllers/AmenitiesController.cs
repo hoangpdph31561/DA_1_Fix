@@ -10,13 +10,13 @@ namespace BaseSolution.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AmanitiesController : ControllerBase
+    public class AmenitiesController : ControllerBase
     {
         private readonly IAmenityReadOnlyRepository _amenityReadOnlyRespository;
         private readonly IAmenityReadWriteRepository _amenityReadWriteRespository;
         private readonly IMapper _mapper;
         private readonly ILocalizationService _localizationService;
-        public AmanitiesController(IAmenityReadOnlyRepository amenityReadOnlyRepository, IAmenityReadWriteRepository amenityReadWriteRepository, IMapper mapper, ILocalizationService localizationService)
+        public AmenitiesController(IAmenityReadOnlyRepository amenityReadOnlyRepository, IAmenityReadWriteRepository amenityReadWriteRepository, IMapper mapper, ILocalizationService localizationService)
         {
             _amenityReadOnlyRespository = amenityReadOnlyRepository;
             _amenityReadWriteRespository = amenityReadWriteRepository;

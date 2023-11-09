@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BaseSolution.Application.DataTransferObjects.RoomDetail;
 using BaseSolution.Application.DataTransferObjects.RoomDetail.Request;
+using BaseSolution.Application.DataTransferObjects.RoomType.Request;
 using BaseSolution.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
             CreateMap<RoomDetailEntity,RoomDetailDto>();
             CreateMap<RoomDetailCreateRequest, RoomDetailEntity>();
             CreateMap<RoomDetailUpdateRequest, RoomDetailEntity>();
+            CreateMap<RoomDetailDeleteRequest, RoomDetailEntity>();
         }
     }
 }

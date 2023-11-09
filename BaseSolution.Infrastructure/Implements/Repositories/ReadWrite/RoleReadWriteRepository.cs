@@ -83,6 +83,8 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
             {
                 var role = await GetUserRoleByIdAsync(entity.Id, cancellationToken);
                 role!.Name = string.IsNullOrEmpty(entity.Name) ? role.Name : entity.Name;
+                role.RoleCode = entity.RoleCode;
+                role!.Status = entity.Status == EntityStatus.Active ? EntityStatus.Active : EntityStatus.InActive;
                 role.ModifiedBy = entity.ModifiedBy;
                 role.ModifiedTime = DateTimeOffset.Now;
                 _appReadWriteDbContext.UserRoles.Update(role);

@@ -60,7 +60,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 RoomDetail!.Deleted = true;
                 RoomDetail.DeletedBy = request.DeletedBy;
                 RoomDetail.DeletedTime = DateTimeOffset.UtcNow;
-                RoomDetail.Status = EntityStatus.Deleted;
+                RoomDetail.Status = RoomStatus.Deleted;
 
                 _dbContext.RoomDetails.Update(RoomDetail);
                 await _dbContext.SaveChangesAsync(cancellationToken);

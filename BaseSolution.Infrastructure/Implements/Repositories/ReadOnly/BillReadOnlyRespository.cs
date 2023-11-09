@@ -35,10 +35,11 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                var example = await _appReadOnlyDbContext.Bills.AsNoTracking().Where(c => c.Id == id && !c.Deleted).ProjectTo<BillDTO>(_mapper.ConfigurationProvider)
+                var bill = await _appReadOnlyDbContext.Bills.AsNoTracking().Where(c => c.Id == id && !c.Deleted).ProjectTo<BillDTO>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(cancellationToken);
-
-                return RequestResult<BillDTO?>.Succeed(example);
+                var userCreated = await _appReadOnlyDbContext.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == bill!.CreatedBy, cancellationToken) == null ? "N/A" : _appReadOnlyDbContext.Users.AsNoTracking().First(x => x.Id == bill!.CreatedBy)!.Name;
+                bill!.CreatedUserName = userCreated;
+                return RequestResult<BillDTO?>.Succeed(bill);
             }
             catch (Exception e)
             {
@@ -93,7 +94,11 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 IQueryable<BillEntity> queryable = _appReadOnlyDbContext.Bills.AsNoTracking().AsQueryable();
                 var result = await _appReadOnlyDbContext.Bills.AsNoTracking().Where(x => !x.Deleted)
                     .PaginateAsync<BillEntity, BillDTO>(request, _mapper, cancellationToken);
-
+                foreach (var item in result.Data!)
+                {
+                    var userCreated = await _appReadOnlyDbContext.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == item.CreatedBy, cancellationToken) == null ? "N/A" : _appReadOnlyDbContext.Users.AsNoTracking().First(x => x.Id == item.CreatedBy)!.Name;
+                    item.CreatedUserName = userCreated;
+                }
                 return RequestResult<PaginationResponse<BillDTO>>.Succeed(new PaginationResponse<BillDTO>()
                 {
                     PageNumber = request.PageNumber,

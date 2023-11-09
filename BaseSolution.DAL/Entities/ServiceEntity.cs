@@ -14,7 +14,7 @@ namespace BaseSolution.Domain.Entities
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public decimal Price { get; set; }
-        public bool IsBookingNeed { get; set; }
+        public bool IsRoomBookingNeed { get; set; }
         public string Unit { get; set; } = string.Empty;
         public Guid ServiceTypeId { get; set; }
         public EntityStatus Status { get; set; } = EntityStatus.Active;

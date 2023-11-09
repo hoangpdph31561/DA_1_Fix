@@ -20,7 +20,7 @@ namespace BaseSolution.Infrastructure.Database.Configurations
             builder.Property(x => x.Description).IsUnicode(true).IsRequired();
             builder.Property(x => x.Price).IsRequired();
             builder.Property(x => x.Unit).IsRequired().IsUnicode(true);
-            builder.Property(x => x.IsBookingNeed).IsRequired();
+            builder.Property(x => x.IsRoomBookingNeed).IsRequired();
             builder.HasOne(x => x.ServiceType).WithMany(x => x.Services).HasForeignKey(x => x.ServiceTypeId);
         }
     }

@@ -20,8 +20,7 @@ namespace BaseSolution.Domain.Entities
         public List<string> Images { get; set; } = new List<string>();
         public Guid FloorId { get; set; }
         public Guid RoomTypeId { get; set; }
-        public EntityStatus Status { get; set; } = EntityStatus.Active;
-
+        public RoomStatus Status { get; set; } = RoomStatus.Vacant;
         public DateTimeOffset CreatedTime { get; set; }
         public Guid? CreatedBy { get; set; }
         public DateTimeOffset ModifiedTime { get; set; }

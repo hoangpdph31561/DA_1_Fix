@@ -29,7 +29,7 @@ namespace BaseSolution.API.Controllers
             _mapper = mapper;
         }
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] ViewRoomDetailWithPaginationRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetListRoomDetailByAdmin([FromQuery] ViewRoomDetailWithPaginationRequest request, CancellationToken cancellationToken)
         {
             RoomDetailListWithPaginationViewModel vm = new(_RoomDetailReadOnlyRepository, _localizationService);
 
@@ -38,7 +38,7 @@ namespace BaseSolution.API.Controllers
             return Ok(vm);
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get([FromQuery] Guid id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetRoomDetailById(Guid id, CancellationToken cancellationToken)
         {
             RoomDetailViewModel vm = new(_RoomDetailReadOnlyRepository, _localizationService);
 

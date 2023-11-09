@@ -12,5 +12,6 @@ public class UserProfile : Profile
         CreateMap<UserEntity, UserDTO>();
         CreateMap<UserCreateRequest, UserEntity>();
         CreateMap<UserUpdateRequest, UserEntity>();
+        CreateMap<UserDeleteRequest, UserEntity>();
     }
 }

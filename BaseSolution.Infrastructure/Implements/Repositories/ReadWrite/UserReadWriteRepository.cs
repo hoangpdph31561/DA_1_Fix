@@ -1,4 +1,5 @@
-﻿using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
+﻿using BaseSolution.Application.DataTransferObjects.User.Request;
+using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
 using BaseSolution.Application.ValueObjects.Common;
 using BaseSolution.Application.ValueObjects.Response;
@@ -49,14 +50,44 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
             }
         }
 
+        public async Task<RequestResult<int>> DeleteUserAsync(UserDeleteRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var user = await GetUserByIdAsync(request.Id, cancellationToken);
+                user!.Deleted = true;
+                user.DeletedBy = request.DeletedBy;
+                user.DeletedTime = DateTimeOffset.Now;
+                user.Status = EntityStatus.Deleted;
+                _appReadWriteDbContext.Users.Update(user);
+                await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
+                return RequestResult<int>.Succeed(1);
+            }
+            catch (Exception e)
+            {
+                return RequestResult<int>.Fail(_localizationService["Unable to delete user"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToDelete + "user"
+                    }
+                });
+            }
+        }
+
         public async Task<RequestResult<int>> UpdateUserAsync(UserEntity entity, CancellationToken cancellationToken)
         {
             try
             {
                 var user = await GetUserByIdAsync(entity.Id, cancellationToken);
 
+                user!.Name = entity.Name;
                 user!.UserRole = entity.UserRole;
                 user.Status = entity.Status == EntityStatus.Active ? EntityStatus.Active : EntityStatus.InActive;
+                user.PhoneNumber = entity.PhoneNumber;
+                user.Email = entity.Email;
+                user.Password = entity.Password;
                 user.ModifiedBy = entity.ModifiedBy;
                 user.ModifiedTime = DateTimeOffset.Now;
                 _appReadWriteDbContext.Users.Update(user);

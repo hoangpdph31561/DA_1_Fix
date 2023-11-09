@@ -25,7 +25,7 @@ namespace BaseSolution.API.Controllers
             _localizationService = localizationService;
         }
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] ViewRoomBookingDetailWithPaginationRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetListRoomBookingDetailByAdmin([FromQuery] ViewRoomBookingDetailWithPaginationRequest request, CancellationToken cancellationToken)
         {
             RoomBookingDetailListWithPaginationViewModel vm = new(_roomBookingDetailReadOnlyRepository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
@@ -34,7 +34,7 @@ namespace BaseSolution.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(Guid id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetRoomBookingDetailByAdmin(Guid id, CancellationToken cancellationToken)
         {
             RoomBookingDetailViewModel vm = new(_roomBookingDetailReadOnlyRepository, _localizationService);
             await vm.HandleAsync(id, cancellationToken);

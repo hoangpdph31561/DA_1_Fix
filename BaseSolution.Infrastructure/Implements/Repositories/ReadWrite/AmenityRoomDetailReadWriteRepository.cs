@@ -78,7 +78,8 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
             try
             {
                 var AmenityRoomDetail = await GetAmenityRoomDetailByIdAsync(entity.Id, cancellationToken);
-
+                AmenityRoomDetail!.AmenityId = entity.AmenityId;
+                AmenityRoomDetail.RoomTypeId = entity.RoomTypeId;
                 AmenityRoomDetail!.Amount = entity.Amount;
                 AmenityRoomDetail.Status = entity.Status == EntityStatus.Active ? EntityStatus.Active : EntityStatus.InActive;
                 AmenityRoomDetail.ModifiedBy = entity.ModifiedBy;

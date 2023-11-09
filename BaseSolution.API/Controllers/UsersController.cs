@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using BaseSolution.Application.DataTransferObjects.Amenity.Request;
 using BaseSolution.Application.DataTransferObjects.User.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
+using BaseSolution.Infrastructure.Implements.Repositories.ReadWrite;
+using BaseSolution.Infrastructure.ViewModels.Amenity;
 using BaseSolution.Infrastructure.ViewModels.User;
 using Microsoft.AspNetCore.Mvc;
 
@@ -53,7 +56,15 @@ namespace BaseSolution.API.Controllers
             await vm.HandleAsync(request, cancellationToken);
             return Ok(vm);
         }
+        [HttpDelete]
+        public async Task<IActionResult> DeleteUser(UserDeleteRequest request, CancellationToken cancellationToken)
+        {
+            UserDeleteViewModel vm = new(_userReadWriteRespository, _localizationService, _mapper);
 
-        
+            await vm.HandleAsync(request, cancellationToken);
+
+            return Ok(vm);
+        }
+
     }
 }

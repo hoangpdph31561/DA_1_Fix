@@ -12,7 +12,7 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
             CreateMap<RoomTypeEntity, RoomTypeDTO>();
             CreateMap<RoomTypeCreateRequest, RoomTypeEntity>();
             CreateMap<RoomTypeUpdateRequest, RoomTypeEntity>();
-            CreateMap<RoomTypeCreateRequest, RoomTypeDTO>();
+            CreateMap<RoomTypeDeleteRequest, RoomTypeEntity>();
         }
     }
 }

@@ -30,7 +30,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                var RoomType = await _dbContext.Amenities.AsNoTracking().Where(x => x.Id == idRoomType && !x.Deleted).ProjectTo<RoomTypeDTO>(_mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
+                var RoomType = await _dbContext.RoomTypes.AsNoTracking().Where(x => x.Id == idRoomType && !x.Deleted).ProjectTo<RoomTypeDTO>(_mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
                 return RequestResult<RoomTypeDTO?>.Succeed(RoomType);
 
             }

@@ -10,7 +10,6 @@ namespace BaseSolution.Application.DataTransferObjects.User.Request
         public string Email { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
         public Guid UserRoleId { get; set; }
-        public EntityStatus Status { get; set; } = EntityStatus.Active;
         public Guid? CreatedBy { get; set; }
     }
 }

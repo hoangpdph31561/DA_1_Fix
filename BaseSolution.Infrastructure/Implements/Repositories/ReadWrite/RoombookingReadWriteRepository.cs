@@ -85,8 +85,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
             {
                 var roomBooking = await GetRoomBookingByIdAsync(entity.Id, cancellationToken);
 
-                roomBooking!.CodeBooking = entity.CodeBooking;
-                roomBooking.BookingType = entity.BookingType;
+                roomBooking!.BookingType = entity.BookingType;
                 roomBooking.CustomerId = entity.CustomerId;
                 roomBooking.UserId = entity.UserId;
                 roomBooking!.Status = entity.Status == EntityStatus.Active ? EntityStatus.Active : EntityStatus.InActive;

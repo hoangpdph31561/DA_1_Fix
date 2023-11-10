@@ -12,7 +12,7 @@ namespace BaseSolution.Application.DataTransferObjects.ServiceOrderDetail.Reques
         public Guid ServiceId { get; set; }
         public Guid ServiceOrderId { get; set; }
         public decimal Price { get; set; }
-        public int Amount { get; set; }
+        public double Amount { get; set; }
         public Guid? ModifiedBy { get; set; }
     }
 }

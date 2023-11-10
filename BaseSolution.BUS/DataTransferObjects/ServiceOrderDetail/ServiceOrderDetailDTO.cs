@@ -13,10 +13,10 @@ namespace BaseSolution.Application.DataTransferObjects.ServiceOrderDetail
         public Guid ServiceId { get; set; }
         public Guid ServiceOrderId { get; set; }
         public decimal Price { get; set; }
-        public int Amount { get; set; }
+        public double Amount { get; set; }
         //Tên service
         public string ServiceName { get; set; } = string.Empty;
         //Unit service 
-        public UnitType ServiceUnitType { get; set; }
+        public string ServiceUnitType { get; set; } = string.Empty;
     }
 }

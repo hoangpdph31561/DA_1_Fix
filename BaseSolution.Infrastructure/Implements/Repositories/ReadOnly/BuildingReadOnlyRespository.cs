@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static BaseSolution.Application.ValueObjects.Common.QueryConstant;
 
 namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
 {
@@ -57,6 +58,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             try
             {
                 IQueryable<BuildingEntity> queryable = _dbContext.Buildings.AsNoTracking().AsQueryable();
+
                 var result = await _dbContext.Buildings.AsNoTracking().PaginateAsync<BuildingEntity, BuildingDTO>(request, _mapper, cancellationToken);
                 return RequestResult<PaginationResponse<BuildingDTO>>.Succeed(new PaginationResponse<BuildingDTO>
                 {
@@ -85,6 +87,18 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             try
             {
                 IQueryable<BuildingEntity> queryable = _dbContext.Buildings.AsNoTracking().AsQueryable();
+                if(!String.IsNullOrWhiteSpace(request.Search))
+                {
+                    request.SearchByFields = new List<SearchModel>()
+                    {
+                        new()
+                        {
+                            SearchValue = request.Search,
+                            SearchFieldName = nameof(BuildingEntity.Name),
+                            MatchType = MatchTypes.Contain
+                        }
+                    };
+                }
                 var result = await _dbContext.Buildings.AsNoTracking().Where(x => !x.Deleted).PaginateAsync<BuildingEntity, BuildingDTO>(request, _mapper, cancellationToken);
                 return RequestResult<PaginationResponse<BuildingDTO>>.Succeed(new PaginationResponse<BuildingDTO>
                 {

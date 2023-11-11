@@ -1,0 +1,105 @@
+﻿@if(IsLoading)
+{
+    <LoadingIndicator/>
+}
+else
+{
+    <div>
+        <div class="m-3">
+            <MudPaper Class="p-2 custom-list-display-border" Elevation="0">
+                <div class="d-flex align-items-center px-2">
+                    <div class="mr-auto">
+                        <MudText Typo="Typo.h5" Style="font-weight:500;">@Label</MudText>
+                        @if (LabelHelper != null && LabelHelper != "")
+                        {
+                            <MudText Typo="Typo.caption">@LabelHelper</MudText>
+                        }
+
+                    </div>
+                    @HeaderContent
+                </div>
+            </MudPaper>
+            @if (ToolbarContent != null)
+            {
+                <div class="mt-3">
+                    @ToolbarContent
+                </div>
+            }
+            <div class="row @(AdditionalSearchBarColumn != null || HideSearch == false ? "mt-3" : "")">
+                @if (AdditionalSearchBarColumn != null)
+                {
+                    <div class="col">
+                        @AdditionalSearchBarColumn
+                    </div>
+                }
+                @if (!HideSearch)
+                {
+                    <div class="col">
+                        <MudTextField Immediate Variant="Variant.Outlined" Class="custom-list-display-border-input" Style="background-color: white;" @bind-Value="@SearchString" DebounceInterval="200" OnDebounceIntervalElapsed="@(async () => await OnSearchFunc())" Label="Tìm kiếm" HelperText="@HelperSearch" Disabled="@DisableSearch" MaxLength="200" AdornmentIcon="@Icons.Material.Filled.Search" Adornment="Adornment.End" OnAdornmentClick="@(async () => await OnSearchFunc())"></MudTextField>
+                     </div>
+                }
+            </div>
+            <div class="@BodyClass">
+                @if (IsLoadingBody)
+                {
+                    <LoadingIndicator />
+                }
+                else
+                {
+                    @BodyContent
+                }
+            </div>
+        </div>
+    </div>
+    <div class="pb-1"></div>
+}
+
+@code {
+    [Parameter]
+    public bool IsLoading { get; set; }
+    [Parameter]
+    public bool IsLoadingBody { get; set; }
+    [Parameter]
+    public string? Label { get; set; } = "";
+
+    [Parameter]
+    public string? LabelHelper { get; set; } = "";
+
+    [Parameter]
+    public RenderFragment? HeaderContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? ToolbarContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? BodyContent { get; set; }
+
+    [Parameter]
+    public string? BodyClass { get; set; } = "mt-4";
+
+    [Parameter]
+    public RenderFragment? AdditionalSearchBarColumn { get; set; }
+
+    [Parameter]
+    public bool HideSearch { get; set; } = false;
+
+    [Parameter]
+    public bool DisableSearch { get; set; } = false;
+
+    [Parameter]
+    public string HelperSearch { get; set; } = "";
+
+    [Parameter]
+    public string SearchString { get; set; } = "";
+
+    [Parameter]
+    public int SearchDelay { get; set; } = 200;
+
+    [Parameter]
+    public EventCallback<string> OnSearch { get; set; }
+
+    private async Task OnSearchFunc()
+    {
+        await OnSearch.InvokeAsync(SearchString);
+    }
+}

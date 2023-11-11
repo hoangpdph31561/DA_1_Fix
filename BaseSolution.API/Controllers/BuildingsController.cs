@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using BaseSolution.Application.DataTransferObjects.Building;
 using BaseSolution.Application.DataTransferObjects.Building.Request;
 
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
+using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Infrastructure.Implements.Repositories.ReadOnly;
 using BaseSolution.Infrastructure.Implements.Repositories.ReadWrite;
 using BaseSolution.Infrastructure.ViewModels.Building;
@@ -33,14 +35,26 @@ namespace BaseSolution.API.Controllers
         {
             BuildingListWithPaginationByAdminViewModel vm = new(_buildingReadOnlyRespository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-            return Ok(vm);
+            if(vm.Success)
+            {
+                PaginationResponse<BuildingDTO> result = new();
+                result = (PaginationResponse<BuildingDTO>)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
         }
         [HttpGet("getBuildingsByOther")]
         public async Task<IActionResult> GetListBuildingByOther([FromQuery] ViewBuildingWithPaginationRequest request, CancellationToken cancellationToken)
         {
             BuildingListWithPaginationByOtherViewModel vm = new(_buildingReadOnlyRespository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-            return Ok(vm);
+            if (vm.Success)
+            {
+                PaginationResponse<BuildingDTO> result = new();
+                result = (PaginationResponse<BuildingDTO>)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBuildingById(Guid id, CancellationToken cancellationToken)
@@ -68,7 +82,7 @@ namespace BaseSolution.API.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteBuilding(BuildingDeleteRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> DeleteBuilding([FromQuery]BuildingDeleteRequest request, CancellationToken cancellationToken)
         {
             BuildingDeleteViewModel vm = new(_buildingReadWriteRespository, _mapper, _localizationService);
 

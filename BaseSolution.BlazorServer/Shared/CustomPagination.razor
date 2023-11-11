@@ -1,0 +1,49 @@
+﻿<div class="@Class">
+    <div class="w-100 d-flex justify-items-center align-items-center">
+        <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowLeft" Size="Size.Medium" Class="ms-auto" Disabled="@(CurrentPageNumber <= 1)" OnClick="@(async () => await OnArrowClick(false))" />
+        <MudText Class="mx-4" Style="">@CurrentPageNumber</MudText>
+        <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowRight" Size="Size.Medium" Class="me-auto" Disabled="@(!HasNext)" OnClick="@(async () => await OnArrowClick(true))" />
+    </div>
+</div>
+
+@code {
+    #region Basic Params
+
+    [Parameter]
+    public string Class { get; set; }
+
+    #endregion
+
+    [Parameter]
+    public int CurrentPageNumber { get; set; } = 1;
+
+    #region Single Page Shift Pagination Params
+
+    [Parameter]
+    public bool HasNext { get; set; } = false;
+
+    /// <summary>
+    ///     Call the determined func with return page number (int)
+    /// </summary>
+    [Parameter]
+    public EventCallback<int> OnPageChange { get; set; }
+
+    private async Task OnArrowClick(bool isForward)
+    {
+        if (CurrentPageNumber < 1) CurrentPageNumber = 1;
+        if (CurrentPageNumber >= 1)
+        {
+            CurrentPageNumber += isForward ? 1 : -1;
+            await OnPageChange.InvokeAsync(CurrentPageNumber);
+        }
+    }
+
+    #endregion
+
+    #region Multiple Page Choices Pagination
+
+    //[Parameter]
+    //public int ObjectCount { get; set; } = 0;
+
+    #endregion
+}

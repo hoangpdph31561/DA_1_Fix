@@ -14,7 +14,8 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
     {
         public BuildingProfile()
         {
-            CreateMap<BuildingEntity, BuildingDTO>();
+            CreateMap<BuildingEntity, BuildingDTO>().ForMember(
+                dest => dest.NumberOfFloors, opt => opt.MapFrom(src => src.Floors.Where(fl => !fl.Deleted).Count()));
             CreateMap<BuildingCreateRequest, BuildingEntity>();
             CreateMap<BuildingUpdateRequest, BuildingEntity>(); 
             CreateMap<BuildingCreateRequest, BuildingDTO>();

@@ -9,5 +9,6 @@ namespace BaseSolution.Application.DataTransferObjects.Building.Request
 {
     public class ViewBuildingWithPaginationRequest : PaginationRequest
     {
+        public string Search { get; set; } = string.Empty;
     }
 }

@@ -1,0 +1,49 @@
+﻿@{
+    EntityStatus statusValue = Status;
+}
+@switch(statusValue)
+{
+    case EntityStatus.Active:
+        <MudChip Color="Color.Success">@nameof(EntityStatus.Active)</MudChip>
+        break;
+    case EntityStatus.InActive:
+        <MudChip Color="Color.Default">@nameof(EntityStatus.InActive)</MudChip>
+
+        break;
+    case EntityStatus.Pending:
+        <MudChip Color="Color.Warning">@nameof(EntityStatus.Pending)</MudChip>
+
+        break;
+    case EntityStatus.PendingForConfirmation:
+        <MudChip Color="Color.Secondary">@nameof(EntityStatus.PendingForConfirmation)</MudChip>
+
+        break;
+        case EntityStatus.PendingForActivation:
+        <MudChip Color="Color.Info">@nameof(EntityStatus.PendingForActivation)</MudChip>
+
+        break;
+    case EntityStatus.PendingForApproval:
+        <MudChip Color="Color.Dark">@nameof(EntityStatus.PendingForApproval)</MudChip>
+
+        break;
+    case EntityStatus.Locked:
+        <MudChip Color="Color.Error">@nameof(EntityStatus.Locked)</MudChip>
+
+        break;
+}
+@code {
+    [Parameter]
+    public EntityStatus Status { get; set; }
+    /*
+     * /*
+ * Active = 1,
+    InActive = 2,
+    Deleted = 3,
+    Pending = 4,
+    PendingForActivation = 5,
+    PendingForConfirmation = 6,
+    PendingForApproval = 7,
+    Locked = 8,
+ */
+     
+}

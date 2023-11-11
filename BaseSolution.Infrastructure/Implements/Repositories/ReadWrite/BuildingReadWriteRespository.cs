@@ -80,6 +80,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
             {
                 var building = await GetBuildingByIdAsync(entity.Id, cancellationToken);
                 building!.Name = string.IsNullOrEmpty(entity.Name) ? building.Name : entity.Name;
+                building.Status = entity.Status;
                 building.ModifiedBy = entity.ModifiedBy;
                 building.ModifiedTime = DateTimeOffset.Now;
                 _appReadWriteDbContext.Buildings.Update(building);

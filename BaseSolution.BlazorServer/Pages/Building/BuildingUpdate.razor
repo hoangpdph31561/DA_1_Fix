@@ -1,0 +1,139 @@
+﻿@using Respository.Interfaces
+@using Data.DataTransferObjects.Building
+@using Data.DataTransferObjects.Building.Request
+
+@if(building == null && lstBuilding == null)
+{
+    <LoadingIndicator></LoadingIndicator>
+}
+else
+{
+    <MudPopover Style="background-color: rgba(255, 255, 255, 0.8); width: 100vw; height: 100vh; position: fixed;" Open="true">
+        <div class="d-flex justify-center align-center w-100 h-100">
+            <MudPaper Class="px-5 pt-5 pb-4 w-50" Elevation="5">
+                <MudForm Model="buildingUpdate" @ref="@_form" @bind-IsValid="@_formIsValid">
+                    <h5>Chi tiết tòa nhà</h5>
+                    <div class="row">
+                        <div class="col">
+                            <div class="row">
+                                <div class="col-12">
+                                    <MudTextField @bind-Value="buildingUpdate.Name" Label="Tên tòa nhà" For="() => buildingUpdate.Name" Class="mb-2"></MudTextField>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <MudSelect T="EntityStatus" Label="Trạng thái" AnchorOrigin="Origin.BottomCenter" @bind-Value="buildingUpdate.Status" For="() => buildingUpdate.Status" Class="mb-2"> 
+                                        <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
+                                        <MudSelectItem Value="EntityStatus.InActive">Không hoạt động</MudSelectItem>
+                                        <MudSelectItem Value="EntityStatus.Pending">Chờ</MudSelectItem>
+                                        <MudSelectItem Value="EntityStatus.PendingForActivation">Chờ hoạt động</MudSelectItem>
+                                        <MudSelectItem Value="EntityStatus.PendingForConfirmation">Chờ kích hoạt</MudSelectItem>
+                                        <MudSelectItem Value="EntityStatus.PendingForApproval">Chờ chấp thuận</MudSelectItem>
+                                        <MudSelectItem Value="EntityStatus.Locked">Khóa</MudSelectItem>
+
+
+                                    </MudSelect>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="float-end">
+                        <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+                        <MudButton OnClick="Reset">Khôi phục</MudButton>
+                        <MudButton OnClick="UpdateBuilding">Lưu</MudButton>
+                    </div>
+                </MudForm>
+            </MudPaper>
+        </div>
+    </MudPopover>
+}
+
+@code {
+    /*
+    * /*
+    * Active = 1,
+    InActive = 2,
+    Deleted = 3,
+    Pending = 4,
+    PendingForActivation = 5,
+    PendingForConfirmation = 6,
+    PendingForApproval = 7,
+    Locked = 8,
+    */
+
+    #region Khai báo
+    [Parameter]
+    public Guid idBuilding { get; set; }
+    [Parameter]
+    public EventCallback onCloseDetail { get; set; }
+    [Inject]
+    public IBuildingRespo buildingRespo { get; set; }
+    [Inject]
+    public IDialogService dialogService { get; set; }
+    [Inject]
+    public ISnackbar snackbar { get; set; }
+    MudForm _form;
+    private bool _formIsValid;
+    private List<BuildingDTO> lstBuilding;
+    private BuildingUpdateRequest buildingUpdate = new();
+    private BuildingDTO building;
+    #endregion
+    #region Code xử lý
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        building = await buildingRespo.GetBuildingById(idBuilding);
+        buildingUpdate.Id = building.Id;
+        buildingUpdate.Name = building.Name;
+        buildingUpdate.Status = building.Status;
+    }
+    private async Task OnClickCancel()
+    {
+        await onCloseDetail.InvokeAsync();
+    }
+    private bool CheckChangeData()
+    {
+        return building.Name != buildingUpdate.Name || building.Status != buildingUpdate.Status;
+    }
+    private async Task UpdateBuilding()
+    {
+        await _form.Validate();
+        if(!_form.IsValid) return;
+        var confirm = await dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận sửa tòa nhà",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if(confirm == true)
+        {
+            var result = await buildingRespo.UpdateBuilding(buildingUpdate);
+            if(result)
+            {
+                if(CheckChangeData())
+                {
+                    await OnClickCancel();
+                    snackbar.Add("Sửa thành công", Severity.Success);
+                }
+                else
+                {
+                    await OnClickCancel();
+                    snackbar.Add("Không có thay đổi dữ liệu để cập nhật", Severity.Warning);
+                }
+            }
+            else
+            {
+                snackbar.Add("Sửa thất bại", Severity.Error);
+            }
+        }
+    }
+    private async Task Reset()
+    {
+        await LoadData();
+    }
+    #endregion
+}

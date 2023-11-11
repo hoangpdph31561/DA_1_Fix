@@ -9,5 +9,7 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
         Task<PaginationResponse<BuildingDTO>> GetAllBuilding(ViewBuildingWithPaginationRequest request);
         Task<bool> DeleteBuilding(BuildingDeleteRequest request);
         Task<bool> CreateBuilding(BuildingCreateRequest request);
+        Task<bool> UpdateBuilding(BuildingUpdateRequest request);
+        Task<BuildingDTO> GetBuildingById(Guid id);
     }
 }

@@ -61,7 +61,12 @@ namespace BaseSolution.API.Controllers
         {
             BuildingViewModel vm = new(_buildingReadOnlyRespository, _localizationService);
             await vm.HandleAsync(id, cancellationToken);
-            return Ok(vm);
+            if (vm.Success)
+            {
+                BuildingDTO result = (BuildingDTO)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
         }
         [HttpPost]
         public async Task<IActionResult> CreateNewBuilding(BuildingCreateRequest request, CancellationToken cancellationToken)

@@ -29,9 +29,9 @@
                             <MudTd>@(_lstBuildings.IndexOf(context) + 1)</MudTd>
                                 <MudTd>@context.Name</MudTd>
                                 <MudTd>@context.NumberOfFloors</MudTd>
-                                <MudTd>@context.Status</MudTd>
+                                <MudTd><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTd>
                                 <MudTd>
-                                    <MudChip Icon="@Icons.Filled.MenuOpen" Color="Color.Primary" Disabled="@_isDisableControls">Chi tiết</MudChip>
+                                    <MudChip Icon="@Icons.Filled.MenuOpen" Color="Color.Primary" OnClick="@(() => OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
                                     <MudChip Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => OnDelete(context.Id))" Disabled="@_isDisableControls">Xóa</MudChip>
                                 </MudTd>
                             </RowTemplate>
@@ -45,7 +45,11 @@
 </CustomListDisplay>
 @if(closeAdd == false)
 {
-    <BuildingCreate onCloseAdd="OnCloseAdd"></BuildingCreate>
+    <BuildingCreate onCloseAdd="OnCloseAdd" ></BuildingCreate>
+}
+@if(_idBuildingDetail != Guid.Empty && closeDetail == false)
+{
+    <BuildingUpdate idBuilding="_idBuildingDetail" onCloseDetail="OnCloseDetail"></BuildingUpdate>
 }
 @code {
     #region Khai báo
@@ -116,6 +120,16 @@
         _buildingRequest.Search = searchString;
         await LoadData();
 
+    }
+    private async Task OpenDetail(Guid idBuilding)
+    {
+        _idBuildingDetail = idBuilding;
+        closeDetail = false;
+    }
+    private async Task OnCloseDetail()
+    {
+        await LoadData();
+        closeDetail = true;
     }
     #endregion
     #region Code event

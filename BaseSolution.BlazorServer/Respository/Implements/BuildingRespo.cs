@@ -41,5 +41,17 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             var result = await _httpClient.GetFromJsonAsync<PaginationResponse<BuildingDTO>>(url);
             return result;
         }
+
+        public async Task<BuildingDTO> GetBuildingById(Guid id)
+        {
+            var result = await _httpClient.GetFromJsonAsync<BuildingDTO>($"api/Buildings/{id}");
+            return result;
+        }
+
+        public async Task<bool> UpdateBuilding(BuildingUpdateRequest request)
+        {
+            var result = await _httpClient.PutAsJsonAsync("api/Buildings", request);
+            return result.IsSuccessStatusCode;
+        }
     }
 }

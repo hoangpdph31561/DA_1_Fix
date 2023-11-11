@@ -1,0 +1,132 @@
+﻿@page "/building"
+@using Respository.Interfaces
+@using Data.DataTransferObjects.Building
+@using Data.DataTransferObjects.Building.Request
+
+
+<CustomListDisplay Label="@("Danh sách tòa nhà của khách sạn")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
+    <HeaderContent>
+        <MudChip Icon="@Icons.Material.Filled.Add" @onclick="() => OpenAdd()" Color="Color.Primary">Thêm</MudChip>
+    </HeaderContent>
+    <BodyContent>
+        <MudPaper Elevation="0" Class="custom-list-display-border">
+            @if (_isLoadingList)
+            {
+                <MudProgressLinear Color="Color.Primary" Indeterminate="true"></MudProgressLinear>
+            }
+            else
+            {
+                <MudCard Class="p-3" Elevation="2">
+                    <MudTable Items="@_buildingVM.Data">
+                        <HeaderContent>
+                            <MudTh>STT</MudTh>
+                            <MudTh>Tên tòa</MudTh>
+                            <MudTh>Số tầng</MudTh>
+                            <MudTh>Trạng thái</MudTh>
+                            <MudTh>Hành động</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd>@(_lstBuildings.IndexOf(context) + 1)</MudTd>
+                                <MudTd>@context.Name</MudTd>
+                                <MudTd>@context.NumberOfFloors</MudTd>
+                                <MudTd>@context.Status</MudTd>
+                                <MudTd>
+                                    <MudChip Icon="@Icons.Filled.MenuOpen" Color="Color.Primary" Disabled="@_isDisableControls">Chi tiết</MudChip>
+                                    <MudChip Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => OnDelete(context.Id))" Disabled="@_isDisableControls">Xóa</MudChip>
+                                </MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                        <MudDivider />
+                        <CustomPagination Class="my-1" HasNext="@_buildingVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="_buildingVM.PageNumber"></CustomPagination>
+                    </MudCard>
+            }
+        </MudPaper>
+    </BodyContent>
+</CustomListDisplay>
+@if(closeAdd == false)
+{
+    <BuildingCreate onCloseAdd="OnCloseAdd"></BuildingCreate>
+}
+@code {
+    #region Khai báo
+    [Inject]
+    public IBuildingRespo _buildingRespo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    private Guid _idBuildingDetail = Guid.Empty;
+    private bool closeAdd = true;
+    private bool closeDetail = true;
+    private PaginationResponse<BuildingDTO> _buildingVM;
+    private bool _isLoadingAll = true;
+    private bool _isLoadingList = true;
+    private readonly bool _isDisableControls = false;
+    private ViewBuildingWithPaginationRequest _buildingRequest = new();
+    private List<BuildingDTO> _lstBuildings;
+    private BuildingDeleteRequest requestDelete = new();
+    #endregion
+    #region Code xử lý
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        _buildingVM = await _buildingRespo.GetAllBuilding(_buildingRequest);
+        _lstBuildings = _buildingVM.Data.ToList();
+        _isLoadingList = false;
+        _isLoadingAll = false;
+    }
+    private async Task OnPaginationButtonClick(int pageNumber)
+    {
+        if (_isDisableControls) return;
+        _isLoadingList = true;
+        _buildingRequest.PageNumber = pageNumber;
+        await LoadData();
+    }
+    public async Task OnDelete(Guid deleteId)
+    {
+        var confirm = await _dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận xóa tòa nhà?",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if(confirm == true)
+        {
+            requestDelete.Id = deleteId;
+            var removeConfirm = await _buildingRespo.DeleteBuilding(requestDelete);
+            if(removeConfirm)
+            {
+                _snackbar.Add("Xóa thành công", Severity.Success);
+            }
+            else
+            {
+                _snackbar.Add("Xóa thất bại", Severity.Error);
+            }
+            await LoadData();
+        }
+    }
+    private async Task OnSearch(string? searchString)
+    {
+        _isLoadingList = true;
+        _buildingRequest.PageNumber = 1;
+        _buildingRequest.Search = searchString;
+        await LoadData();
+
+    }
+    #endregion
+    #region Code event
+    private void OpenAdd()
+    {
+        closeAdd = false;
+    }
+    private async Task OnCloseAdd()
+    {
+        await LoadData();
+        closeAdd = true;
+    }
+    #endregion
+}

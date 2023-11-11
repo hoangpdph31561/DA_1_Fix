@@ -12,5 +12,6 @@ namespace BaseSolution.Application.DataTransferObjects.Building
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public EntityStatus Status { get; set; }
+        public int NumberOfFloors { get; set; }
     }
 }

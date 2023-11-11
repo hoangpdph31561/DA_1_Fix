@@ -1,4 +1,6 @@
 using BaseSolution.BlazorServer.Data;
+using BaseSolution.BlazorServer.Respository.Implements;
+using BaseSolution.BlazorServer.Respository.Interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
@@ -13,7 +15,11 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddMudServices();
-
+builder.Services.AddScoped(c => new HttpClient
+{
+    BaseAddress = new Uri("https://localhost:7005")
+});
+builder.Services.AddTransient<IBuildingRespo, BuildingRespo>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

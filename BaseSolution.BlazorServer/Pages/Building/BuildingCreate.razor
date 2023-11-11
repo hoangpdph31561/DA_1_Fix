@@ -1,0 +1,83 @@
+﻿@using Data.DataTransferObjects.Building.Request
+@using Respository.Interfaces
+@using Data.DataTransferObjects.Building
+
+<MudPopover Style="background-color: rgba(255, 255, 255, 0.8); width: 100vw; height: 100vh; position: fixed; display: flex; justify-content: center; align-items: center;" Open="true" Elevation="0">
+    <div class="d-flex justify-center align-center w-100 h-100">
+        <MudPaper Class="px-5 pt-5 pb-4 w-50" Elevation="3">
+           <MudForm Model="@_buildingCreate" @bind-IsValid="@success" @ref="@_form">
+               <h5>Thêm tòa nhà khách sạn</h5>
+               <div class="row">
+                   <div class="col">
+                       <div class="row">
+                           <div class="col-6">
+                               <MudTextField @bind-Value="_buildingCreate.Name" Label="Tên tòa nhà" For="() => _buildingCreate.Name" Class="mb-2"></MudTextField>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+               <div class="float-end">
+                   <MudButton OnClick="@OnClickCancel">Hủy</MudButton>
+                   <MudButton @onclick="Reset">Làm mới</MudButton>
+                   <MudButton @onclick="CreateNewBuilding" Disabled="@(!success)">Lưu</MudButton>
+               </div>
+           </MudForm>
+        </MudPaper>
+    </div>
+</MudPopover>
+
+@code {
+    [Parameter]
+    public EventCallback onCloseAdd { get; set; }
+    [Inject]
+    public IBuildingRespo _buildingRespo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    private BuildingCreateRequest _buildingCreate = new();
+    private bool success;
+    MudForm _form;
+    private async Task OnValidSubmid()
+    {
+
+    }
+    private async Task OnClickCancel()
+    {
+        await onCloseAdd.InvokeAsync();
+    }
+    private async Task CreateNewBuilding()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+        var confirm = await _dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận thêm tòa nhà?",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if(confirm == true)
+        {
+            var result = await _buildingRespo.CreateBuilding(_buildingCreate);
+            if(result == true)
+            {
+                await OnClickCancel();
+                _snackbar.Add("Thêm thành công", Severity.Success);
+            }
+            else
+            {
+                _snackbar.Add
+                (
+                    "Thêm thất bại",
+                     Severity.Error
+                );
+            }
+            await Reset();
+        }
+    }
+    private async Task Reset()
+    {
+        _buildingCreate = new BuildingCreateRequest();
+    }
+}

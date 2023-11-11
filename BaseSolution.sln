@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BaseSolution.API", "BaseSol
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BaseSolution.Infrastructure", "BaseSolution.Infrastructure\BaseSolution.Infrastructure.csproj", "{B0E1E118-1CB0-4D77-89D8-C314C8793270}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseSolution.BlazorServer", "BaseSolution.BlazorServer\BaseSolution.BlazorServer.csproj", "{7E49F7AE-0BF7-4789-9FD1-9078E792C99E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BaseSolution.BlazorServer", "BaseSolution.BlazorServer\BaseSolution.BlazorServer.csproj", "{7E49F7AE-0BF7-4789-9FD1-9078E792C99E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -87,7 +87,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             try
             {
                 IQueryable<FloorEntity> queryable = _appReadOnlyDbContext.Floors.AsNoTracking().AsQueryable();
-                var result = await _appReadOnlyDbContext.Floors.AsNoTracking().Where(x => !x.Deleted)
+                var result = await _appReadOnlyDbContext.Floors.AsNoTracking().Where(x => !x.Deleted && !x.Building.Deleted)
                     .PaginateAsync<FloorEntity, FloorDTO>(request, _mapper, cancellationToken);
 
                 return RequestResult<PaginationResponse<FloorDTO>>.Succeed(new PaginationResponse<FloorDTO>()

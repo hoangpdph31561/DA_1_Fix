@@ -15,7 +15,9 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
         public FloorProfie()
         {
             CreateMap<FloorEntity, FloorDTO>().ForMember(
-                dest => dest.BuildingName, opt => opt.MapFrom(src => src.Building.Name));
+                dest => dest.BuildingName, opt => opt.MapFrom(src => src.Building.Name))
+                .ForMember(
+                dest => dest.NumberOfRoomRent, opt => opt.MapFrom(src => src.RoomDetails.Where(rd => !rd.Deleted).Count()));
             CreateMap<FloorCreateRequest, FloorEntity>();
             CreateMap<FloorUpdateRequest, FloorEntity>();
             CreateMap<FloorCreateRequest, FloorDTO>();

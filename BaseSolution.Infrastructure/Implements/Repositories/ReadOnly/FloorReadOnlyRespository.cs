@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static BaseSolution.Application.ValueObjects.Common.QueryConstant;
 
 namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
 {
@@ -58,6 +59,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             try
             {
                 IQueryable<FloorEntity> queryable = _appReadOnlyDbContext.Floors.AsNoTracking().AsQueryable();
+                
                 var result = await _appReadOnlyDbContext.Floors.AsNoTracking()
                     .PaginateAsync<FloorEntity, FloorDTO>(request, _mapper, cancellationToken);
 
@@ -87,6 +89,18 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             try
             {
                 IQueryable<FloorEntity> queryable = _appReadOnlyDbContext.Floors.AsNoTracking().AsQueryable();
+                if (!String.IsNullOrWhiteSpace(request.SearchString))
+                {
+                    request.SearchByFields = new List<SearchModel>()
+                    {
+                        new()
+                        {
+                            SearchValue = request.SearchString,
+                            MatchType = MatchTypes.Contain,
+                            SearchFieldName = nameof(FloorEntity.Name)
+                        }
+                    };
+                }
                 var result = await _appReadOnlyDbContext.Floors.AsNoTracking().Where(x => !x.Deleted && !x.Building.Deleted && x.BuildingId == request.BuildingId)
                     .PaginateAsync<FloorEntity, FloorDTO>(request, _mapper, cancellationToken);
 

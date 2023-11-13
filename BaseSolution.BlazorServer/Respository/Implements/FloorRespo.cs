@@ -32,6 +32,10 @@ namespace BaseSolution.BlazorServer.Respository.Implements
         public async Task<PaginationResponse<FloorDTO>> GetAllFloors(ViewFloorWithPaginationRequest request)
         {
             string url = $"/api/Floors?BuildingId={request.BuildingId}&PageNumber={request.PageNumber}&PageSize={request.PageSize}";
+            if(!String.IsNullOrWhiteSpace(request.SearchString))
+            {
+                url = $"/api/Floors?BuildingId={request.BuildingId}&SearchString={request.SearchString}&PageNumber={request.PageNumber}&PageSize={request.PageSize}";
+            }
             var result = await _httpClient.GetFromJsonAsync<PaginationResponse<FloorDTO>>(url);
             return result;
         }

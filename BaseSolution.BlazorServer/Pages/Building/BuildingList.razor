@@ -4,7 +4,7 @@
 @using Data.DataTransferObjects.Building.Request
 
 
-<CustomListDisplay Label="@("Danh sách tòa nhà của khách sạn")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
+<CustomListDisplayP2 Label="@("Danh sách tòa nhà của khách sạn")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>
         <MudChip Icon="@Icons.Material.Filled.Add" @onclick="() => OpenAdd()" Color="Color.Primary">Thêm</MudChip>
     </HeaderContent>
@@ -42,7 +42,7 @@
             }
         </MudPaper>
     </BodyContent>
-</CustomListDisplay>
+</CustomListDisplayP2>
 @if(closeAdd == false)
 {
     <BuildingCreate onCloseAdd="OnCloseAdd" ></BuildingCreate>

@@ -4,9 +4,9 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Floor.Request;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
 <PageTitle>Quản lý tầng khách sạn</PageTitle>
-<CustomListDisplay Label="Danh sách tầng của tòa nhà" IsLoading="@(lstBuilding == null)" DisableSearch="@_isDisableControls">
+<CustomListDisplayP2 Label="Danh sách tầng của tòa nhà" IsLoading="@(lstBuilding == null)" OnSearch="@OnSearch" DisableSearch="@_isDisableControls">
     <HeaderContent>
-        <MudChip Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@_isDisableControls">Thêm</MudChip>
+        <MudChip Icon="@Icons.Material.Filled.Add" Color="Color.Primary" @onclick="() => OpenAdd()" Disabled="@_isDisableControls">Thêm</MudChip>
     </HeaderContent>
     <AdditionalSearchBarColumn>
         <MudSelect Variant="Variant.Outlined" Style="background-color: white;" AnchorOrigin="Origin.BottomCenter" Label="Tòa nhà" @bind-Value="_idBuilding"> 
@@ -48,7 +48,11 @@
             }
         </MudPaper>
     </BodyContent>
-</CustomListDisplay>
+</CustomListDisplayP2>
+@if(closeAdd == false)
+{
+    <FloorCreate onCloseAdd="OnCloseAdd"></FloorCreate>
+}
 @code {
     #region Khai báo
     [Inject]

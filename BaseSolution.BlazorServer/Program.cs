@@ -19,7 +19,10 @@ builder.Services.AddScoped(c => new HttpClient
 {
     BaseAddress = new Uri("https://localhost:7005")
 });
+#region AddTransient
 builder.Services.AddTransient<IBuildingRespo, BuildingRespo>();
+builder.Services.AddTransient<IFloorRespo, FloorRespo>();
+#endregion
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

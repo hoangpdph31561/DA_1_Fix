@@ -9,5 +9,6 @@ namespace BaseSolution.Application.DataTransferObjects.Floor.Request
 {
     public class ViewFloorWithPaginationRequest : PaginationRequest
     {
+        public Guid BuildingId { get; set; }
     }
 }

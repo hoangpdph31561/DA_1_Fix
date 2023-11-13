@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using BaseSolution.Application.DataTransferObjects.Floor;
 using BaseSolution.Application.DataTransferObjects.Floor.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
+using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Infrastructure.ViewModels.Floor;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -43,7 +45,12 @@ namespace BaseSolution.API.Controllers
         {
             FloorListWithPaginationByOtherViewModel vm = new(_floorReadOnlyRespository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-            return Ok(vm);
+            if(vm.Success)
+            {
+                PaginationResponse<FloorDTO> result = (PaginationResponse < FloorDTO >) vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
         }
         [HttpPost]
         public async Task<IActionResult> CreateNewFloor(FloorCreateRequest request, CancellationToken cancellationToken)
@@ -60,7 +67,7 @@ namespace BaseSolution.API.Controllers
             return Ok(vm);
         }
         [HttpDelete]
-        public async Task<IActionResult> DeleteFloor(FloorDeleteRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> DeleteFloor([FromQuery]FloorDeleteRequest request, CancellationToken cancellationToken)
         {
             FloorDeleteViewModel vm = new(_floorReadWriteRespository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);

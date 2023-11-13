@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BaseSolution.Application.DataTransferObjects.Floor
+﻿namespace BaseSolution.BlazorServer.Data.DataTransferObjects.Floor
 {
     public class FloorDTO
     {
@@ -14,7 +8,7 @@ namespace BaseSolution.Application.DataTransferObjects.Floor
         public Guid BuildingId { get; set; }
         //Tên tòa nhà chứa tầng
         public string BuildingName { get; set; } = string.Empty;
-        //Số phòng đã được tạo để thuê
+        //Số phòng được tạo để thuê trên tầng
         public int NumberOfRoomRent { get; set; }
     }
 }

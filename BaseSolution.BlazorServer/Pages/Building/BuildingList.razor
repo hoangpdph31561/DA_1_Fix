@@ -65,7 +65,7 @@
     private PaginationResponse<BuildingDTO> _buildingVM;
     private bool _isLoadingAll = true;
     private bool _isLoadingList = true;
-    private readonly bool _isDisableControls = false;
+    private bool _isDisableControls = false;
     private ViewBuildingWithPaginationRequest _buildingRequest = new();
     private List<BuildingDTO> _lstBuildings;
     private BuildingDeleteRequest requestDelete = new();

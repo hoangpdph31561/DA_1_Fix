@@ -1,0 +1,114 @@
+﻿@if(IsLoading)
+{
+    <LoadingIndicator/>
+}
+else
+{
+    <MudPaper Elevation="0">
+        <MudPaper Class="ma-3" Elevation="0">
+            <MudPaper Class="pa-2" Elevation="0">
+                <MudPaper Class="d-flex align-center px-2" Elevation="0">
+                    <MudPaper Class="mr-auto" Elevation="0">
+                        <MudText Typo="Typo.h5" Style="font-weight:500;">@Label</MudText>
+                        @if (LabelHelper != null && LabelHelper != "")
+                        {
+                            <MudText Typo="Typo.caption">@LabelHelper</MudText>
+                        }
+                    </MudPaper>
+                    @HeaderContent
+                </MudPaper>
+            </MudPaper>
+            @if (ToolbarContent != null)
+            {
+                <MudPaper Class="mt-3" Elevation="0">
+                    @ToolbarContent
+                </MudPaper>
+            }
+            @if (AdditionalSearchBarColumn != null || HideSearch == false)
+            {
+                <MudGrid>
+                    @if(AdditionalSearchBarColumn !=null && HideSearch)
+                    {
+                        <MudItem xs="12">
+                            @AdditionalSearchBarColumn
+                        </MudItem>
+                    }
+                    else if (!HideSearch && AdditionalSearchBarColumn == null)
+                    {
+                        <MudItem xs="12">
+                            <MudTextField Immediate Variant="Variant.Outlined" Class="custom-list-display-border-input" Style="background-color: white;" @bind-Value="@SearchString" DebounceInterval="200" OnDebounceIntervalElapsed="@(async () => await OnSearchFunc())" Label="Tìm kiếm" HelperText="@HelperSearch" Disabled="@DisableSearch" MaxLength="200" AdornmentIcon="@Icons.Material.Filled.Search" Adornment="Adornment.End" OnAdornmentClick="@(async () => await OnSearchFunc())"></MudTextField>
+                         </MudItem>
+                    }
+                    else
+                    {
+                        <MudItem xs="6">
+                            @AdditionalSearchBarColumn
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudTextField Immediate Variant="Variant.Outlined" Class="custom-list-display-border-input" Style="background-color: white;" @bind-Value="@SearchString" DebounceInterval="200" OnDebounceIntervalElapsed="@(async () => await OnSearchFunc())" Label="Tìm kiếm" HelperText="@HelperSearch" Disabled="@DisableSearch" MaxLength="200" AdornmentIcon="@Icons.Material.Filled.Search" Adornment="Adornment.End" OnAdornmentClick="@(async () => await OnSearchFunc())"></MudTextField>
+                         </MudItem>
+                    }
+                </MudGrid>
+            }
+            <MudPaper Class="@BodyClass" Elevation="0">
+                @if (IsLoadingBody)
+                {
+                    <LoadingIndicator />
+                }
+                else
+                {
+                    @BodyContent
+                }
+            </MudPaper>
+        </MudPaper>
+    </MudPaper>
+}
+@code {
+    [Parameter]
+    public bool IsLoading { get; set; }
+    [Parameter]
+    public bool IsLoadingBody { get; set; }
+    [Parameter]
+    public string? Label { get; set; } = "";
+
+    [Parameter]
+    public string? LabelHelper { get; set; } = "";
+
+    [Parameter]
+    public RenderFragment? HeaderContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? ToolbarContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? BodyContent { get; set; }
+
+    [Parameter]
+    public string? BodyClass { get; set; } = "mt-4";
+
+    [Parameter]
+    public RenderFragment? AdditionalSearchBarColumn { get; set; }
+
+    [Parameter]
+    public bool HideSearch { get; set; } = false;
+
+    [Parameter]
+    public bool DisableSearch { get; set; } = false;
+
+    [Parameter]
+    public string HelperSearch { get; set; } = "";
+
+    [Parameter]
+    public string SearchString { get; set; } = "";
+
+    [Parameter]
+    public int SearchDelay { get; set; } = 200;
+
+    [Parameter]
+    public EventCallback<string> OnSearch { get; set; }
+
+    private async Task OnSearchFunc()
+    {
+        await OnSearch.InvokeAsync(SearchString);
+    }
+}

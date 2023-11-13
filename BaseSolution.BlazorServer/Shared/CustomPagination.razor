@@ -1,9 +1,9 @@
 ﻿<div class="@Class">
-    <div class="w-100 d-flex justify-items-center align-items-center">
+    <MudPaper Class="w-100 d-flex justify-center align-center" Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowLeft" Size="Size.Medium" Class="ms-auto" Disabled="@(CurrentPageNumber <= 1)" OnClick="@(async () => await OnArrowClick(false))" />
         <MudText Class="mx-4" Style="">@CurrentPageNumber</MudText>
         <MudIconButton Icon="@Icons.Material.Filled.KeyboardArrowRight" Size="Size.Medium" Class="me-auto" Disabled="@(!HasNext)" OnClick="@(async () => await OnArrowClick(true))" />
-    </div>
+    </MudPaper>
 </div>
 
 @code {

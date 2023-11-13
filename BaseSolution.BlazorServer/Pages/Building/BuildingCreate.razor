@@ -2,20 +2,18 @@
 @using Respository.Interfaces
 @using Data.DataTransferObjects.Building
 
-<MudPopover Style="background-color: rgba(255, 255, 255, 0.8); width: 100vw; height: 100vh; position: fixed; display: flex; justify-content: center; align-items: center;" Open="true" Elevation="0">
-    <div class="d-flex justify-center align-center w-100 h-100">
-        <MudPaper Class="px-5 pt-5 pb-4 w-50" Elevation="3">
+<MudPopover Style="background-color: rgba(255, 255, 255, 0.8); width: 100vw; height: 100vh; position: fixed; display: flex; justify-content: center; align-items: center;"  Open="true" Elevation="0">
+    <MudPaper Class="d-flex justify-center align-center" Width="100%" Height="100%" Elevation="0">
+        <MudPaper Class="px-5 pt-5 pb-4" Width="50%" Elevation="3">
            <MudForm Model="@_buildingCreate" @bind-IsValid="@success" @ref="@_form">
                <h5>Thêm tòa nhà khách sạn</h5>
-               <div class="row">
-                   <div class="col">
-                       <div class="row">
-                           <div class="col-6">
-                               <MudTextField @bind-Value="_buildingCreate.Name" Label="Tên tòa nhà" For="() => _buildingCreate.Name" Class="mb-2"></MudTextField>
-                           </div>
-                       </div>
-                   </div>
-               </div>
+               <MudPaper Width="100%" Elevation="0">
+                   <MudGrid>
+                       <MudItem xs="12">
+                            <MudTextField @bind-Value="_buildingCreate.Name" Label="Tên tòa nhà" For="() => _buildingCreate.Name" Class="mb-2"></MudTextField>
+                       </MudItem>
+                   </MudGrid>
+               </MudPaper>
                <div class="float-end">
                    <MudButton OnClick="@OnClickCancel">Hủy</MudButton>
                    <MudButton @onclick="Reset">Làm mới</MudButton>
@@ -23,7 +21,7 @@
                </div>
            </MudForm>
         </MudPaper>
-    </div>
+    </MudPaper>
 </MudPopover>
 
 @code {

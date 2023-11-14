@@ -4,5 +4,6 @@ namespace BaseSolution.Application.DataTransferObjects.Amenity.Request
 {
     public class ViewAmenityWithPaginationRequest : PaginationRequest
     {
+        public string? SearchString { get; set; }
     }
 }

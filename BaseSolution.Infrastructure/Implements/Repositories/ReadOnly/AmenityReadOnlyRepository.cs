@@ -11,6 +11,7 @@ using BaseSolution.Domain.Entities;
 using BaseSolution.Infrastructure.Database.AppDbContext;
 using BaseSolution.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
+using static BaseSolution.Application.ValueObjects.Common.QueryConstant;
 
 namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
 {
@@ -53,7 +54,20 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             try
             {
                 IQueryable<AmenityEntity> queryable = _dbContext.Amenities.AsNoTracking().AsQueryable();
-                var result = await _dbContext.Amenities.AsNoTracking().PaginateAsync<AmenityEntity, AmenityDTO>(request, _mapper, cancellationToken);
+                if(!String.IsNullOrWhiteSpace(request.SearchString))
+                {
+                    request.SearchByFields = new List<SearchModel>()
+                {
+                    new()
+                    {
+                        SearchFieldName = nameof(AmenityEntity.Name),
+                        SearchValue = request.SearchString,
+                        MatchType = MatchTypes.Contain
+                    }
+                };
+                }
+                
+                var result = await _dbContext.Amenities.AsNoTracking().Where(x => !x.Deleted).PaginateAsync<AmenityEntity, AmenityDTO>(request, _mapper, cancellationToken);
                 return RequestResult<PaginationResponse<AmenityDTO>>.Succeed(new PaginationResponse<AmenityDTO>
                 {
                     PageNumber = request.PageNumber,

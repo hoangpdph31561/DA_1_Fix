@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using BaseSolution.Application.DataTransferObjects.RoomDetail;
 using BaseSolution.Application.DataTransferObjects.RoomDetail.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
+using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Infrastructure.Implements.Repositories.ReadOnly;
 using BaseSolution.Infrastructure.Implements.Repositories.ReadWrite;
 using BaseSolution.Infrastructure.ViewModels.RoomDetail;
@@ -34,8 +36,13 @@ namespace BaseSolution.API.Controllers
             RoomDetailListWithPaginationViewModel vm = new(_RoomDetailReadOnlyRepository, _localizationService);
 
             await vm.HandleAsync(request, cancellationToken);
+            if(vm.Success)
+            {
+                PaginationResponse<RoomDetailDto> result = (PaginationResponse<RoomDetailDto>)vm.Data;
+                return Ok(result);
+            }
 
-            return Ok(vm);
+            return BadRequest(vm);
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRoomDetailById(Guid id, CancellationToken cancellationToken)

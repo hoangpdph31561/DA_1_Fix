@@ -22,6 +22,8 @@ builder.Services.AddScoped(c => new HttpClient
 #region AddTransient
 builder.Services.AddTransient<IBuildingRespo, BuildingRespo>();
 builder.Services.AddTransient<IFloorRespo, FloorRespo>();
+builder.Services.AddTransient<IAmenityRespo, AmenityRespo>();
+builder.Services.AddTransient<IRoomDetailRespo, RoomDetailRespo>();
 #endregion
 var app = builder.Build();
 

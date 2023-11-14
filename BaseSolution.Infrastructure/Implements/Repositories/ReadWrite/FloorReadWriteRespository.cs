@@ -91,6 +91,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 floor.NumberOfRoom = entity.NumberOfRoom;
                 floor.BuildingId = entity.BuildingId;
                 floor.ModifiedBy = entity.ModifiedBy;
+                floor.Status = entity.Status;
                 floor.ModifiedTime = DateTimeOffset.UtcNow;
 
                 _appReadWriteDbContext.Floors.Update(floor);

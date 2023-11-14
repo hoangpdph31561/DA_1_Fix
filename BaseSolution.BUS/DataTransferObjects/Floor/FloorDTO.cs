@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BaseSolution.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ namespace BaseSolution.Application.DataTransferObjects.Floor
         public string Name { get; set; } = string.Empty;
         public int NumberOfRoom { get; set; }
         public Guid BuildingId { get; set; }
+        public EntityStatus Status { get; set; }
         //Tên tòa nhà chứa tầng
         public string BuildingName { get; set; } = string.Empty;
         //Số phòng đã được tạo để thuê

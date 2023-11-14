@@ -1,10 +1,11 @@
-﻿@page "/building"
-@using Respository.Interfaces
-@using Data.DataTransferObjects.Building
-@using Data.DataTransferObjects.Building.Request
-
-
-<CustomListDisplayP2 Label="@("Danh sách tòa nhà của khách sạn")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
+﻿@page "/amenity"
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Amenity;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Amenity.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request;
+@using BaseSolution.BlazorServer.Respository.Interfaces;
+<PageTitle>Quản lý tiện ích khách sạn</PageTitle>
+<CustomListDisplayP2 Label="@("Danh sách tiện ích của khách sạn")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>
         <MudChip Icon="@Icons.Material.Filled.Add" @onclick="() => OpenAdd()" Color="Color.Primary">Thêm</MudChip>
     </HeaderContent>
@@ -17,18 +18,20 @@
             else
             {
                 <MudCard Class="p-3" Elevation="2">
-                    <MudTable Items="@_buildingVM.Data">
+                    <MudTable Items="@amenityVM.Data">
                         <HeaderContent>
                             <MudTh>STT</MudTh>
-                            <MudTh>Tên tòa</MudTh>
-                            <MudTh>Số tầng</MudTh>
+                            <MudTh>Tên tiện ích</MudTh>
+                            <MudTh>Tổng số</MudTh>
+                            <MudTh>Số phòng sử dụng</MudTh>
                             <MudTh>Trạng thái</MudTh>
                             <MudTh>Hành động</MudTh>
                         </HeaderContent>
                         <RowTemplate>
-                            <MudTd>@(_lstBuildings.IndexOf(context) + 1)</MudTd>
+                            <MudTd>@(lstAmenity.IndexOf(context) + 1)</MudTd>
                                 <MudTd>@context.Name</MudTd>
-                                <MudTd>@context.NumberOfFloors</MudTd>
+                                <MudTd>@context.Total</MudTd>
+                                <MudTh>@context.NumberOfRoomUse / @TotalRoomInHotel</MudTh>
                                 <MudTd><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTd>
                                 <MudTd>
                                     <MudChip Icon="@Icons.Filled.MenuOpen" Color="Color.Primary" OnClick="@(() => OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
@@ -37,7 +40,7 @@
                             </RowTemplate>
                         </MudTable>
                         <MudDivider />
-                        <CustomPagination Class="my-1" HasNext="@_buildingVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="_buildingVM.PageNumber"></CustomPagination>
+                        <CustomPagination Class="my-1" HasNext="@amenityVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="amenityVM.PageNumber"></CustomPagination>
                     </MudCard>
             }
         </MudPaper>
@@ -45,30 +48,36 @@
 </CustomListDisplayP2>
 @if(closeAdd == false)
 {
-    <BuildingCreate onCloseAdd="OnCloseAdd" ></BuildingCreate>
+    <AmenityCreate onCloseAdd="OnCloseAdd" ></AmenityCreate>
 }
-@if(_idBuildingDetail != Guid.Empty && closeDetail == false)
+@if(_idAmenity != Guid.Empty && closeDetail == false)
 {
-    <BuildingUpdate idBuilding="_idBuildingDetail" onCloseDetail="OnCloseDetail"></BuildingUpdate>
+    <AmenityUpdate idAmenity="_idAmenity" onCloseDetail="OnCloseDetail"></AmenityUpdate>
 }
 @code {
     #region Khai báo
     [Inject]
-    public IBuildingRespo _buildingRespo { get; set; }
+    public IAmenityRespo amenityRespo { get; set; }
+    [Inject]
+    public IRoomDetailRespo roomDetailRespo { get; set; }
     [Inject]
     public IDialogService _dialogService { get; set; }
     [Inject]
     public ISnackbar _snackbar { get; set; }
-    private Guid _idBuildingDetail = Guid.Empty;
+    private Guid _idAmenity = Guid.Empty;
     private bool closeAdd = true;
     private bool closeDetail = true;
-    private PaginationResponse<BuildingDTO> _buildingVM;
+    private PaginationResponse<AmenityDTO> amenityVM;
+    private PaginationResponse<RoomDetailDTO> roomDetailVM;
     private bool _isLoadingAll = true;
     private bool _isLoadingList = true;
     private bool _isDisableControls = false;
-    private ViewBuildingWithPaginationRequest _buildingRequest = new();
-    private List<BuildingDTO> _lstBuildings;
-    private BuildingDeleteRequest requestDelete = new();
+    private ViewAmenityWithPaginationRequest amenityRequest = new();
+    private ViewRoomDetailWithPaginationRequest roomDetailRequest = new();
+    private List<AmenityDTO> lstAmenity;
+    private List<RoomDetailDTO> lstRoomDetail;
+    public int TotalRoomInHotel { get; set; }
+    private DeleteAmenityRequest requestDelete = new();
     #endregion
     #region Code xử lý
     protected override async Task OnInitializedAsync()
@@ -77,8 +86,11 @@
     }
     private async Task LoadData()
     {
-        _buildingVM = await _buildingRespo.GetAllBuilding(_buildingRequest);
-        _lstBuildings = _buildingVM.Data.ToList();
+        amenityVM = await amenityRespo.GetAllAmentity(amenityRequest);
+        lstAmenity = amenityVM.Data.ToList();
+        roomDetailVM = await roomDetailRespo.GetAllRoomDetails(roomDetailRequest);
+        lstRoomDetail = roomDetailVM.Data.ToList();
+        TotalRoomInHotel = lstRoomDetail.Count;
         _isLoadingList = false;
         _isLoadingAll = false;
     }
@@ -86,7 +98,7 @@
     {
         if (_isDisableControls) return;
         _isLoadingList = true;
-        _buildingRequest.PageNumber = pageNumber;
+        amenityRequest.PageNumber = pageNumber;
         await LoadData();
     }
     public async Task OnDelete(Guid deleteId)
@@ -94,15 +106,15 @@
         var confirm = await _dialogService.ShowMessageBox
         (
             "Thông báo",
-            "Xác nhận xóa tòa nhà?",
+            "Xác nhận xóa tiện ích?",
             "Xác nhận",
             cancelText: "Hủy"
         );
-        if(confirm == true)
+        if (confirm == true)
         {
             requestDelete.Id = deleteId;
-            var removeConfirm = await _buildingRespo.DeleteBuilding(requestDelete);
-            if(removeConfirm)
+            var removeConfirm = await amenityRespo.DeleteAmenity(requestDelete);
+            if (removeConfirm)
             {
                 _snackbar.Add("Xóa thành công", Severity.Success);
             }
@@ -116,14 +128,14 @@
     private async Task OnSearch(string? searchString)
     {
         _isLoadingList = true;
-        _buildingRequest.PageNumber = 1;
-        _buildingRequest.Search = searchString;
+        amenityRequest.PageNumber = 1;
+        amenityRequest.SearchString = searchString;
         await LoadData();
 
     }
-    private async Task OpenDetail(Guid idBuilding)
+    private async Task OpenDetail(Guid idAmenity)
     {
-        _idBuildingDetail = idBuilding;
+        _idAmenity = idAmenity;
         closeDetail = false;
     }
     private async Task OnCloseDetail()

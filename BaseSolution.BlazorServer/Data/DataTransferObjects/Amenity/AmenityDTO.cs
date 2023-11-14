@@ -1,17 +1,18 @@
-﻿using BaseSolution.Domain.Enums;
+﻿using BaseSolution.BlazorServer.Data.ValueObjects.Common;
 
-namespace BaseSolution.Application.DataTransferObjects.Amenity
+namespace BaseSolution.BlazorServer.Data.DataTransferObjects.Amenity
 {
     public class AmenityDTO
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public EntityStatus Status { get; set; } = EntityStatus.Active;
-        //Tổng số Amenity trong ksan
+        public EntityStatus Status { get; set; }
+        //Tổng số trong khách sạn
         public int Total { get; set; }
-        //Số phòng sử dụng
+        //Tổng số phòng sử dụng amenity
         public int NumberOfRoomUse { get; set; }
         
+       
     }
 }

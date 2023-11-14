@@ -1,29 +1,51 @@
 ﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Building;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Floor.Request;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
-<MudPopover Style="background-color: rgba(255, 255, 255, 0.8); width: 100vw; height: 100vh; position: fixed;" Open="true" Elevation="0">
-    <MudPaper class="d-flex justify-center align-center " Elevation="0" Width="100%" Height="100%" >
-        <MudPaper Class="px-5 pt-5 pb-4 w-50" Elevation="3">
-            <MudForm Model="@floorCreateRequest" @ref="_form" >
-                <h5>Thêm tầng cho khách sạn</h5>
-                <div class="container">
-                    <div class="row">
-                        <div class="col">
-                            <MudTextField @bind-Value="@floorCreateRequest.Name" For="@(() => floorCreateRequest.Name)" Label="Tên tầng"></MudTextField>
-                        </div>
+@if(_isLoadingList)
+{
+    <LoadingIndicator></LoadingIndicator>
+}
+else
+{
+    <MudPopover Style="background-color: rgba(255, 255, 255, 0.8); width: 100vw; height: 100vh; position: fixed; " Open="true" Elevation="0">
+        <MudPaper class="d-flex justify-center align-center " Elevation="0" Width="100%" Height="100%">
+            <MudPaper Class="px-5 pt-5 pb-4" Width="50%" Elevation="3">
+                <MudForm Model="@floorCreateRequest" @ref="_form">
+                    <h5>Thêm tầng cho khách sạn</h5>
+                    <MudPaper Width="100%" Elevation="0">
+                        <MudGrid>
+                            <MudItem xs="12" sm="6">
+                                <MudTextField Class="mb-2" @bind-Value="@floorCreateRequest.Name" For="@(() => floorCreateRequest.Name)" Label="Tên tầng"></MudTextField>
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <MudSelect T="string" Label="Tòa nhà" AnchorOrigin="Origin.BottomCenter" @bind-Value="@_selectedBuidingId" For="@(() => _selectedBuidingId)" Class="mb-2">
+                                    @foreach (var item in lstBuilding)
+                                    {
+                                        <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudItem>
+                        </MudGrid>
+                        <MudGrid>
+                            <MudItem xs="12" sm="12">
+                                <MudTextField @bind-Value="@floorCreateRequest.NumberOfRoom" For="@(() => floorCreateRequest.NumberOfRoom)" Label="Số phòng cho thuê">
+                                    
+                                </MudTextField>
+                            </MudItem>
+                            
+                        </MudGrid>
+                    </MudPaper>
+                    <div class="float-end">
+                        <MudButton OnClick="@OnClickCancel">Hủy</MudButton>
+                        <MudButton @onclick="Reset">Làm mới</MudButton>
+                        <MudButton @onclick="CreateNewFloor">Lưu</MudButton>
                     </div>
-                </div>
-                <div class="container">
-                    <div class="row">
-                        <div class="col">
-                            <MudTextField @bind-Value="@floorCreateRequest.NumberOfRoom" For="@(() => floorCreateRequest.NumberOfRoom)" Label="Số phòng cho thuê nhiều nhất"></MudTextField>
-                        </div>
-                    </div>
-                </div>
-            </MudForm>
+                </MudForm>
+            </MudPaper>
         </MudPaper>
-    </MudPaper>
-</MudPopover>
+    </MudPopover>
+}
+
 
 @code {
     #region Khai báo
@@ -41,7 +63,8 @@
     private PaginationResponse<BuildingDTO> buildingPage;
     private List<BuildingDTO> lstBuilding;
     private FloorCreateRequest floorCreateRequest = new();
-
+    private bool _isLoadingList = true;
+    private string _selectedBuidingId;
     #endregion
     #region Xử lý code
     protected override async Task OnInitializedAsync()
@@ -52,6 +75,7 @@
     {
         buildingPage = await buildingRespo.GetAllBuilding(new Data.DataTransferObjects.Building.Request.ViewBuildingWithPaginationRequest { PageSize = int.MaxValue - 1 });
         lstBuilding = buildingPage.Data.ToList();
+        _isLoadingList = false;
     }
     private async Task OnClickCancel()
     {
@@ -70,6 +94,7 @@
         );
         if (confirm == true)
         {
+            floorCreateRequest.BuildingId = Guid.Parse(_selectedBuidingId);
             var result = await floorRespo.CreateNewFloor(floorCreateRequest);
             if (result == true)
             {

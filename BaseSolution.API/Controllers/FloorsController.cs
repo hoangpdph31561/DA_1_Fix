@@ -31,7 +31,12 @@ namespace BaseSolution.API.Controllers
         {
             FloorViewModel vm = new(_floorReadOnlyRespository, _localizationService);
             await vm.HandleAsync(id, cancellationToken);
-            return Ok(vm);
+            if(vm.Success)
+            {
+                FloorDTO result = (FloorDTO)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
         }
         [HttpGet("getFloorsByAdmin")]
         public async Task<IActionResult> GetFloorByAdmin([FromQuery]ViewFloorWithPaginationRequest request, CancellationToken cancellationToken)

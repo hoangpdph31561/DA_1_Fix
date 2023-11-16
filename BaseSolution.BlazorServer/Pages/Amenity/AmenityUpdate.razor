@@ -8,9 +8,9 @@
 else
 {
     <MudPopover Style="background-color: rgba(255, 255, 255, 0.8); width: 100vw; height: 100vh; position: fixed;" Open="true">
-        
-            <div class="d-flex justify-center align-center w-100 h-100">
-                <MudPaper Class="px-5 pt-5 pb-4 w-50" Elevation="5">
+
+        <div style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;">
+                <MudPaper Class="px-5 pt-5 pb-4 w-50" Width="50%" Elevation="5">
                     <MudForm Model="updateAmenityRequest" @ref="@_form" @bind-IsValid="@_formIsValid">
                         <h5>Chi tiết tiện ích</h5>
                         <MudPaper Elevation="0" Width="100%">

@@ -1,7 +1,7 @@
 ﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Amenity.Request;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
 <MudPopover Style="background-color: rgba(255, 255, 255, 0.8); width: 100vw; height: 100vh; position: fixed; display: flex; justify-content: center; align-items: center; " Open="true" Elevation="0">
-    <MudPaper Class="d-flex justify-center align-center" Width="100%" Height="100%" Elevation="0">
+    <div style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;" >
         <MudPaper Class="px-5 pt-5 pb-4" Width="50%" Elevation="3">
             <MudForm Model="@amenityCreateRequest" @bind-IsValid="@success" @ref="@_form">
                 <h5>Thêm tòa nhà khách sạn</h5>
@@ -24,7 +24,7 @@
                 </div>
             </MudForm>
         </MudPaper>
-    </MudPaper>
+    </div>
 </MudPopover>
 @code {
     [Parameter]

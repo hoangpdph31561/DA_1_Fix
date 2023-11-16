@@ -1,15 +1,14 @@
-﻿@page "/floor"
+﻿@page "/floorlistp2"
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Building;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Floor;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Floor.Request;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
-<PageTitle>Quản lý tầng khách sạn</PageTitle>
-<CustomListDisplayP2 Label="Danh sách tầng của tòa nhà" IsLoading="@(lstBuilding == null)" OnSearch="@OnSearch" DisableSearch="@_isDisableControls">
+<CustomListDisplayP2 Label="Danh sách tầng trong khách sạn" IsLoading="lstBuilding == null" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>
-        <MudChip Icon="@Icons.Material.Filled.Add" Color="Color.Primary" @onclick="() => OpenAdd()" Disabled="@_isDisableControls">Thêm</MudChip>
+        <MudChip Icon="@Icons.Material.Filled.Add" OnClick="@(async() => await OpenAdd())" Color="Color.Primary">Thêm</MudChip>
     </HeaderContent>
     <AdditionalSearchBarColumn>
-        <MudSelect ValuesChanged="@((string s) => OnChangeSelect(s))" Variant="Variant.Outlined" Style="background-color: white;" AnchorOrigin="Origin.BottomCenter" Label="Tòa nhà" @bind-Value="_idBuilding">
+        <MudSelect Variant="Variant.Outlined" Style="background-color: white;" AnchorOrigin="Origin.BottomCenter" Label="Tòa nhà" @bind-Value="_idBuilding">
             @foreach (var item in lstBuilding)
             {
                 <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
@@ -18,9 +17,9 @@
     </AdditionalSearchBarColumn>
     <BodyContent>
         <MudPaper Elevation="0">
-            @if(_isLoadingList)
+            @if (_isLoadingList)
             {
-                <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="m-3"/>
+                <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="m-3" />
             }
             else
             {
@@ -35,30 +34,21 @@
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd>@(lstFloor.IndexOf(context) + 1)</MudTd>
-                        <MudTd>@context.Name</MudTd>
-                        <MudTd>@context.NumberOfRoomRent / @context.NumberOfRoom</MudTd>
-                        <MudTd>@context.BuildingName</MudTd>
-                        <MudTh><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTh>
-                        <MudTd>
-                            <MudButton Icon="@Icons.Filled.MenuOpen" Color="Color.Primary" OnClick="@( async() => await OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudButton>
-                            <MudChip Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@( async() => await OnDelete(context.Id))" Disabled="@_isDisableControls">Xóa</MudChip>
-                        </MudTd>
-                    </RowTemplate>
-                </MudTable>
-                <MudDivider />
+                            <MudTd>@context.Name</MudTd>
+                            <MudTd>@context.NumberOfRoomRent / @context.NumberOfRoom</MudTd>
+                            <MudTd>@context.BuildingName</MudTd>
+                            <MudTh><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTh>
+                            <MudTd>
+                                <MudChip Icon="@Icons.Filled.MenuOpen" Color="Color.Primary" OnClick="@( async() => await OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
+                                <MudChip Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@( async() => await OnDelete(context.Id))" Disabled="@_isDisableControls">Xóa</MudChip>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
                 <CustomPagination Class="my-1" HasNext="@floorPagination.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="@floorPagination.PageNumber"></CustomPagination>
             }
         </MudPaper>
     </BodyContent>
 </CustomListDisplayP2>
-@if(closeAdd == false)
-{
-    <FloorCreate onCloseAdd="OnCloseAdd"></FloorCreate>
-}
-@if(_idFloor != Guid.Empty && closeDetail == false)
-{
-    <FloorUpdate idFloor="_idFloor" onCloseDetail="@(() => OnCloseDetail())"></FloorUpdate>
-}
 
 @code {
     #region Khai báo
@@ -70,7 +60,6 @@
     public IDialogService dialogService { get; set; }
     [Inject]
     public ISnackbar snackbar { get; set; }
-
     private ViewFloorWithPaginationRequest floorRequest = new();
     private List<BuildingDTO> lstBuilding;
     private PaginationResponse<FloorDTO> floorPagination;
@@ -80,24 +69,27 @@
     private string _idBuilding = Guid.Empty.ToString();
     private string _idBuildingCurrent = Guid.Empty.ToString();
     private Guid _idFloor = Guid.Empty;
-    private bool closeAdd = true;
-    private bool closeDetail = true;
     private bool _isLoadingAll = true;
     private bool _isLoadingList = true;
     private bool _isDisableControls = false;
-
     #endregion
     #region Code xử lý
-    protected override async Task OnInitializedAsync()
+    private async Task LoadData()
+    {
+        floorRequest.BuildingId = Guid.Parse(_idBuilding);
+        floorPagination = await floorRespo.GetAllFloors(floorRequest);
+        lstFloor = floorPagination.Data.ToList();
+        _isLoadingList = false;
+    }
+    protected async override Task OnInitializedAsync()
     {
         buildingPagination = await buildingRespo.GetAllBuilding(new Data.DataTransferObjects.Building.Request.ViewBuildingWithPaginationRequest { PageSize = int.MaxValue - 1 });
         lstBuilding = buildingPagination.Data.ToList();
-        if(lstBuilding != null)
+        if (lstBuilding != null)
         {
-            if(lstBuilding.Any())
+            if (lstBuilding.Any())
             {
                 _idBuilding = lstBuilding[0].Id.ToString();
-                _idBuilding = _idBuildingCurrent;
                 floorRequest.BuildingId = Guid.Parse(_idBuilding);
                 await LoadData();
             }
@@ -111,68 +103,6 @@
             }
         }
     }
-    private async Task LoadData()
-    {
-        floorRequest.BuildingId = Guid.Parse(_idBuilding);
-        floorPagination = await floorRespo.GetAllFloors(floorRequest);
-        lstFloor = floorPagination.Data.ToList();
-        _isLoadingList = false;
-    }
-    /*
-     *
-     * protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if(_idBuilding != _idBuildingCurrent)
-        {
-            _isLoadingList = true;
-            _idBuildingCurrent = _idBuilding;
-            floorRequest.PageNumber = 1;
-            await LoadData();
-            StateHasChanged();
-        }
-
-    }
-     */
-
-    private async Task OnChangeSelect(string id)
-    {
-        
-            _isLoadingList = true;
-            _idBuilding = id;
-            floorRequest.PageNumber = 1;
-            await LoadData();
-        
-    }
-    private void OpenAdd()
-    {
-        closeAdd = false;
-    }
-
-    private async Task OpenDetail(Guid idFloor)
-    {
-        var parameters = new DialogParameters<FloorUpdateP2>();
-        parameters.Add(x => x.idFloor, idFloor);
-        await dialogService.ShowAsync<FloorUpdateP2>("Chi tiết tầng", parameters);
-    }
-
-    private async Task OnCloseAdd()
-    {
-        await LoadData();
-        closeAdd = true;
-    }
-
-    private async Task OnCloseDetail()
-    {
-        await LoadData();
-        closeDetail = true;
-    }
-    private async Task OnPaginationButtonClick(int pageNumber)
-    {
-        if (_isDisableControls) return;
-        _isLoadingList = true;
-        floorRequest.PageNumber = pageNumber;
-        await LoadData();
-    }
     private async Task OnSearch(string? searchString)
     {
         if (_isDisableControls) return;
@@ -181,9 +111,37 @@
         floorRequest.SearchString = searchString;
         await LoadData();
     }
+    private async Task OpenAdd()
+    {
+        var dialog = await dialogService.ShowAsync<FloorCreate2>("Thêm tầng mới");
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
+
+    }
+    private async Task OpenDetail(Guid idFloor)
+    {
+        var parameters = new DialogParameters<FloorUpdateP2>();
+        parameters.Add(x => x.idFloor, idFloor);
+        var dialog = await dialogService.ShowAsync<FloorUpdateP2>("Chi tiết tầng", parameters);
+        var result = await dialog.Result;
+        if(!result.Canceled)
+        {
+            await LoadData();
+        }
+    }
+    private async Task OnPaginationButtonClick(int pageNumber)
+    {
+        if (_isDisableControls) return;
+        _isLoadingList = true;
+        floorRequest.PageNumber = pageNumber;
+        await LoadData();
+    }
     private async Task OnDelete(Guid id)
     {
-        
+
         var confirm = await dialogService.ShowMessageBox
         (
             "Thông báo",
@@ -204,6 +162,18 @@
                 snackbar.Add("Xóa thất bại", Severity.Error);
             }
             await LoadData();
+        }
+
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_idBuilding != _idBuildingCurrent)
+        {
+            _isLoadingList = true;
+            _idBuildingCurrent = _idBuilding;
+            floorRequest.PageNumber = 1;
+            await LoadData();
+            StateHasChanged();
         }
         
     }

@@ -1,0 +1,142 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Building;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Floor;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Floor.Request;
+@using BaseSolution.BlazorServer.Respository.Interfaces;
+<MudDialog>
+    <DialogContent>
+        @if(floorInfo == null)
+        {
+            <LoadingIndicator></LoadingIndicator>
+        }
+        else
+        {
+            <MudForm Model="floorUpdateRequest" @ref="@_form" @bind-IsValid="@_formIsValid">
+                <MudPaper Width="100%" Elevation="0">
+                    <MudGrid>
+                        <MudItem xs="12" sm="6">
+                            <MudTextField @bind-Value="floorUpdateRequest.Name" For="@(() => floorUpdateRequest.Name)" Label="Tên tầng"></MudTextField>
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudSelect T="Guid" Label="Tòa nhà" AnchorOrigin="Origin.BottomCenter" @bind-Value="floorUpdateRequest.BuildingId" For="@(() => floorUpdateRequest.BuildingId)">
+                                @foreach (var item in lstBuilding)
+                                {
+                                    <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                    </MudGrid>
+                    <MudGrid>
+                        <MudItem xs="12" sm="6">
+                            <MudTextField @bind-Value="floorUpdateRequest.NumberOfRoom" For="@(() => floorUpdateRequest.NumberOfRoom)" Label="Số phòng cho thuê"></MudTextField>
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="floorUpdateRequest.Status" For="@(() => floorUpdateRequest.Status)">
+                                <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
+                                <MudSelectItem Value="EntityStatus.InActive">Không hoạt động</MudSelectItem>
+                                <MudSelectItem Value="EntityStatus.Pending">Chờ</MudSelectItem>
+                                <MudSelectItem Value="EntityStatus.PendingForActivation">Chờ hoạt động</MudSelectItem>
+                                <MudSelectItem Value="EntityStatus.PendingForConfirmation">Chờ kích hoạt</MudSelectItem>
+                                <MudSelectItem Value="EntityStatus.PendingForApproval">Chờ chấp thuận</MudSelectItem>
+                                <MudSelectItem Value="EntityStatus.Locked">Khóa</MudSelectItem>
+                            </MudSelect>
+                        </MudItem>
+                    </MudGrid>
+                </MudPaper>
+            </MudForm>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+        <MudButton OnClick="Reset">Khôi phục</MudButton>
+        <MudButton OnClick="UpdateFloor">Lưu</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #region Khai báo
+    [Parameter]
+    public Guid idFloor { get; set; }
+    [Parameter]
+    public EventCallback onCloseDetail { get; set; }
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    [Inject]
+    public IBuildingRespo buildingRespo { get; set; }
+    [Inject]
+    public IDialogService dialogService { get; set; }
+    [Inject]
+    public ISnackbar snackbar { get; set; }
+    [Inject]
+    public IFloorRespo floorRespo { get; set; }
+    MudForm _form;
+    private bool _formIsValid;
+    private FloorDTO floorInfo;
+    private FloorUpdateRequest floorUpdateRequest = new();
+    private PaginationResponse<BuildingDTO> buildingPage;
+    private List<BuildingDTO> lstBuilding;
+
+    #endregion
+    #region Code xử lý
+    protected async override Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        floorInfo = await floorRespo.GetFloorById(idFloor);
+        buildingPage = await buildingRespo.GetAllBuilding(new Data.DataTransferObjects.Building.Request.ViewBuildingWithPaginationRequest { PageSize = int.MaxValue - 1 });
+        lstBuilding = buildingPage.Data.ToList();
+        floorUpdateRequest.Id = floorInfo.Id;
+        floorUpdateRequest.Status = floorInfo.Status;
+        floorUpdateRequest.NumberOfRoom = floorInfo.NumberOfRoom;
+        floorUpdateRequest.BuildingId = floorInfo.BuildingId;
+        floorUpdateRequest.Name = floorInfo.Name;
+    }
+    private async Task OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+    private async Task Reset()
+    {
+        await LoadData();
+    }
+    private bool CheckChangeData()
+    {
+        return floorInfo.Name != floorUpdateRequest.Name || floorInfo.Status != floorUpdateRequest.Status || floorInfo.NumberOfRoom != floorUpdateRequest.NumberOfRoom || floorInfo.BuildingId != floorUpdateRequest.BuildingId;
+    }
+    private async Task UpdateFloor()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+        var confirm = await dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận sửa tòa nhà",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            var result = await floorRespo.UpdateFloor(floorUpdateRequest);
+            if (result)
+            {
+                if (CheckChangeData())
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    snackbar.Add("Sửa thành công", Severity.Success);
+                }
+                else
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    snackbar.Add("Không có thay đổi dữ liệu để cập nhật", Severity.Warning);
+                }
+            }
+            else
+            {
+                snackbar.Add("Sửa thất bại", Severity.Error);
+            }
+            Reset();
+        }
+    }
+    #endregion
+}

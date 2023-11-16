@@ -1,0 +1,116 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Building;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Floor.Request;
+@using BaseSolution.BlazorServer.Respository.Interfaces;
+<MudDialog>
+    <DialogContent>
+        @if(_isLoadingList)
+        {
+            <LoadingIndicator></LoadingIndicator>
+        }
+        else
+        {
+            <MudForm Model="@floorCreateRequest" @ref="_form">
+                <MudPaper Elevation="0" >
+                    <MudGrid>
+                        <MudItem xs="12" sm="6">
+                            <MudTextField Class="mb-2" @bind-Value="@floorCreateRequest.Name" For="@(() => floorCreateRequest.Name)" Label="Tên tầng"></MudTextField>
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudSelect T="string" Label="Tòa nhà" AnchorOrigin="Origin.BottomCenter" @bind-Value="@_selectedBuidingId" For="@(() => _selectedBuidingId)" Class="mb-2">
+                                @foreach (var item in lstBuilding)
+                                {
+                                    <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                    </MudGrid>
+                    <MudGrid>
+                        <MudItem xs="12" sm="12">
+                            <MudTextField @bind-Value="@floorCreateRequest.NumberOfRoom" For="@(() => floorCreateRequest.NumberOfRoom)" Label="Số phòng cho thuê">
+
+                            </MudTextField>
+                        </MudItem>
+
+                    </MudGrid>
+                </MudPaper>
+            </MudForm>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+        <MudButton OnClick="Reset">Khôi phục</MudButton>
+        <MudButton OnClick="CreateNewFloor">Lưu</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #region Khai báo
+    [CascadingParameter] 
+    MudDialogInstance MudDialog { get; set; }
+    [Inject]
+    public IBuildingRespo buildingRespo { get; set; }
+    [Inject]
+    public IFloorRespo floorRespo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    private PaginationResponse<BuildingDTO> buildingPage;
+    private List<BuildingDTO> lstBuilding;
+    private FloorCreateRequest floorCreateRequest = new();
+    private bool _isLoadingList = true;
+    private string _selectedBuidingId;
+    MudForm _form;
+    #endregion
+    #region Code xử lý
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        buildingPage = await buildingRespo.GetAllBuilding(new Data.DataTransferObjects.Building.Request.ViewBuildingWithPaginationRequest { PageSize = int.MaxValue - 1 });
+        lstBuilding = buildingPage.Data.ToList();
+        _isLoadingList = false;
+    }
+    private void OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+    private void Reset()
+    {
+        floorCreateRequest = new();
+    }
+    private async Task CreateNewFloor()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+        var confirm = await _dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận thêm tầng vào tòa nhà?",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            floorCreateRequest.BuildingId = Guid.Parse(_selectedBuidingId);
+            var result = await floorRespo.CreateNewFloor(floorCreateRequest);
+            if (result == true)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                _snackbar.Add("Thêm thành công", Severity.Success);
+            }
+            else
+            {
+                _snackbar.Add
+                (
+                    "Thêm thất bại",
+                     Severity.Error
+                );
+            }
+            Reset();
+        }
+    }
+    #endregion
+}

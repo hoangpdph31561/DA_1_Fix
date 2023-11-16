@@ -2,31 +2,25 @@
 @using Respository.Interfaces
 @using Data.DataTransferObjects.Building
 
-<MudPopover Style="background-color: rgba(255, 255, 255, 0.8); width: 100vw; height: 100vh; position: fixed; display: flex; justify-content: center; align-items: center; " Open="true" Elevation="0">
-    <MudPaper Class="d-flex justify-center align-center" Width="100%" Height="100%" Elevation="0" >
-        <MudPaper Class="px-5 pt-5 pb-4" Width="50%" Elevation="3">
-           <MudForm Model="@_buildingCreate" @bind-IsValid="@success" @ref="@_form">
-               <h5>Thêm tòa nhà khách sạn</h5>
-               <MudPaper Width="100%" Elevation="0">
-                   <MudGrid>
-                       <MudItem xs="12">
-                            <MudTextField @bind-Value="_buildingCreate.Name" Label="Tên tòa nhà" For="() => _buildingCreate.Name" Class="mb-2"></MudTextField>
-                       </MudItem>
-                   </MudGrid>
-               </MudPaper>
-               <div class="float-end">
-                   <MudButton OnClick="@OnClickCancel">Hủy</MudButton>
-                   <MudButton @onclick="Reset">Làm mới</MudButton>
-                   <MudButton @onclick="CreateNewBuilding" Disabled="@(!success)">Lưu</MudButton>
-               </div>
-           </MudForm>
+<MudDialog>
+    <DialogContent>
+        <MudPaper Elevation="0">
+            <MudForm Model="_buildingCreate" @bind-IsValid="success" @ref="_form">
+                <MudTextField Class="mb-2" @bind-Value="_buildingCreate.Name" For="@(() => _buildingCreate.Name)" Label="Tên tầng"></MudTextField>
+            </MudForm>
+            
         </MudPaper>
-    </MudPaper>
-</MudPopover>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@OnClickCancel">Hủy</MudButton>
+        <MudButton @onclick="Reset">Làm mới</MudButton>
+        <MudButton @onclick="CreateNewBuilding" Disabled="@(!success)">Lưu</MudButton>
+    </DialogActions>
+</MudDialog>
 
 @code {
-    [Parameter]
-    public EventCallback onCloseAdd { get; set; }
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
     [Inject]
     public IBuildingRespo _buildingRespo { get; set; }
     [Inject]
@@ -36,13 +30,9 @@
     private BuildingCreateRequest _buildingCreate = new();
     private bool success;
     MudForm _form;
-    private async Task OnValidSubmid()
-    {
-
-    }
     private async Task OnClickCancel()
     {
-        await onCloseAdd.InvokeAsync();
+        MudDialog.Cancel();
     }
     private async Task CreateNewBuilding()
     {
@@ -60,7 +50,7 @@
             var result = await _buildingRespo.CreateBuilding(_buildingCreate);
             if(result == true)
             {
-                await OnClickCancel();
+                MudDialog.Close(DialogResult.Ok(true));
                 _snackbar.Add("Thêm thành công", Severity.Success);
             }
             else
@@ -71,10 +61,10 @@
                      Severity.Error
                 );
             }
-            await Reset();
+            Reset();
         }
     }
-    private async Task Reset()
+    private void Reset()
     {
         _buildingCreate = new BuildingCreateRequest();
     }

@@ -4,30 +4,30 @@
 @switch(statusValue)
 {
     case EntityStatus.Active:
-        <MudChip Color="Color.Success">@nameof(EntityStatus.Active)</MudChip>
+        <MudChip Color="Color.Success">Hoạt động</MudChip>
         break;
     case EntityStatus.InActive:
-        <MudChip Color="Color.Default">@nameof(EntityStatus.InActive)</MudChip>
+        <MudChip Color="Color.Default">Không hoạt động</MudChip>
 
         break;
     case EntityStatus.Pending:
-        <MudChip Color="Color.Warning">@nameof(EntityStatus.Pending)</MudChip>
+        <MudChip Color="Color.Warning">Chờ</MudChip>
 
         break;
     case EntityStatus.PendingForConfirmation:
-        <MudChip Color="Color.Secondary">@nameof(EntityStatus.PendingForConfirmation)</MudChip>
+        <MudChip Color="Color.Secondary">Chờ xác nhận</MudChip>
 
         break;
         case EntityStatus.PendingForActivation:
-        <MudChip Color="Color.Info">@nameof(EntityStatus.PendingForActivation)</MudChip>
+        <MudChip Color="Color.Info">Chờ kích hoạt</MudChip>
 
         break;
     case EntityStatus.PendingForApproval:
-        <MudChip Color="Color.Dark">@nameof(EntityStatus.PendingForApproval)</MudChip>
+        <MudChip Color="Color.Dark">Chờ chấp thuận</MudChip>
 
         break;
     case EntityStatus.Locked:
-        <MudChip Color="Color.Error">@nameof(EntityStatus.Locked)</MudChip>
+        <MudChip Color="Color.Error">Khóa</MudChip>
 
         break;
 }

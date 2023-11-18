@@ -9,11 +9,11 @@ namespace BaseSolution.Infrastructure.Extensions
     public static class UtilityExtensions
     {
         private static Random random = new Random();
-        public static string GenerateRandomString()
+        public static string GenerateRandomString(int totalLength)
         {
             const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             const string numbers = "0123456789";
-            const int totalLength = 15;
+            
 
             StringBuilder sb = new StringBuilder();
 

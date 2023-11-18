@@ -15,6 +15,8 @@ namespace BaseSolution.Domain.Entities
         public string IdentificationNumber { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
+        public string? ApprovedCode { get; set; }
+        public DateTimeOffset? ApprovedCodeExpiredTime { get; set; }
         public CustomerType CustomerType { get; set; }
         public EntityStatus Status { get; set; } = EntityStatus.Active;
 

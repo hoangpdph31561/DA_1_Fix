@@ -53,21 +53,13 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                IQueryable<AmenityEntity> queryable = _dbContext.Amenities.AsNoTracking().AsQueryable();
-                if(!String.IsNullOrWhiteSpace(request.SearchString))
+                IQueryable<AmenityEntity> queryable = _dbContext.Amenities.AsNoTracking().AsQueryable().Where(x => !x.Deleted);
+                if (!String.IsNullOrWhiteSpace(request.SearchString))
                 {
-                    request.SearchByFields = new List<SearchModel>()
-                {
-                    new()
-                    {
-                        SearchFieldName = nameof(AmenityEntity.Name),
-                        SearchValue = request.SearchString,
-                        MatchType = MatchTypes.Contain
-                    }
-                };
+                    queryable = queryable.Where(x => x.Name.ToLower().Contains(request.SearchString.ToLower()));
                 }
-                
-                var result = await _dbContext.Amenities.AsNoTracking().Where(x => !x.Deleted).PaginateAsync<AmenityEntity, AmenityDTO>(request, _mapper, cancellationToken);
+
+                var result = await queryable.PaginateAsync<AmenityEntity, AmenityDTO>(request, _mapper, cancellationToken);
                 return RequestResult<PaginationResponse<AmenityDTO>>.Succeed(new PaginationResponse<AmenityDTO>
                 {
                     PageNumber = request.PageNumber,

@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using static SatoLab.Admin.Blazor.Data.ValueObjects.Common.QueryConstant;
+using static BaseSolution.BlazorServer.Data.ValueObjects.Common.QueryConstant;
 
-namespace SatoLab.Admin.Blazor.Data.ValueObjects.Common;
+namespace BaseSolution.BlazorServer.Data.ValueObjects.Common;
 
 public class SearchModel
 {

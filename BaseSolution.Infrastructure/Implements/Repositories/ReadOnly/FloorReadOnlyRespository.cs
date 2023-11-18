@@ -88,20 +88,12 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                IQueryable<FloorEntity> queryable = _appReadOnlyDbContext.Floors.AsNoTracking().AsQueryable();
+                IQueryable<FloorEntity> queryable = _appReadOnlyDbContext.Floors.AsNoTracking().AsQueryable().Where(x=> !x.Deleted);
                 if (!String.IsNullOrWhiteSpace(request.SearchString))
                 {
-                    request.SearchByFields = new List<SearchModel>()
-                    {
-                        new()
-                        {
-                            SearchValue = request.SearchString,
-                            MatchType = MatchTypes.Contain,
-                            SearchFieldName = nameof(FloorEntity.Name)
-                        }
-                    };
+                    queryable = queryable.Where(x => x.Name.ToLower().Contains(request.SearchString.ToLower()));
                 }
-                var result = await _appReadOnlyDbContext.Floors.AsNoTracking().Where(x => !x.Deleted && !x.Building.Deleted && x.BuildingId == request.BuildingId)
+                var result = await queryable.Where(x => !x.Building.Deleted && x.BuildingId == request.BuildingId)
                     .PaginateAsync<FloorEntity, FloorDTO>(request, _mapper, cancellationToken);
 
                 return RequestResult<PaginationResponse<FloorDTO>>.Succeed(new PaginationResponse<FloorDTO>()

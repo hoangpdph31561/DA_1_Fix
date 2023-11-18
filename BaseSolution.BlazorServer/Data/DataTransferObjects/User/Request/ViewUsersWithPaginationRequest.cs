@@ -1,7 +1,7 @@
-﻿using BaseSolution.BlazorServer.Data.ValueObjects.Pagination;
-using SatoLab.Admin.Blazor.Data.ValueObjects.Common;
+﻿using BaseSolution.BlazorServer.Data.ValueObjects.Common;
+using BaseSolution.BlazorServer.Data.ValueObjects.Pagination;
 using System.Text.Json.Serialization;
-using static SatoLab.Admin.Blazor.Data.ValueObjects.Common.QueryConstant;
+using static BaseSolution.BlazorServer.Data.ValueObjects.Common.QueryConstant;
 
 namespace BaseSolution.BlazorServer.Data.DataTransferObjects.User.Request
 {

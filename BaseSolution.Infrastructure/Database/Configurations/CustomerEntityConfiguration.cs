@@ -21,6 +21,8 @@ namespace BaseSolution.Infrastructure.Database.Configurations
             builder.Property(x => x.Email).IsUnicode(false).IsRequired();
             builder.Property(x => x.PhoneNumber).IsUnicode(false).IsRequired().HasMaxLength(20);
             builder.Property(x => x.CustomerType).IsRequired();
+            builder.Property(x => x.ApprovedCode).IsRequired(false).IsUnicode(false);
+            builder.Property(x => x.ApprovedCodeExpiredTime).IsRequired(false);
         }
     }
 }

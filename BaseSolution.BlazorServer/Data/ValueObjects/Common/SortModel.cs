@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace SatoLab.Admin.Blazor.Data.ValueObjects.Common;
+namespace BaseSolution.BlazorServer.Data.ValueObjects.Common;
 
 public class SortModel
 {

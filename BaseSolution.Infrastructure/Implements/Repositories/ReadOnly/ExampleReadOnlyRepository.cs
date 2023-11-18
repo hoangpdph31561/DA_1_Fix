@@ -53,9 +53,18 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                IQueryable<ExampleEntity> queryable = _exampleEntities.AsNoTracking().AsQueryable();
-                var result = await _exampleEntities.AsNoTracking()
-                    .PaginateAsync<ExampleEntity, ExampleDto>(request, _mapper, cancellationToken);
+                var queryable = _exampleEntities.AsNoTracking();
+
+                // check if search field is null
+                if (string.IsNullOrWhiteSpace(request.Name))
+                {
+                    queryable = queryable.Where(c => c.Name.Contains(request.Name!));
+                }
+
+                // check if sort field is null
+                queryable = queryable.OrderBy(c => c.Status);
+
+                var result = await queryable.PaginateAsync<ExampleEntity, ExampleDto>(request, _mapper, cancellationToken);
 
                 return RequestResult<PaginationResponse<ExampleDto>>.Succeed(new PaginationResponse<ExampleDto>()
                 {

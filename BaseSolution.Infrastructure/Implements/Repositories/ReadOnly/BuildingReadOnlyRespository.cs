@@ -86,20 +86,12 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                IQueryable<BuildingEntity> queryable = _dbContext.Buildings.AsNoTracking().AsQueryable();
+                IQueryable<BuildingEntity> queryable = _dbContext.Buildings.AsNoTracking().AsQueryable().Where(x => !x.Deleted);
                 if(!String.IsNullOrWhiteSpace(request.Search))
                 {
-                    request.SearchByFields = new List<SearchModel>()
-                    {
-                        new()
-                        {
-                            SearchValue = request.Search,
-                            SearchFieldName = nameof(BuildingEntity.Name),
-                            MatchType = MatchTypes.Contain
-                        }
-                    };
+                    queryable = queryable.Where(x => x.Name.ToLower().Contains(request.Search.ToLower()));
                 }
-                var result = await _dbContext.Buildings.AsNoTracking().Where(x => !x.Deleted).PaginateAsync<BuildingEntity, BuildingDTO>(request, _mapper, cancellationToken);
+                var result = await queryable.PaginateAsync<BuildingEntity, BuildingDTO>(request, _mapper, cancellationToken);
                 return RequestResult<PaginationResponse<BuildingDTO>>.Succeed(new PaginationResponse<BuildingDTO>
                 {
                     PageNumber = request.PageNumber,

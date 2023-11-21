@@ -1,13 +1,13 @@
-﻿using BaseSolution.Domain.Enums;
+﻿using BaseSolution.BlazorServer.Data.ValueObjects.Common;
 
-namespace BaseSolution.Application.DataTransferObjects.RoomBookingDetail
+namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBookingDetail
 {
-    public class RoomBookingDetailDTO
+    public class RoombookingDetailDTO
     {
         public string NameCustomer { get; set; } = string.Empty;
         public BookingType BookingType { get; set; }
         public DateTimeOffset CheckInBooking { get; set; }
         public DateTimeOffset CheckOutBooking { get; set; }
-        public decimal PrePaid { get; set; } = 0;
+        public int CountRoom {  get; set; }
     }
 }

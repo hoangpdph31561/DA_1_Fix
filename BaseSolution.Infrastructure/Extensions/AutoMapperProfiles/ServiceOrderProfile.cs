@@ -2,11 +2,7 @@
 using BaseSolution.Application.DataTransferObjects.ServiceOrder;
 using BaseSolution.Application.DataTransferObjects.ServiceOrder.Request;
 using BaseSolution.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
 {
@@ -14,8 +10,15 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
     {
         public ServiceOrderProfile()
         {
-            CreateMap<ServiceOrderEntity, ServiceOrderDTO>().ForMember(
-                dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer.Name));
+            CreateMap<ServiceOrderEntity, ServiceOrderDTO>()
+                .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer.Name))
+                .ForMember(des => des.Price, opt => opt.MapFrom(src => src.ServiceOrderDetails.Select(x => x.Price).First()))
+                .ForMember(des => des.Quantity, opt => opt.MapFrom(src => src.ServiceOrderDetails.Count()))
+                .ForMember(des => des.CustomerName, opt => opt.MapFrom(src => src.ServiceOrderDetails.Count()))
+                .ForMember(des => des.UserName, opt => opt.MapFrom(src => src.RoomBookingDetail.RoomBooking.User.Name))
+                .ForMember(des => des.Name, opt => opt.MapFrom(src => src.ServiceOrderDetails.Select(x => x.Service.Name).First()));
+                 ;
+
             CreateMap<ServiceOrderCreateRequest, ServiceOrderEntity>();
             CreateMap<ServiceOrderUpdateRequest, ServiceOrderEntity>();
         }

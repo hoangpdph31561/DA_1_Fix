@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BaseSolution.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,15 +9,19 @@ namespace BaseSolution.Application.DataTransferObjects.Bill
 {
     public class BillDTO
     {
-        public Guid Id { get; set; }
-        public Guid CustomerId { get; set; }
+        public Guid Id { get; set; } // mã hóa đơn
+        public DateTimeOffset CreatedTime { get; set; }
         public Guid? RoomBookingId { get; set; }
         public Guid? ServiceOrderId { get; set; }
-        public DateTimeOffset CreatedTime { get; set; }
+        public EntityStatus Status { get; set; } = EntityStatus.Active;
         public Guid? CreatedBy { get; set; }
-        //Tên khách trên hóa đơn
-        public string CustomerName { get; set; } = string.Empty;
-        //Tên nhân viên tạo hóa đơn
-        public string CreatedUserName { get; set; } = string.Empty;
+        public string? CreatedUserName { get; set; }
+
+        // Based on 
+        public int TotalService { get; set; } // tổng số lượng của 1 dịch vụ 
+         public decimal ServicePrice { get; set; } // giá của dịch vụ 
+        public float ServiceAmount { get; set; } // ServiceAmount = TotalService x ServicePrice
+        public float RoomPrice { get; set; }
+        public float TotalAmount { get; set; } // TotalAmount = TotalService + RoomPrice
     }
 }

@@ -15,7 +15,6 @@ namespace BaseSolution.Domain.Entities
         public Guid? RoomBookingId { get; set; }
         public Guid? ServiceOrderId { get; set; }
         public EntityStatus Status { get; set; } = EntityStatus.Active;
-
         public DateTimeOffset CreatedTime { get; set; }
         public Guid? CreatedBy { get; set; }
         public DateTimeOffset ModifiedTime { get; set; }

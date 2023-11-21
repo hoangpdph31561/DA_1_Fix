@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using BaseSolution.Application.DataTransferObjects.Example;
 using BaseSolution.Application.DataTransferObjects.ServiceOrder;
 using BaseSolution.Application.DataTransferObjects.ServiceOrder.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
@@ -12,11 +11,7 @@ using BaseSolution.Domain.Entities;
 using BaseSolution.Infrastructure.Database.AppDbContext;
 using BaseSolution.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
 {
@@ -90,6 +85,10 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 var result = await _appReadOnlyDbContext.ServiceOrders.AsNoTracking().Where(x => !x.Deleted)
                     .PaginateAsync<ServiceOrderEntity, ServiceOrderDTO>(request, _mapper, cancellationToken);
 
+                foreach (var item in result.Data)
+                {
+                    item.TotalAmount = (float)item.Price * item.Quantity;
+                }
                 return RequestResult<PaginationResponse<ServiceOrderDTO>>.Succeed(new PaginationResponse<ServiceOrderDTO>()
                 {
                     PageNumber = request.PageNumber,

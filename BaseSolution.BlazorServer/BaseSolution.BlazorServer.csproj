@@ -18,4 +18,11 @@
     <PackageReference Include="MudBlazor" Version="6.0.13" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\DataTransferObjects\Bill\Request\" />
+    <Folder Include="Data\DataTransferObjects\RoomBookingDetail\Request\" />
+    <Folder Include="Data\DataTransferObjects\RoomBooking\Request\" />
+    <Folder Include="Data\DataTransferObjects\Service\Request\" />
+  </ItemGroup>
+
 </Project>

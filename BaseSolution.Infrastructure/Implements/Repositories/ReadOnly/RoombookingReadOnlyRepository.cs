@@ -52,8 +52,12 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                IQueryable<RoomBookingEntity> queryable = _dbContext.RoomBookings.AsNoTracking().AsQueryable();
                 var result = await _dbContext.RoomBookings.AsNoTracking().PaginateAsync<RoomBookingEntity, RoombookingDTO>(request, _mapper, cancellationToken);
+                foreach (var item in result.Data!)
+                {
+                    item.ServiceAmount = (float)(item.CountServices * item.ServicePrice);
+                    item.TotalAmount = item.ServiceAmount + (float)item.RoomPrice;
+                }
                 return RequestResult<PaginationResponse<RoombookingDTO>>.Succeed(new PaginationResponse<RoombookingDTO>
                 {
                     PageNumber = request.PageNumber,

@@ -1,11 +1,5 @@
-﻿using BaseSolution.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BaseSolution.Application.DataTransferObjects.Customer.Request
+﻿using BaseSolution.BlazorServer.Data.ValueObjects.Common;
+namespace BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
 {
     public class CustomerCreateRequest
     {
@@ -15,6 +9,6 @@ namespace BaseSolution.Application.DataTransferObjects.Customer.Request
         public string PhoneNumber { get; set; } = string.Empty;
         public string? ApprovedCode { get; set; }
         public DateTimeOffset? ApprovedCodeExpiredTime { get; set; }
-        public CustomerType CustomerType { get; set; }
+        public EntityStatus Status { get; set; }
     }
 }

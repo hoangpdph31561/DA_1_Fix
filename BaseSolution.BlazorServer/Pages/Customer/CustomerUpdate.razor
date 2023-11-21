@@ -1,0 +1,67 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
+@using BaseSolution.BlazorServer.Respository.Interfaces
+
+@page "/customerUpdate"
+<CustomListDisplayP2 Label="@("Thông tin cá nhân")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls">
+    <HeaderContent>
+
+    </HeaderContent>
+    <BodyContent>
+        <MudPaper Elevation="0" Class="custom-list-display-border">
+            @if (_isLoadingList)
+            {
+                <MudProgressLinear Color="Color.Primary" Indeterminate="true"></MudProgressLinear>
+            }
+            else
+            {
+                <MudCard Class="p-3" Elevation="2">
+                    <MudTable Items="@customerVM.Data">
+                        <HeaderContent>
+                            <MudTh>Tên</MudTh>
+                            <MudTh>Mã định danh</MudTh>
+                            <MudTh>Email</MudTh>
+                            <MudTh>Số điện thoại</MudTh>
+                            <MudTh>Hành động</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd>@context.Name</MudTd>
+                            <MudTd>@context.IdentificationNumber</MudTd>
+                            <MudTd>@context.Email"</MudTd>
+                            <MudTh>@context.PhoneNumber</MudTh>
+                            <MudTd>
+                                  <MudChip Icon="@Icons.Material.Filled.Details" Color="Color.Primary" Disabled="@_isDisableControls">Chi tiết</MudChip>
+                             </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </MudCard>
+            }
+        </MudPaper>
+    </BodyContent>
+</CustomListDisplayP2>
+@code {
+    [Inject]
+    public ICustomerRepo customerRepo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    private PaginationResponse<CustomerDTO> customerVM;
+    private bool _isLoadingAll = true;
+    private bool _isLoadingList = true;
+    private bool _isDisableControls = false;
+    private Guid idCustomer = Guid.Empty;
+    private bool closeDetail = true;
+    private ViewCustomerWithPaginationRequest customerRequest = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        customerVM = await customerRepo.GetCustomer(customerRequest);
+        _isLoadingList = false;
+        _isLoadingAll = false;
+    }
+}

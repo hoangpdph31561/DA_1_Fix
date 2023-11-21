@@ -11,6 +11,7 @@ using MailKit.Net.Smtp;
 using MimeKit;
 using Microsoft.AspNetCore.Authorization;
 using BaseSolution.Application.DataTransferObjects.Customer;
+using BaseSolution.Application.ValueObjects.Pagination;
 
 namespace BaseSolution.API.Controllers
 {
@@ -38,8 +39,13 @@ namespace BaseSolution.API.Controllers
             CustomerListWithPaginationViewModel vm = new(_CustomerReadOnlyRepository, _localizationService);
 
             await vm.HandleAsync(request, cancellationToken);
-
-            return Ok(vm);
+            if (vm.Success)
+            {
+                PaginationResponse<CustomerDto> result = new();
+                result = (PaginationResponse<CustomerDto>)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
         }
 
         // GET api/<CustomerController>/5

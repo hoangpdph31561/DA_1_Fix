@@ -9,5 +9,6 @@ namespace BaseSolution.Application.DataTransferObjects.Bill.Request
 {
     public class ViewBillWithPaginationRequest : PaginationRequest
     {
+
     }
 }

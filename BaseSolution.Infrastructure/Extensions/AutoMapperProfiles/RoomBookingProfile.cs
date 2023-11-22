@@ -9,7 +9,16 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
     {
         public RoomBookingProfile()
         {
-            CreateMap<RoomBookingEntity, RoombookingDTO>();
+            CreateMap<RoomBookingEntity, RoombookingDTO>()
+                     .ForMember(des => des.NameCustomer, otp => otp.MapFrom(src => src.Customer.Name))
+                     .ForMember(des => des.StaffName, otp => otp.MapFrom(src => src.User.Name))
+                     .ForMember(des => des.NameBuilding, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.RoomDetail.Floor.Building.Name).FirstOrDefault()))
+                     .ForMember(des => des.NameFloor, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.RoomDetail.Floor.Name).FirstOrDefault()))
+                     .ForMember(des => des.NameRoom, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.RoomDetail.Name).FirstOrDefault()))
+                     .ForMember(des => des.CountServices, otp => otp.MapFrom(src => src.RoomBookingDetails.SelectMany(x => x.ServiceOrders).SelectMany(s => s.ServiceOrderDetails).Count()))
+                     .ForMember(des => des.ServicePrice, otp => otp.MapFrom(src => src.Customer.ServiceOrders.SelectMany(x => x.ServiceOrderDetails.Select(x => x.Price)).FirstOrDefault()))
+                     .ForMember(des => des.RoomPrice, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.Price).FirstOrDefault()));
+
             CreateMap<RoombookingCreateRequest, RoomBookingEntity>();
             CreateMap<RoombookingUpdateRequest, RoomBookingEntity>();
             CreateMap<RoombookingDeleteRequest, RoomBookingEntity>();

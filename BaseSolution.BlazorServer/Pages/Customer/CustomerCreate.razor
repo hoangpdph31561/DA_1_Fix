@@ -1,0 +1,101 @@
+﻿@page "/login-customer"
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer
+@using System.ComponentModel.DataAnnotations
+@using System.Threading.Tasks
+@using System.Text.RegularExpressions
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request;
+@using BaseSolution.BlazorServer.Extensions;
+@using BaseSolution.BlazorServer.Respository.Interfaces;
+@using Microsoft.AspNetCore.Mvc;
+
+<MudGrid>
+    <MudItem xs="12" sm="7">
+        <MudPaper Class="pa-4">
+            <MudForm Model="createRequest" @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+                <MudTextField T="string" Label="Tên" @bind-Value="createRequest.Name" Disabled="isFormLocked" />
+                <MudTextField T="string" Label="Mã định danh" @bind-Value="createRequest.IdentificationNumber" Required="true" Disabled="isFormLocked" />
+                <MudTextField T="string" Label="Email" Disabled="isFormLocked"
+                              Validation='new EmailAddressAttribute() { ErrorMessage = "The email address is invalid" }' @bind-Value="createRequest.Email" />
+                <MudTextField T="string" Label="Số điện thoại" @bind-Value="createRequest.PhoneNumber" Disabled="isFormLocked" />
+                <MudSpacer></MudSpacer>
+                <MudButton  style="position: relative; top: 10px; left: 560px;"
+                Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)"  OnClick="@SendEmail">Gửi mã</MudButton>
+            </MudForm>
+        </MudPaper>
+        <MudPaper Class="pa-4 mt-4">
+            <div class="d-flex align-center justify-space-between">
+                <MudTextField T="string" Label="Nhập code" Required="true" @bind-Value="createRequest.ApprovedCode" @onchange="@HandleValidSubmit"></MudTextField>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@Login">Đăng nhập</MudButton>
+            </div>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    bool success = false;
+    bool isCodeSent = false;
+    bool isFormLocked = false;
+    MudForm form;
+    string[] errors = { };
+    [Parameter]
+    public string identification { get; set; }
+    [Inject]
+    public ICustomerRepo customerRepo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    [Inject]
+    public ISendMailService sendMailService { get; set; }
+    public CustomerCreateRequest createRequest = new();
+    public CustomerDTO customer;
+    private async Task HandleValidSubmit()
+    {
+        string apCode = createRequest.ApprovedCode;
+        var result = await sendMailService.ConfirmCode(apCode);
+    }
+
+    private async Task SendEmail()
+    {
+        if (!isCodeSent)
+        {
+            if (string.IsNullOrWhiteSpace(createRequest.Email))
+            {
+                await _dialogService.ShowMessageBox("Lỗi", "Vui lòng nhập địa chỉ email!");
+                return;
+            }
+            string emailAddress = createRequest.Email;
+            await sendMailService.SendMail(emailAddress);
+            isCodeSent = true;
+            isFormLocked = true;
+        }
+    }
+
+    private async Task Login()
+    {
+        if (isCodeSent && isFormLocked)
+        {
+            var confirm = await _dialogService.ShowMessageBox(
+                "Thông báo",
+                "Xác nhận đăng nhập?",
+                "Xác nhận",
+                cancelText: "Hủy"
+            );
+
+            if (confirm == true)
+            {
+                isFormLocked = true;
+
+                var result = await customerRepo.CreateCustomer(createRequest);
+                if (result == true)
+                {
+                    _snackbar.Add("Thêm thành công", Severity.Success);
+                }
+                else
+                {
+                    _snackbar.Add("Thêm thất bại", Severity.Error);
+                }
+            }
+        }
+    }
+}

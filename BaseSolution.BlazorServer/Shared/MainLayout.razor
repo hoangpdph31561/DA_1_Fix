@@ -9,9 +9,10 @@
     <MudAppBar Color="Color.Primary" Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudSpacer />
-        <div class="col-auto">
-            <div class="row">
-                <MudText Color="Color.Surface" Typo="Typo.subtitle1">Hello, Admin</MudText>
+        <div class="row-auto">
+            <div>
+                <MudNavLink Href="/login-customer" Icon="@Icons.Material.Filled.Login"></MudNavLink> 
+                <MudNavLink Href="/login-customer" Icon="@Icons.Material.Filled.Logout"></MudNavLink>
             </div>
         </div>
     </MudAppBar>

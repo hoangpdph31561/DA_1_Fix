@@ -56,6 +56,28 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             }
         }
 
+        public async Task<RequestResult<CustomerDto>> GetCustomerByIdentificationAsync(string identifiaction, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var Customer = await _CustomerEntities.AsNoTracking().Where(c => c.IdentificationNumber == identifiaction && !c.Deleted).ProjectTo<CustomerDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(cancellationToken);
+
+                return RequestResult<CustomerDto>.Succeed(Customer);
+            }
+            catch (Exception e)
+            {
+                return RequestResult<CustomerDto>.Fail(_localizationService["Customer is not found"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "Customer"
+                    }
+                });
+            }
+        }
+
         public async Task<RequestResult<PaginationResponse<CustomerDto>>> GetCustomerWithPaginationByAdminAsync(ViewCustomerWithPaginationRequest request, CancellationToken cancellationToken)
         {
             try

@@ -23,7 +23,7 @@
   <ItemGroup>
     <Folder Include="Data\DataTransferObjects\Bill\Request\" />
     <Folder Include="Data\DataTransferObjects\RoomBookingDetail\Request\" />
-    <Folder Include="Data\DataTransferObjects\Service\Request\" />
+    <Folder Include="Data\DataTransferObjects\ServiceOrder\Request\" />
   </ItemGroup>
 
 </Project>

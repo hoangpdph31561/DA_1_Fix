@@ -25,6 +25,7 @@ builder.Services.AddTransient<IAmenityRespo, AmenityRespo>();
 builder.Services.AddTransient<IRoomDetailRespo, RoomDetailRespo>();
 builder.Services.AddTransient<ICustomerRepo, CustomerRepo>();
 builder.Services.AddTransient<ISendMailService, SendMailService>();
+builder.Services.AddTransient<IServiceTypeRespo, ServiceTypeRespo>();
 #endregion
 var app = builder.Build();
 

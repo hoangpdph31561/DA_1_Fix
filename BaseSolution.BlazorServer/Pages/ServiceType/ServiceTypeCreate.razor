@@ -1,0 +1,74 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceType.Request;
+@using BaseSolution.BlazorServer.Respository.Interfaces;
+<MudDialog>
+    <DialogContent>
+        <MudPaper Elevation="0">
+            <MudForm Model="serviceTypeCreateRequest" @bind-IsValid="success" @ref="_form">
+                <MudTextField Class="mb-2" @bind-Value="serviceTypeCreateRequest.Name" For="@(() => serviceTypeCreateRequest.Name)" Label="Tên tiện ích"></MudTextField>
+            </MudForm>
+
+        </MudPaper>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@OnClickCancel">Hủy</MudButton>
+        <MudButton @onclick="Reset">Làm mới</MudButton>
+        <MudButton @onclick="CreateNewBuilding" Disabled="@(!success)">Lưu</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #region Khai báo
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    [Inject]
+    public IServiceTypeRespo serviceTypeRespo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    private ServiceTypeCreateRequest serviceTypeCreateRequest = new();
+    private bool success;
+    MudForm _form;
+    #endregion
+    #region Code xử lý
+    private void OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+    private async Task CreateNewBuilding()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+        var confirm = await _dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận thêm loại dịch vụ?",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            var result = await serviceTypeRespo.CreateNewServiceType(serviceTypeCreateRequest);
+            if (result == true)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                _snackbar.Add("Thêm thành công", Severity.Success);
+            }
+            else
+            {
+                OnClickCancel();
+                _snackbar.Add
+                (
+                    "Thêm thất bại",
+                     Severity.Error
+                );
+            }
+            Reset();
+        }
+    }
+    private void Reset()
+    {
+        serviceTypeCreateRequest = new ServiceTypeCreateRequest();
+    }
+    #endregion
+}

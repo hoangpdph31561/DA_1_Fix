@@ -7,7 +7,7 @@ using BaseSolution.Application.Interfaces.Services;
 using BaseSolution.Application.ValueObjects.Common;
 using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Application.ValueObjects.Response;
-using BaseSolution.Domain.Entities;
+using BaseSolution.Domain.Enums;
 using BaseSolution.Infrastructure.Database.AppDbContext;
 using BaseSolution.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -52,14 +52,54 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                IQueryable<RoomBookingDetailEntity> queryable = _dbContext.RoomBookingDetails.AsNoTracking().AsQueryable();
-                var result = await _dbContext.RoomBookingDetails.AsNoTracking().PaginateAsync<RoomBookingDetailEntity, RoomBookingDetailDTO>(request, _mapper, cancellationToken);
+                var query =  _dbContext.RoomBookingDetails.AsNoTracking().ProjectTo<RoomBookingDetailDTO>(_mapper.ConfigurationProvider);
+                
+                if(string.IsNullOrWhiteSpace(request.SearchString))
+                {
+                    query = query.Where(x => x.NameCustomer.Contains(request.SearchString!));
+                }
+                
+               var result = await query.PaginateAsync(request, cancellationToken);
                 return RequestResult<PaginationResponse<RoomBookingDetailDTO>>.Succeed(new PaginationResponse<RoomBookingDetailDTO>
                 {
                     PageNumber = request.PageNumber,
                     PageSize = request.PageSize,
                     HasNext = result.HasNext,
-                    Data = result.Data
+                    Data = result.Data!
+                });
+            }
+            catch (Exception e)
+            {
+
+                return RequestResult<PaginationResponse<RoomBookingDetailDTO>>.Fail(_localizationService["List of RoomBookingDetail are not found"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error= e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "list of RoomBookingDetail"
+                    }
+                });
+            }
+        }
+
+        public async Task<RequestResult<PaginationResponse<RoomBookingDetailDTO>>> GetRoomBookingDetailWithPaginationByOtherAsync(ViewRoomBookingDetailWithPaginationRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _dbContext.RoomBookingDetails.AsNoTracking().Where(x => x.Status != EntityStatus.Deleted).ProjectTo<RoomBookingDetailDTO>(_mapper.ConfigurationProvider);
+
+                if (string.IsNullOrWhiteSpace(request.SearchString))
+                {
+                    query = query.Where(x => x.NameCustomer.Contains(request.SearchString!));
+                }
+
+                var result = await query.PaginateAsync(request, cancellationToken);
+                return RequestResult<PaginationResponse<RoomBookingDetailDTO>>.Succeed(new PaginationResponse<RoomBookingDetailDTO>
+                {
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize,
+                    HasNext = result.HasNext,
+                    Data = result.Data!
                 });
             }
             catch (Exception e)

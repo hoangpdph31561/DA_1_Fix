@@ -9,5 +9,7 @@ namespace BaseSolution.Application.DataTransferObjects.ServiceOrder.Request
 {
     public class ViewServiceOrderWithPaginationRequest : PaginationRequest
     {
+        public string? SearchString { get; set; }
     }
 }
+

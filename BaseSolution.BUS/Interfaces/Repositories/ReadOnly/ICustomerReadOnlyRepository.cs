@@ -15,5 +15,6 @@ namespace BaseSolution.Application.Interfaces.Repositories.ReadOnly
         Task<RequestResult<CustomerDto?>> GetCustomerByIdAsync(Guid idCustomer, CancellationToken cancellationToken);
         Task<RequestResult<PaginationResponse<CustomerDto>>> GetCustomerWithPaginationByAdminAsync(
             ViewCustomerWithPaginationRequest request, CancellationToken cancellationToken);
+        Task<RequestResult<CustomerDto>> GetCustomerByIdentificationAsync(string identifiaction, CancellationToken cancellationToken);
     }
 }

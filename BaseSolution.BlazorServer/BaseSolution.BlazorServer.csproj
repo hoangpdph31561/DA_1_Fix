@@ -15,7 +15,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MailKit" Version="4.3.0" />
+    <PackageReference Include="MimeKit" Version="4.3.0" />
     <PackageReference Include="MudBlazor" Version="6.11.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\DataTransferObjects\Bill\Request\" />
+    <Folder Include="Data\DataTransferObjects\RoomBookingDetail\Request\" />
+    <Folder Include="Data\DataTransferObjects\Service\Request\" />
   </ItemGroup>
 
 </Project>

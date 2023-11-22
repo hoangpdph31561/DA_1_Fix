@@ -7,11 +7,7 @@ using BaseSolution.Domain.Entities;
 using BaseSolution.Domain.Enums;
 using BaseSolution.Infrastructure.Database.AppDbContext;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
 {
@@ -29,6 +25,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
         {
             try
             {
+                entity.ApprovedCodeExpiredTime = DateTime.UtcNow;
                 entity.CreatedTime = DateTimeOffset.UtcNow;
 
                 await _dbContext.Customers.AddAsync(entity);
@@ -79,7 +76,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 });
             }
         }
-
+       
         public async Task<RequestResult<int>> UpdateCustomerAsync(CustomerEntity entity, CancellationToken cancellationToken)
         {
             try
@@ -119,5 +116,5 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
 
             return Customer;
         }
-    }
+     }
 }

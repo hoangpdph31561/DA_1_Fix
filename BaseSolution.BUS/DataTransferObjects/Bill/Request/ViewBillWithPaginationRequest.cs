@@ -9,5 +9,8 @@ namespace BaseSolution.Application.DataTransferObjects.Bill.Request
 {
     public class ViewBillWithPaginationRequest : PaginationRequest
     {
+        public DateTimeOffset CreatedTime { get; set; }
+        public string? SearchString { get; set; }
+
     }
 }

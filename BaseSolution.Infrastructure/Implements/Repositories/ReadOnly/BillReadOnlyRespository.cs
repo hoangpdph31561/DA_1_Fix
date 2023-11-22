@@ -2,7 +2,6 @@
 using AutoMapper.QueryableExtensions;
 using BaseSolution.Application.DataTransferObjects.Bill;
 using BaseSolution.Application.DataTransferObjects.Bill.Request;
-using BaseSolution.Application.DataTransferObjects.Example;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Services;
 using BaseSolution.Application.ValueObjects.Common;
@@ -12,11 +11,7 @@ using BaseSolution.Domain.Entities;
 using BaseSolution.Infrastructure.Database.AppDbContext;
 using BaseSolution.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
 {
@@ -53,18 +48,27 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 });
             }
         }
-
         public async Task<RequestResult<PaginationResponse<BillDTO>>> GetBillsByAdminAsync(ViewBillWithPaginationRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                IQueryable<BillEntity> queryable = _appReadOnlyDbContext.Bills.AsNoTracking().AsQueryable();
-                var result = await _appReadOnlyDbContext.Bills.AsNoTracking()
-                    .PaginateAsync<BillEntity, BillDTO>(request, _mapper, cancellationToken);
+                var query = _appReadOnlyDbContext.Bills.AsNoTracking().ProjectTo<BillDTO>(_mapper.ConfigurationProvider);
+
+                if (string.IsNullOrWhiteSpace(request.SearchString))
+                {
+                    query = query.Where(x => x.CreatedTime == request.CreatedTime);
+                }
+                var result = await query.PaginateAsync(request, cancellationToken);
+
                 foreach (var item in result.Data!)
                 {
                     var userCreated = await _appReadOnlyDbContext.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == item.CreatedBy, cancellationToken) == null ? "N/A" : _appReadOnlyDbContext.Users.AsNoTracking().First(x => x.Id == item.CreatedBy)!.Name;
                     item.CreatedUserName = userCreated;
+
+                    item.ServiceAmount = (float)(item.TotalService * item.ServicePrice);
+
+                    // tính  tổng tiền 
+                    item.TotalAmount = item.ServiceAmount + item.RoomPrice;
                 }
                 return RequestResult<PaginationResponse<BillDTO>>.Succeed(new PaginationResponse<BillDTO>()
                 {
@@ -86,18 +90,27 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 });
             }
         }
-
         public async Task<RequestResult<PaginationResponse<BillDTO>>> GetBillsByOtherAsync(ViewBillWithPaginationRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                IQueryable<BillEntity> queryable = _appReadOnlyDbContext.Bills.AsNoTracking().AsQueryable();
-                var result = await _appReadOnlyDbContext.Bills.AsNoTracking().Where(x => !x.Deleted)
-                    .PaginateAsync<BillEntity, BillDTO>(request, _mapper, cancellationToken);
+                var query =  _appReadOnlyDbContext.Bills.AsNoTracking().Where(x => !x.Deleted).ProjectTo<BillDTO>(_mapper.ConfigurationProvider);
+
+                if (string.IsNullOrWhiteSpace(request.SearchString))
+                {
+                    query = query.Where(x => x.CreatedTime == request.CreatedTime);
+                }
+                 var result = await query.PaginateAsync(request, cancellationToken);
+
                 foreach (var item in result.Data!)
                 {
                     var userCreated = await _appReadOnlyDbContext.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == item.CreatedBy, cancellationToken) == null ? "N/A" : _appReadOnlyDbContext.Users.AsNoTracking().First(x => x.Id == item.CreatedBy)!.Name;
                     item.CreatedUserName = userCreated;
+
+                    item.ServiceAmount = (float)(item.TotalService * item.ServicePrice);
+
+                    // tính  tổng tiền 
+                    item.TotalAmount = item.ServiceAmount + item.RoomPrice;
                 }
                 return RequestResult<PaginationResponse<BillDTO>>.Succeed(new PaginationResponse<BillDTO>()
                 {

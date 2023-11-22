@@ -4,5 +4,6 @@ namespace BaseSolution.Application.DataTransferObjects.Roombooking.Request
 {
     public class ViewRoombookingWithPaginationRequest : PaginationRequest
     {
+        public string? SearchString { get; set; }
     }
 }

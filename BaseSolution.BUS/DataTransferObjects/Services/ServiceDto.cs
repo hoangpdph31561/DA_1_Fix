@@ -13,7 +13,7 @@ namespace BaseSolution.Application.DataTransferObjects.Services
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public decimal Price { get; set; }
-        public UnitType Unit { get; set; }
+        public string Unit { get; set; }
         public Guid ServiceTypeId { get; set; }
         public EntityStatus Status { get; set; } = EntityStatus.Active;
 

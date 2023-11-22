@@ -1,8 +1,6 @@
-using BaseSolution.BlazorServer.Data;
+﻿using BaseSolution.BlazorServer.Data;
 using BaseSolution.BlazorServer.Respository.Implements;
 using BaseSolution.BlazorServer.Respository.Interfaces;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using MudBlazor.Services;
 
@@ -15,6 +13,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddMudServices();
+
 builder.Services.AddScoped(c => new HttpClient
 {
     BaseAddress = new Uri("https://localhost:7005")
@@ -24,6 +23,8 @@ builder.Services.AddTransient<IBuildingRespo, BuildingRespo>();
 builder.Services.AddTransient<IFloorRespo, FloorRespo>();
 builder.Services.AddTransient<IAmenityRespo, AmenityRespo>();
 builder.Services.AddTransient<IRoomDetailRespo, RoomDetailRespo>();
+builder.Services.AddTransient<ICustomerRepo, CustomerRepo>();
+builder.Services.AddTransient<ISendMailService, SendMailService>();
 #endregion
 var app = builder.Build();
 

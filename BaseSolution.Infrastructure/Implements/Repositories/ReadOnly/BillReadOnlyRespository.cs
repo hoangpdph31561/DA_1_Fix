@@ -52,9 +52,14 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                IQueryable<BillEntity> queryable = _appReadOnlyDbContext.Bills.AsNoTracking().AsQueryable();
-                var result = await _appReadOnlyDbContext.Bills.AsNoTracking()
-                    .PaginateAsync<BillEntity, BillDTO>(request, _mapper, cancellationToken);
+                var query = _appReadOnlyDbContext.Bills.AsNoTracking().ProjectTo<BillDTO>(_mapper.ConfigurationProvider);
+
+                if (string.IsNullOrWhiteSpace(request.SearchString))
+                {
+                    query = query.Where(x => x.CreatedTime == request.CreatedTime);
+                }
+                var result = await query.PaginateAsync(request, cancellationToken);
+
                 foreach (var item in result.Data!)
                 {
                     var userCreated = await _appReadOnlyDbContext.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == item.CreatedBy, cancellationToken) == null ? "N/A" : _appReadOnlyDbContext.Users.AsNoTracking().First(x => x.Id == item.CreatedBy)!.Name;
@@ -63,7 +68,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                     item.ServiceAmount = (float)(item.TotalService * item.ServicePrice);
 
                     // tính  tổng tiền 
-                    item.TotalAmount = item.ServiceAmount + item.RoomPrice; 
+                    item.TotalAmount = item.ServiceAmount + item.RoomPrice;
                 }
                 return RequestResult<PaginationResponse<BillDTO>>.Succeed(new PaginationResponse<BillDTO>()
                 {
@@ -89,9 +94,14 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                IQueryable<BillEntity> queryable = _appReadOnlyDbContext.Bills.AsNoTracking().AsQueryable();
-                var result = await _appReadOnlyDbContext.Bills.AsNoTracking().Where(x => !x.Deleted)
-                    .PaginateAsync<BillEntity, BillDTO>(request, _mapper, cancellationToken);
+                var query =  _appReadOnlyDbContext.Bills.AsNoTracking().Where(x => !x.Deleted).ProjectTo<BillDTO>(_mapper.ConfigurationProvider);
+
+                if (string.IsNullOrWhiteSpace(request.SearchString))
+                {
+                    query = query.Where(x => x.CreatedTime == request.CreatedTime);
+                }
+                 var result = await query.PaginateAsync(request, cancellationToken);
+
                 foreach (var item in result.Data!)
                 {
                     var userCreated = await _appReadOnlyDbContext.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == item.CreatedBy, cancellationToken) == null ? "N/A" : _appReadOnlyDbContext.Users.AsNoTracking().First(x => x.Id == item.CreatedBy)!.Name;

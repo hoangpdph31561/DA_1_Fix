@@ -32,6 +32,14 @@ namespace BaseSolution.API.Controllers
 
             return Ok(vm);
         }
+           [HttpGet]
+        public async Task<IActionResult> GetListRoomBookingDetailByOther([FromQuery] ViewRoomBookingDetailWithPaginationRequest request, CancellationToken cancellationToken)
+        {
+            RoomBookingDetailWithPaginationByOtherViewModel vm = new(_roomBookingDetailReadOnlyRepository, _localizationService);
+            await vm.HandleAsync(request, cancellationToken);
+
+            return Ok(vm);
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRoomBookingDetailByAdmin(Guid id, CancellationToken cancellationToken)

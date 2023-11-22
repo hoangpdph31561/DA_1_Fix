@@ -31,6 +31,14 @@ public class RoombookingsController : ControllerBase
 
         return Ok(vm);
     }
+      [HttpGet]
+    public async Task<IActionResult> GetListRoomBookingDetailByOther([FromQuery] ViewRoombookingWithPaginationRequest request, CancellationToken cancellationToken)
+    {
+        RoomBookingListWithPaginationByOtherViewModel vm = new(_roombookingrReadOnlyRespository, _localizationService);
+        await vm.HandleAsync(request, cancellationToken);
+
+        return Ok(vm);
+    }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetRoomBookingDetailByAdmin(Guid id, CancellationToken cancellationToken)

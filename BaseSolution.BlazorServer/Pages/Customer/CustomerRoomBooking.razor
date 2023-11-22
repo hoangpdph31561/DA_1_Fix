@@ -1,0 +1,128 @@
+﻿@page "/customer/customerRoomBooking"
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request
+@using BaseSolution.BlazorServer.Respository.Interfaces
+
+<MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+    <MudTabPanel Text="Đặt phòng">
+            <CustomListDisplay IsLoading="@(_isLoadingTab)" OnSearch="@OnSearchTab">
+                <HeaderContent>
+
+                </HeaderContent>
+
+                <BodyContent>
+                    <MudPaper Elevation="0" Class="custom-list-display-border">
+                        @if (_isLoadingTab)
+                        {
+                            <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="m-3" />
+                        }
+                        else
+                        {
+                        
+                        }
+                    </MudPaper>
+                </BodyContent>
+            </CustomListDisplay>
+    </MudTabPanel>
+    <MudTabPanel Text="Đặt phòng chi tiết">
+        <MudPaper Elevation="0" Class="custom-list-display-border">
+            @if (_isLoadingTab)
+            {
+                <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="m-3" />
+            }
+            else
+            {
+                <MudGrid>
+                    <MudItem xs="12" md="3" lg="2">
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Checkin" DateFormat="dd/MM/yyyy" Date="@(new System.DateTime(2023,12,11))" />
+                    </MudItem>
+                    <MudItem xs="12" md="3" lg="2">
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Checkout" DateFormat="dd/MM/yyyy" Date="@(new System.DateTime(2023,12,15))" />
+                    </MudItem>
+                </MudGrid>
+                <MudTable Items="@_RoomDetailVM.Data" Style="position:relative;" Elevation="0">
+                    <HeaderContent>
+                        <MudTh>STT</MudTh>
+                        <MudTh>Tên phòng</MudTh>
+                        <MudTh>Loại phòng</MudTh>
+                        <MudTh>Số người tối đa</MudTh>
+                        <MudTh>Giá</MudTh>
+                        <MudTh>Trạng thái</MudTh>
+                        <MudTh>Hành động</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>@(_lstRoomDetail.IndexOf(context) + 1)</MudTd>
+                        <MudTd>@context.Name</MudTd>
+                        <MudTd>@context.NameOfRoomType</MudTd>
+                        <MudTd>@context.MaxPeopleStay</MudTd>
+                        <MudTd>@context.Price</MudTd>
+                        <MudTd><BadgeEntityStatus Status="@context.Status" /></MudTd>
+                        <MudTd>
+                                <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@(() => OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
+                                <MudChip Icon="@Icons.Material.Filled.Add" Color="Color.Error" OnClick="@( async() => await OpenAdd())" Disabled="@_isDisableControls">Đặt phòng</MudChip>
+                        </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                <CustomPagination Class="my-1" HasNext="@_RoomDetailVM.HasNext" OnPageChange="@(async e => await OnPaginationButtonClickTab1(e))" CurrentPageNumber="@_RoomDetailVM.PageNumber"></CustomPagination>
+                <MudDivider />
+            }
+        </MudPaper>
+    </MudTabPanel>
+</MudTabs>
+
+@code {
+    private List<BreadcrumbItem> _breadCrumbs = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Trang chủ", href: null),
+        new BreadcrumbItem("Khách hàng", href: null, disabled: true)
+    };
+    [Inject]
+    public IRoomDetailRespo _roomDetailRepo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    private Guid _idRoomDetail = Guid.Empty;
+    #region
+    private PaginationResponse<RoomDetailDTO> _RoomDetailVM;
+    private List<RoomDetailDTO> _lstRoomDetail;
+    private ViewRoomDetailWithPaginationRequest _roomDetailRequest;
+    // private PaginationResponse<RoomBookingDTO> _RoomBookingVM;
+    #endregion
+    #region
+    private bool _isLoadingAll = true;
+    private bool _isLoadingTab = true;
+    private bool _isLoadingTab1 = true;
+    private bool closeAdd = true;
+    private bool closeDetail = true;
+    private bool _isDisableControls = false;
+    #endregion
+    private async Task LoadData()
+    {
+        _RoomDetailVM = await _roomDetailRepo.GetAllRoomDetails(_roomDetailRequest);
+        _isLoadingTab = false;
+        _isLoadingTab1 = false;
+        _isLoadingAll = false;
+    }
+    private async Task OnSearchTab(string? searchString)
+    {
+        _isLoadingTab = true;
+        await LoadData();
+    }
+    private async Task OpenDetail(Guid idRoomDetail)
+    {
+        _idRoomDetail = idRoomDetail;
+        closeDetail = false;
+    }
+    private async Task OpenAdd()
+    {
+      
+    }
+    private async Task OnPaginationButtonClickTab1(int pageNumber)
+    {
+        if (_isDisableControls) return;
+        _isLoadingTab1 = true;
+        _roomDetailRequest.PageNumber = pageNumber;
+        await LoadData();
+    }
+}

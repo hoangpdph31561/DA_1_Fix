@@ -78,13 +78,13 @@
     {
         floorRequest.BuildingId = Guid.Parse(_idBuilding);
         floorPagination = await floorRespo.GetAllFloors(floorRequest);
-        lstFloor = floorPagination.Data.ToList();
+        lstFloor = floorPagination.Data!.ToList();
         _isLoadingList = false;
     }
     protected async override Task OnInitializedAsync()
     {
         buildingPagination = await buildingRespo.GetAllBuilding(new Data.DataTransferObjects.Building.Request.ViewBuildingWithPaginationRequest { PageSize = int.MaxValue - 1 });
-        lstBuilding = buildingPagination.Data.ToList();
+        lstBuilding = buildingPagination.Data!.ToList();
         if (lstBuilding != null)
         {
             if (lstBuilding.Any())

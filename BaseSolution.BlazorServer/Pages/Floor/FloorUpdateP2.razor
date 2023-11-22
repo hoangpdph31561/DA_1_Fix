@@ -6,7 +6,7 @@
     <DialogContent>
         @if(floorInfo == null)
         {
-            <LoadingIndicator></LoadingIndicator>
+            <MudText>Không có tầng nào</MudText>
         }
         else
         {
@@ -46,9 +46,16 @@
         }
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="OnClickCancel">Hủy</MudButton>
-        <MudButton OnClick="Reset">Khôi phục</MudButton>
-        <MudButton OnClick="UpdateFloor">Lưu</MudButton>
+        @if (floorInfo == null)
+        {
+            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+        }
+        else
+        {
+            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+            <MudButton OnClick="Reset">Khôi phục</MudButton>
+            <MudButton OnClick="UpdateFloor">Lưu</MudButton>
+        }
     </DialogActions>
 </MudDialog>
 
@@ -56,8 +63,6 @@
     #region Khai báo
     [Parameter]
     public Guid idFloor { get; set; }
-    [Parameter]
-    public EventCallback onCloseDetail { get; set; }
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
     [Inject]

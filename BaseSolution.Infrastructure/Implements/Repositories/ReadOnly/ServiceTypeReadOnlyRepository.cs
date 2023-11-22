@@ -59,8 +59,12 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                IQueryable<ServiceTypeEntity> queryable = _ServiceTypeEntities.AsNoTracking().AsQueryable();
-                var result = await _ServiceTypeEntities.AsNoTracking()
+                IQueryable<ServiceTypeEntity> queryable = _ServiceTypeEntities.AsNoTracking().AsQueryable().Where(x => !x.Deleted);
+                if(!string.IsNullOrWhiteSpace(request.SearchString))
+                {
+                    queryable = queryable.Where(x => x.Name.ToLower().Trim().Contains(request.SearchString.ToLower().Trim()));
+                }
+                var result = await queryable
                     .PaginateAsync<ServiceTypeEntity, ServiceTypeDto>(request, _mapper, cancellationToken);
 
                 return RequestResult<PaginationResponse<ServiceTypeDto>>.Succeed(new PaginationResponse<ServiceTypeDto>()

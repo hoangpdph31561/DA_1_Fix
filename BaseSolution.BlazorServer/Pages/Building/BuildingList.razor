@@ -43,11 +43,6 @@
         </MudPaper>
     </BodyContent>
 </CustomListDisplayP2>
-
-@if(_idBuildingDetail != Guid.Empty && closeDetail == false)
-{
-    <BuildingUpdate idBuilding="_idBuildingDetail" onCloseDetail="OnCloseDetail"></BuildingUpdate>
-}
 @code {
     #region Khai báo
     [Inject]
@@ -75,7 +70,7 @@
     private async Task LoadData()
     {
         _buildingVM = await _buildingRespo.GetAllBuilding(_buildingRequest);
-        _lstBuildings = _buildingVM.Data.ToList();
+        _lstBuildings = _buildingVM.Data!.ToList();
         _isLoadingList = false;
         _isLoadingAll = false;
     }
@@ -120,13 +115,14 @@
     }
     private async Task OpenDetail(Guid idBuilding)
     {
-        _idBuildingDetail = idBuilding;
-        closeDetail = false;
-    }
-    private async Task OnCloseDetail()
-    {
-        await LoadData();
-        closeDetail = true;
+        var parameters = new DialogParameters<BuildingUpdate>();
+        parameters.Add(x => x.idBuilding, idBuilding);
+        var dialog = await _dialogService.ShowAsync<BuildingUpdate>("Chi tiết tòa nhà", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
     }
     #endregion
     #region Code event
@@ -139,11 +135,6 @@
             await LoadData();
             StateHasChanged();
         }
-    }
-    private async Task OnCloseAdd()
-    {
-        await LoadData();
-        closeAdd = true;
     }
     #endregion
 }

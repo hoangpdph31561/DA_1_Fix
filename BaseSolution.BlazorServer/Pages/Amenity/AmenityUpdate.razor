@@ -1,78 +1,52 @@
 ﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Amenity.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Amenity;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
-@if (amenity == null && lstAmenity == null)
-{
-    <LoadingIndicator></LoadingIndicator>
-}
-else
-{
-    <MudPopover Style="background-color: rgba(255, 255, 255, 0.8); width: 100vw; height: 100vh; position: fixed;" Open="true">
-
-        <div style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;">
-                <MudPaper Class="px-5 pt-5 pb-4 w-50" Width="50%" Elevation="5">
-                    <MudForm Model="updateAmenityRequest" @ref="@_form" @bind-IsValid="@_formIsValid">
-                        <h5>Chi tiết tiện ích</h5>
-                        <MudPaper Elevation="0" Width="100%">
-                            <MudGrid>
-                                <MudItem xs="12">
-                                    <MudTextField @bind-Value="updateAmenityRequest.Name" Label="Tên tiện ích" For="() => updateAmenityRequest.Name" Class="mb-2"></MudTextField>
-                                </MudItem>
-                            </MudGrid>
-                            <MudGrid >
-                                <MudItem xs="12">
-                                    <MudTextField @bind-Value="updateAmenityRequest.Description" Label="Mô tả" For="() => updateAmenityRequest.Description" Class="mb-2"></MudTextField>
-
-                                </MudItem>
-                            </MudGrid>
-                            <MudGrid>
-                                <MudItem xs="12">
-                                    <MudSelect T="EntityStatus" Label="Trạng thái" AnchorOrigin="Origin.BottomCenter" @bind-Value="updateAmenityRequest.Status" For="() => updateAmenityRequest.Status" Class="mb-2">
-                                        <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
-                                        <MudSelectItem Value="EntityStatus.InActive">Không hoạt động</MudSelectItem>
-                                        <MudSelectItem Value="EntityStatus.Pending">Chờ</MudSelectItem>
-                                        <MudSelectItem Value="EntityStatus.PendingForActivation">Chờ hoạt động</MudSelectItem>
-                                        <MudSelectItem Value="EntityStatus.PendingForConfirmation">Chờ kích hoạt</MudSelectItem>
-                                        <MudSelectItem Value="EntityStatus.PendingForApproval">Chờ chấp thuận</MudSelectItem>
-                                        <MudSelectItem Value="EntityStatus.Locked">Khóa</MudSelectItem>
-
-
-                                    </MudSelect>
-                                </MudItem>
-                            </MudGrid>
-                        </MudPaper>
-                       
-                        <div class="float-end">
-                            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
-                            <MudButton OnClick="Reset">Khôi phục</MudButton>
-                            <MudButton OnClick="UpdateAmenity">Lưu</MudButton>
-                        </div>
-                    </MudForm>
+<MudDialog>
+    <DialogContent>
+        @if (amenity == null)
+        {
+            <MudText>Không có tiện ích của bạn</MudText>
+        }
+        else
+        {
+            <MudForm Model="updateAmenityRequest" @ref="_form" @bind-IsValid="_formIsValid">
+                <MudPaper Width="100%" Elevation="0">
+                    <MudTextField @bind-Value="updateAmenityRequest.Name" For="@(() => updateAmenityRequest.Name)" Label="Tên tiện ích"></MudTextField>
+                    <MudTextField @bind-Value="updateAmenityRequest.Description" For="@(() => updateAmenityRequest.Description)" Label="Mô tả"></MudTextField>
+                    <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="updateAmenityRequest.Status" For="@(() => updateAmenityRequest.Status)">
+                        <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.InActive">Không hoạt động</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.Pending">Chờ</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.PendingForActivation">Chờ hoạt động</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.PendingForConfirmation">Chờ kích hoạt</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.PendingForApproval">Chờ chấp thuận</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.Locked">Khóa</MudSelectItem>
+                    </MudSelect>
                 </MudPaper>
-            </div>
-        
-        
-    </MudPopover>
-}
+            </MudForm>
+        }
+    </DialogContent>
+    <DialogActions>
+        @if(amenity == null)
+        {
+            <MudButton @onclick="OnClickCancel">Hủy</MudButton>
+        }
+        else
+        {
+            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+            <MudButton OnClick="@(async() => await Reset())">Khôi phục</MudButton>
+            <MudButton OnClick="@(async() => await UpdateAmenity())">Lưu</MudButton>
+        }
+    </DialogActions>
+</MudDialog>
+
 
 @code {
-       /*
-       * /*
-       * Active = 1,
-       InActive = 2,
-       Deleted = 3,
-       Pending = 4,
-       PendingForActivation = 5,
-       PendingForConfirmation = 6,
-       PendingForApproval = 7,
-       Locked = 8,
-    */
-
     #region Khai báo
     [Parameter]
     public Guid idAmenity { get; set; }
-    [Parameter]
-    public EventCallback onCloseDetail { get; set; }
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
     [Inject]
     public IAmenityRespo amenityRespo { get; set; }
     [Inject]
@@ -81,7 +55,6 @@ else
     public ISnackbar snackbar { get; set; }
     MudForm _form;
     private bool _formIsValid;
-    private List<AmenityDTO> lstAmenity;
     private UpdateAmenityRequest updateAmenityRequest = new();
     private AmenityDTO amenity;
     #endregion
@@ -98,9 +71,9 @@ else
         updateAmenityRequest.Status = amenity.Status;
         updateAmenityRequest.Description = amenity.Description;
     }
-    private async Task OnClickCancel()
+    private void OnClickCancel()
     {
-        await onCloseDetail.InvokeAsync();
+        MudDialog.Cancel();
     }
     private bool CheckChangeData()
     {
@@ -124,12 +97,12 @@ else
             {
                 if (CheckChangeData())
                 {
-                    await OnClickCancel();
+                    MudDialog.Close(DialogResult.Ok(true));
                     snackbar.Add("Sửa thành công", Severity.Success);
                 }
                 else
                 {
-                    await OnClickCancel();
+                    OnClickCancel();
                     snackbar.Add("Không có thay đổi dữ liệu để cập nhật", Severity.Warning);
                 }
             }
@@ -137,6 +110,7 @@ else
             {
                 snackbar.Add("Sửa thất bại", Severity.Error);
             }
+            await Reset();
         }
     }
     private async Task Reset()

@@ -2,70 +2,50 @@
 @using Data.DataTransferObjects.Building
 @using Data.DataTransferObjects.Building.Request
 
-@if(building == null )
-{
-    <LoadingIndicator></LoadingIndicator>
-}
-else
-{
-    <MudPopover Style="background-color: rgba(255, 255, 255, 0.8); width: 100vw; height: 100vh; position: fixed;" Open="true">
-        <div style="display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;">
-            <MudPaper Class="px-5 pt-5 pb-4" Width="50%" Elevation="5">
-                <MudForm Model="buildingUpdate" @ref="@_form" @bind-IsValid="@_formIsValid">
-                    <h5>Chi tiết tòa nhà</h5>
-                    <div class="row">
-                        <div class="col">
-                            <div class="row">
-                                <div class="col-12">
-                                    <MudTextField @bind-Value="buildingUpdate.Name" Label="Tên tòa nhà" For="() => buildingUpdate.Name" Class="mb-2"></MudTextField>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12">
-                                    <MudSelect T="EntityStatus" Label="Trạng thái" AnchorOrigin="Origin.BottomCenter" @bind-Value="buildingUpdate.Status" For="() => buildingUpdate.Status" Class="mb-2"> 
-                                        <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
-                                        <MudSelectItem Value="EntityStatus.InActive">Không hoạt động</MudSelectItem>
-                                        <MudSelectItem Value="EntityStatus.Pending">Chờ</MudSelectItem>
-                                        <MudSelectItem Value="EntityStatus.PendingForActivation">Chờ hoạt động</MudSelectItem>
-                                        <MudSelectItem Value="EntityStatus.PendingForConfirmation">Chờ kích hoạt</MudSelectItem>
-                                        <MudSelectItem Value="EntityStatus.PendingForApproval">Chờ chấp thuận</MudSelectItem>
-                                        <MudSelectItem Value="EntityStatus.Locked">Khóa</MudSelectItem>
-
-
-                                    </MudSelect>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="float-end">
-                        <MudButton OnClick="OnClickCancel">Hủy</MudButton>
-                        <MudButton OnClick="Reset">Khôi phục</MudButton>
-                        <MudButton OnClick="UpdateBuilding">Lưu</MudButton>
-                    </div>
-                </MudForm>
-            </MudPaper>
-        </div>
-    </MudPopover>
-}
+<MudDialog>
+    <DialogContent>
+        @if(building == null)
+        {
+            <MudText>Không có tòa nhà được chọn</MudText>
+        }
+        else
+        {
+            <MudForm Model="buildingUpdate" @ref="_form" @bind-bind-IsValid="_formIsValid">
+                <MudPaper Width="100%" Elevation="0">
+                    <MudTextField @bind-Value="buildingUpdate.Name" For="@(() => buildingUpdate.Name)" Label="Tên tòa"></MudTextField>
+                    <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="buildingUpdate.Status" For="@(() => buildingUpdate.Status)">
+                        <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.InActive">Không hoạt động</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.Pending">Chờ</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.PendingForActivation">Chờ hoạt động</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.PendingForConfirmation">Chờ kích hoạt</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.PendingForApproval">Chờ chấp thuận</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.Locked">Khóa</MudSelectItem>
+                    </MudSelect>
+                </MudPaper>
+            </MudForm>
+        }
+    </DialogContent>
+    <DialogActions>
+        @if (building == null)
+        {
+            <MudButton @onclick="OnClickCancel">Hủy</MudButton>
+        }
+        else
+        {
+            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+            <MudButton OnClick="@(async() => await Reset())">Khôi phục</MudButton>
+            <MudButton OnClick="@(async() => await UpdateBuilding())">Lưu</MudButton>
+        }
+    </DialogActions>
+</MudDialog>
 
 @code {
-    /*
-    * /*
-    * Active = 1,
-    InActive = 2,
-    Deleted = 3,
-    Pending = 4,
-    PendingForActivation = 5,
-    PendingForConfirmation = 6,
-    PendingForApproval = 7,
-    Locked = 8,
-    */
-
     #region Khai báo
     [Parameter]
     public Guid idBuilding { get; set; }
-    [Parameter]
-    public EventCallback onCloseDetail { get; set; }
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
     [Inject]
     public IBuildingRespo buildingRespo { get; set; }
     [Inject]
@@ -89,9 +69,9 @@ else
         buildingUpdate.Name = building.Name;
         buildingUpdate.Status = building.Status;
     }
-    private async Task OnClickCancel()
+    private void OnClickCancel()
     {
-        await onCloseDetail.InvokeAsync();
+        MudDialog.Cancel();
     }
     private bool CheckChangeData()
     {
@@ -115,12 +95,12 @@ else
             {
                 if(CheckChangeData())
                 {
-                    await OnClickCancel();
+                    MudDialog.Close(DialogResult.Ok(true));
                     snackbar.Add("Sửa thành công", Severity.Success);
                 }
                 else
                 {
-                    await OnClickCancel();
+                    OnClickCancel();
                     snackbar.Add("Không có thay đổi dữ liệu để cập nhật", Severity.Warning);
                 }
             }

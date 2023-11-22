@@ -30,7 +30,7 @@
     private BuildingCreateRequest _buildingCreate = new();
     private bool success;
     MudForm _form;
-    private async Task OnClickCancel()
+    private void OnClickCancel()
     {
         MudDialog.Cancel();
     }
@@ -55,6 +55,7 @@
             }
             else
             {
+                OnClickCancel();
                 _snackbar.Add
                 (
                     "Thêm thất bại",

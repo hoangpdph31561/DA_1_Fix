@@ -23,7 +23,7 @@ public class RoombookingsController : ControllerBase
         _mapper = mapper;
         _localizationService = localizationService;
     }
-    [HttpGet]
+    [HttpGet("getRoomBookingByDetail")]
     public async Task<IActionResult> GetListRoomBookingDetailByAdmin([FromQuery] ViewRoombookingWithPaginationRequest request, CancellationToken cancellationToken)
     {
         RoombookingListWithPaginationViewModel vm = new(_roombookingrReadOnlyRespository, _localizationService);
@@ -31,7 +31,7 @@ public class RoombookingsController : ControllerBase
 
         return Ok(vm);
     }
-      [HttpGet]
+      [HttpGet("getRoomBookingByOther")]
     public async Task<IActionResult> GetListRoomBookingDetailByOther([FromQuery] ViewRoombookingWithPaginationRequest request, CancellationToken cancellationToken)
     {
         RoomBookingListWithPaginationByOtherViewModel vm = new(_roombookingrReadOnlyRespository, _localizationService);

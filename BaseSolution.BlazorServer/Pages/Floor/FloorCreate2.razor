@@ -70,7 +70,7 @@
     private async Task LoadData()
     {
         buildingPage = await buildingRespo.GetAllBuilding(new Data.DataTransferObjects.Building.Request.ViewBuildingWithPaginationRequest { PageSize = int.MaxValue - 1 });
-        lstBuilding = buildingPage.Data.ToList();
+        lstBuilding = buildingPage.Data!.ToList();
         _isLoadingList = false;
     }
     private void OnClickCancel()

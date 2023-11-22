@@ -75,10 +75,10 @@
     public IFloorRespo floorRespo { get; set; }
     MudForm _form;
     private bool _formIsValid;
-    private FloorDTO floorInfo;
+    private FloorDTO? floorInfo;
     private FloorUpdateRequest floorUpdateRequest = new();
     private PaginationResponse<BuildingDTO> buildingPage;
-    private List<BuildingDTO> lstBuilding;
+    private List<BuildingDTO>? lstBuilding;
 
     #endregion
     #region Code xử lý
@@ -90,14 +90,14 @@
     {
         floorInfo = await floorRespo.GetFloorById(idFloor);
         buildingPage = await buildingRespo.GetAllBuilding(new Data.DataTransferObjects.Building.Request.ViewBuildingWithPaginationRequest { PageSize = int.MaxValue - 1 });
-        lstBuilding = buildingPage.Data.ToList();
+        lstBuilding = buildingPage.Data!.ToList();
         floorUpdateRequest.Id = floorInfo.Id;
         floorUpdateRequest.Status = floorInfo.Status;
         floorUpdateRequest.NumberOfRoom = floorInfo.NumberOfRoom;
         floorUpdateRequest.BuildingId = floorInfo.BuildingId;
         floorUpdateRequest.Name = floorInfo.Name;
     }
-    private async Task OnClickCancel()
+    private void OnClickCancel()
     {
         MudDialog.Cancel();
     }
@@ -140,7 +140,7 @@
             {
                 snackbar.Add("Sửa thất bại", Severity.Error);
             }
-            Reset();
+            await Reset();
         }
     }
     #endregion

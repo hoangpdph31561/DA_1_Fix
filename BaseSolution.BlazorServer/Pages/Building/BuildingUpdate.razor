@@ -55,7 +55,7 @@
     MudForm _form;
     private bool _formIsValid;
     private BuildingUpdateRequest buildingUpdate = new();
-    private BuildingDTO building;
+    private BuildingDTO? building;
     #endregion
     #region Code xử lý
     protected override async Task OnInitializedAsync()
@@ -75,7 +75,7 @@
     }
     private bool CheckChangeData()
     {
-        return building.Name != buildingUpdate.Name || building.Status != buildingUpdate.Status;
+        return building!.Name != buildingUpdate.Name || building.Status != buildingUpdate.Status;
     }
     private async Task UpdateBuilding()
     {

@@ -1,5 +1,5 @@
 ﻿using BaseSolution.BlazorServer.Data.ValueObjects.Common;
-using BaseSolution.BlazorServer.Enums;
+
 
 namespace BaseSolution.BlazorServer.Data.DataTransferObjects.Customer
 {

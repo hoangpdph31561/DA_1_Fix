@@ -62,21 +62,33 @@ namespace BaseSolution.API.Controllers
         {
             FloorCreateViewModel vm = new(_floorReadOnlyRespository, _floorReadWriteRespository,_mapper, _localizationService);
             await vm.HandleAsync(request,cancellationToken); 
-            return Ok(vm);
+            if(vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
         }
         [HttpPut]
         public async Task<IActionResult> UpdateFloor(FloorUpdateRequest request, CancellationToken cancellationToken)
         {
             FloorUpdateViewModel vm = new(_floorReadWriteRespository, _mapper, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-            return Ok(vm);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
         }
         [HttpDelete]
         public async Task<IActionResult> DeleteFloor([FromQuery]FloorDeleteRequest request, CancellationToken cancellationToken)
         {
             FloorDeleteViewModel vm = new(_floorReadWriteRespository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-            return Ok(vm);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
         }
     }
 }

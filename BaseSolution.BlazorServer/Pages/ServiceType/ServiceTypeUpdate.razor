@@ -1,0 +1,118 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceType.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceType;
+@using BaseSolution.BlazorServer.Respository.Interfaces;
+<MudDialog>
+    <DialogContent>
+        @if (serviceType == null)
+        {
+            <MudText>Không có tiện ích của bạn</MudText>
+        }
+        else
+        {
+            <MudForm Model="updateServiceTypeRequest" @ref="_form" @bind-IsValid="_formIsValid">
+                <MudPaper Width="100%" Elevation="0">
+                    <MudTextField @bind-Value="updateServiceTypeRequest.Name" For="@(() => updateServiceTypeRequest.Name)" Label="Tên tiện ích"></MudTextField>
+                    <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="updateServiceTypeRequest.Status" For="@(() => updateServiceTypeRequest.Status)">
+                        <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.InActive">Không hoạt động</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.Pending">Chờ</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.PendingForActivation">Chờ hoạt động</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.PendingForConfirmation">Chờ kích hoạt</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.PendingForApproval">Chờ chấp thuận</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.Locked">Khóa</MudSelectItem>
+                    </MudSelect>
+                </MudPaper>
+            </MudForm>
+        }
+    </DialogContent>
+    <DialogActions>
+        @if (serviceType == null)
+        {
+            <MudButton @onclick="OnClickCancel">Hủy</MudButton>
+        }
+        else
+        {
+            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+            <MudButton OnClick="@(async() => await Reset())">Khôi phục</MudButton>
+            <MudButton OnClick="@(async() => await UpdateAmenity())">Lưu</MudButton>
+        }
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #region Khai báo
+    [Parameter]
+    public Guid idServiceType { get; set; }
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    [Inject]
+    public IServiceTypeRespo serviceTypeRespo { get; set; }
+    [Inject]
+    public IDialogService dialogService { get; set; }
+    [Inject]
+    public ISnackbar snackbar { get; set; }
+    MudForm _form;
+    private bool _formIsValid;
+    private ServiceTypeUpdateRequest updateServiceTypeRequest = new();
+    private ServiceTypeDTO? serviceType;
+    #endregion 
+    #region Code xử lý
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        serviceType = await serviceTypeRespo.GetServiceTypeById(idServiceType);
+        updateServiceTypeRequest.Id = serviceType.Id;
+        updateServiceTypeRequest.Name = serviceType.Name;
+        updateServiceTypeRequest.Status = serviceType.Status;
+    }
+    private void OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+    private bool CheckChangeData()
+    {
+        return serviceType!.Name != updateServiceTypeRequest.Name || serviceType.Status != updateServiceTypeRequest.Status;
+    }
+    private async Task UpdateAmenity()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+        var confirm = await dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận sửa loại dịch vụ",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            var result = await serviceTypeRespo.UpdateServiceType(updateServiceTypeRequest);
+            if (result)
+            {
+                if (CheckChangeData())
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    snackbar.Add("Sửa thành công", Severity.Success);
+                }
+                else
+                {
+                    OnClickCancel();
+                    snackbar.Add("Không có thay đổi dữ liệu để cập nhật", Severity.Warning);
+                }
+            }
+            else
+            {
+                snackbar.Add("Sửa thất bại", Severity.Error);
+            }
+            await Reset();
+        }
+    }
+    private async Task Reset()
+    {
+        await LoadData();
+    }
+    #endregion
+}

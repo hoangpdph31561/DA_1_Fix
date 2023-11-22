@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using BaseSolution.Application.DataTransferObjects.ServiceType;
 using BaseSolution.Application.DataTransferObjects.ServiceType.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
+using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Infrastructure.ViewModels.ServiceType;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -33,8 +35,13 @@ namespace BaseSolution.API.Controllers
             ServiceTypeListWithPaginationViewModel vm = new(_ServiceTypeReadOnlyRepository, _localizationService);
 
             await vm.HandleAsync(request, cancellationToken);
+            if (vm.Success)
+            {
+                PaginationResponse<ServiceTypeDto> result = (PaginationResponse<ServiceTypeDto>)vm.Data;
+                return Ok(result);
+            }
 
-            return Ok(vm);
+            return BadRequest(vm);
         }
 
         // GET api/<ServiceTypeController>/5
@@ -44,8 +51,13 @@ namespace BaseSolution.API.Controllers
             ServiceTypeViewModel vm = new(_ServiceTypeReadOnlyRepository, _localizationService);
 
             await vm.HandleAsync(id, cancellationToken);
+            if (vm.Success) 
+            {
+                ServiceTypeDto serviceTypeDto = (ServiceTypeDto)vm.Data;
+                return Ok(serviceTypeDto);
+            }
 
-            return Ok(vm);
+            return BadRequest(vm);
         }
 
         [HttpPost]
@@ -54,8 +66,12 @@ namespace BaseSolution.API.Controllers
             ServiceTypeCreateViewModel vm = new(_ServiceTypeReadOnlyRepository, _ServiceTypeReadWriteRepository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
 
-            return Ok(vm);
+            return BadRequest(vm);
         }
 
         [HttpPut]
@@ -64,18 +80,26 @@ namespace BaseSolution.API.Controllers
             ServiceTypeUpdateViewModel vm = new(_ServiceTypeReadWriteRepository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);
+            if(vm.Success)
+            {
+                return Ok(vm);
+            }
 
-            return Ok(vm);
+            return BadRequest(vm);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(ServiceTypeDeleteRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> Delete([FromQuery]ServiceTypeDeleteRequest request, CancellationToken cancellationToken)
         {
             ServiceTypeDeleteViewModel vm = new(_ServiceTypeReadWriteRepository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
 
-            return Ok(vm);
+            return BadRequest(vm);
         }
     }
 }

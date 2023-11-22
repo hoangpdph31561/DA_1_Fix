@@ -54,7 +54,11 @@ namespace BaseSolution.API.Controllers
         {
             AmenityCreateViewModel vm = new(_amenityReadOnlyRespository, _amenityReadWriteRespository, _mapper, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-            return Ok(vm);
+            if(vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
         }
 
         [HttpPut]
@@ -62,7 +66,11 @@ namespace BaseSolution.API.Controllers
         {
             AmenityUpdateViewModel vm = new(_amenityReadWriteRespository, _mapper, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-            return Ok(vm);
+            if(vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
         }
 
         [HttpDelete]
@@ -71,8 +79,12 @@ namespace BaseSolution.API.Controllers
             AmenityDeleteViewModel vm = new(_amenityReadWriteRespository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);
+            if(vm.Success) 
+            {
+                return Ok(vm);
+            }
 
-            return Ok(vm);
+            return BadRequest(vm);
         }
     }
 }

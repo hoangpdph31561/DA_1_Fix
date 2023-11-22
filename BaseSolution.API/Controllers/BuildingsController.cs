@@ -73,8 +73,12 @@ namespace BaseSolution.API.Controllers
         {
             BuildingCreateViewModel vm = new(_buildingReadOnlyRespository, _buildingReadWriteRespository, _mapper, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
 
-            return Ok(vm);
+            return BadRequest(vm);
         }
 
         [HttpPut]
@@ -82,18 +86,23 @@ namespace BaseSolution.API.Controllers
         {
             BuildingUpdateViewModel vm = new(_buildingReadWriteRespository, _mapper, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-
-            return Ok(vm);
+            if(vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteBuilding([FromQuery]BuildingDeleteRequest request, CancellationToken cancellationToken)
         {
             BuildingDeleteViewModel vm = new(_buildingReadWriteRespository, _mapper, _localizationService);
-
             await vm.HandleAsync(request, cancellationToken);
-
-            return Ok(vm);
+            if(vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
         }
 
     }

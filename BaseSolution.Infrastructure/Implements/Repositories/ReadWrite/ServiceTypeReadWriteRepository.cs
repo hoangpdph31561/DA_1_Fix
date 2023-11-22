@@ -89,7 +89,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
 
                 // Update value to existed ServiceType
                 ServiceType!.Name = string.IsNullOrWhiteSpace(entity.Name) ? ServiceType.Name : entity.Name;
-
+                ServiceType.Status = entity.Status;
                 ServiceType.ModifiedBy = entity.ModifiedBy;
                 ServiceType.ModifiedTime = DateTimeOffset.UtcNow;
 

@@ -107,7 +107,7 @@
     }
     private bool CheckChangeData()
     {
-        return floorInfo.Name != floorUpdateRequest.Name || floorInfo.Status != floorUpdateRequest.Status || floorInfo.NumberOfRoom != floorUpdateRequest.NumberOfRoom || floorInfo.BuildingId != floorUpdateRequest.BuildingId;
+        return floorInfo!.Name != floorUpdateRequest.Name || floorInfo.Status != floorUpdateRequest.Status || floorInfo.NumberOfRoom != floorUpdateRequest.NumberOfRoom || floorInfo.BuildingId != floorUpdateRequest.BuildingId;
     }
     private async Task UpdateFloor()
     {

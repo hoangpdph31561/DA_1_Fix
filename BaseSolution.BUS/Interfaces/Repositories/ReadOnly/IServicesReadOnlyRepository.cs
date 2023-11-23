@@ -12,8 +12,8 @@ namespace BaseSolution.Application.Interfaces.Repositories.ReadOnly
 {
     public interface IServiceReadOnlyRepository
     {
-        Task<RequestResult<ServiceDto?>> GetServiceByIdAsync(Guid idService, CancellationToken cancellationToken);
-        Task<RequestResult<PaginationResponse<ServiceDto>>> GetServiceWithPaginationByAdminAsync(
+        Task<RequestResult<ServiceDTO?>> GetServiceByIdAsync(Guid idService, CancellationToken cancellationToken);
+        Task<RequestResult<PaginationResponse<ServiceDTO>>> GetServiceWithPaginationByAdminAsync(
             ViewServiceWithPaginationRequest request, CancellationToken cancellationToken);
     }
 }

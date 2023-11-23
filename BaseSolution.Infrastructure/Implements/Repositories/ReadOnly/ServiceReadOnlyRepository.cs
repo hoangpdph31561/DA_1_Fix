@@ -32,18 +32,18 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             _localizationService = localizationService;
         }
 
-        public async Task<RequestResult<ServiceDto?>> GetServiceByIdAsync(Guid idService, CancellationToken cancellationToken)
+        public async Task<RequestResult<ServiceDTO?>> GetServiceByIdAsync(Guid idService, CancellationToken cancellationToken)
         {
             try
             {
-                var Service = await _ServiceEntities.AsNoTracking().Where(c => c.Id == idService && !c.Deleted).ProjectTo<ServiceDto>(_mapper.ConfigurationProvider)
+                var Service = await _ServiceEntities.AsNoTracking().Where(c => c.Id == idService && !c.Deleted).ProjectTo<ServiceDTO>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(cancellationToken);
 
-                return RequestResult<ServiceDto?>.Succeed(Service);
+                return RequestResult<ServiceDTO?>.Succeed(Service);
             }
             catch (Exception e)
             {
-                return RequestResult<ServiceDto?>.Fail(_localizationService["Service is not found"], new[]
+                return RequestResult<ServiceDTO?>.Fail(_localizationService["Service is not found"], new[]
                 {
                     new ErrorItem
                     {
@@ -54,15 +54,18 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             }
         }
 
-        public async Task<RequestResult<PaginationResponse<ServiceDto>>> GetServiceWithPaginationByAdminAsync(ViewServiceWithPaginationRequest request, CancellationToken cancellationToken)
+        public async Task<RequestResult<PaginationResponse<ServiceDTO>>> GetServiceWithPaginationByAdminAsync(ViewServiceWithPaginationRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                IQueryable<ServiceEntity> queryable = _ServiceEntities.AsNoTracking().AsQueryable();
-                var result = await _ServiceEntities.AsNoTracking()
-                    .PaginateAsync<ServiceEntity, ServiceDto>(request, _mapper, cancellationToken);
+                IQueryable<ServiceEntity> queryable = _ServiceEntities.AsNoTracking().AsQueryable().Where(x => !x.Deleted && x.ServiceTypeId == request.ServiceTypeId);
+                if(!string.IsNullOrWhiteSpace(request.SearchString))
+                {
+                    queryable = queryable.Where(x => x.Name.ToLower().Trim().Contains(request.SearchString.ToLower().Trim()));
+                }
+                var result = await queryable.PaginateAsync<ServiceEntity, ServiceDTO>(request, _mapper, cancellationToken);
 
-                return RequestResult<PaginationResponse<ServiceDto>>.Succeed(new PaginationResponse<ServiceDto>()
+                return RequestResult<PaginationResponse<ServiceDTO>>.Succeed(new PaginationResponse<ServiceDTO>()
                 {
                     PageNumber = request.PageNumber,
                     PageSize = request.PageSize,
@@ -72,7 +75,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             }
             catch (Exception e)
             {
-                return RequestResult<PaginationResponse<ServiceDto>>.Fail(_localizationService["List of Service are not found"], new[]
+                return RequestResult<PaginationResponse<ServiceDTO>>.Fail(_localizationService["List of Service are not found"], new[]
                 {
                     new ErrorItem
                     {

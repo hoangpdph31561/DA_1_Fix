@@ -28,7 +28,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
         {
             try
             {
-                entity.CreatedTime = DateTimeOffset.Now;
+                entity.CreatedTime = DateTimeOffset.UtcNow;
                 await _appReadWriteDbContext.Buildings.AddAsync(entity);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
                 return RequestResult<Guid>.Succeed(entity.Id);
@@ -54,7 +54,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 var building = await GetBuildingByIdAsync(request.Id, cancellationToken);
                 building!.Deleted = true;
                 building.DeletedBy = request.DeletedBy;
-                building.DeletedTime = DateTimeOffset.Now;
+                building.DeletedTime = DateTimeOffset.UtcNow;
                 building.Status = EntityStatus.Deleted;
                 _appReadWriteDbContext.Buildings.Update(building);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
@@ -82,7 +82,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 building!.Name = string.IsNullOrEmpty(entity.Name) ? building.Name : entity.Name;
                 building.Status = entity.Status;
                 building.ModifiedBy = entity.ModifiedBy;
-                building.ModifiedTime = DateTimeOffset.Now;
+                building.ModifiedTime = DateTimeOffset.UtcNow;
                 _appReadWriteDbContext.Buildings.Update(building);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
                 return RequestResult<int>.Succeed(1);

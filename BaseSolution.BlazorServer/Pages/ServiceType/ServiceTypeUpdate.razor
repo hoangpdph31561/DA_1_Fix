@@ -5,7 +5,7 @@
     <DialogContent>
         @if (serviceType == null)
         {
-            <MudText>Không có tiện ích của bạn</MudText>
+            <MudText>Không có loại dịch vụ của bạn</MudText>
         }
         else
         {
@@ -34,7 +34,7 @@
         {
             <MudButton OnClick="OnClickCancel">Hủy</MudButton>
             <MudButton OnClick="@(async() => await Reset())">Khôi phục</MudButton>
-            <MudButton OnClick="@(async() => await UpdateAmenity())">Lưu</MudButton>
+            <MudButton OnClick="@(async() => await UpdateServiceType())">Lưu</MudButton>
         }
     </DialogActions>
 </MudDialog>
@@ -76,7 +76,7 @@
     {
         return serviceType!.Name != updateServiceTypeRequest.Name || serviceType.Status != updateServiceTypeRequest.Status;
     }
-    private async Task UpdateAmenity()
+    private async Task UpdateServiceType()
     {
         await _form.Validate();
         if (!_form.IsValid) return;

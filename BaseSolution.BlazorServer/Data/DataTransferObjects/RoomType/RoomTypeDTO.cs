@@ -1,6 +1,6 @@
-﻿using BaseSolution.Domain.Enums;
+﻿using BaseSolution.BlazorServer.Data.ValueObjects.Common;
 
-namespace BaseSolution.Application.DataTransferObjects.RoomType
+namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType
 {
     public class RoomTypeDTO
     {

@@ -52,8 +52,12 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                IQueryable<RoomTypeEntity> queryable = _dbContext.RoomTypes.AsNoTracking().AsQueryable();
-                var result = await _dbContext.RoomTypes.AsNoTracking().PaginateAsync<RoomTypeEntity, RoomTypeDTO>(request, _mapper, cancellationToken);
+                IQueryable<RoomTypeEntity> queryable = _dbContext.RoomTypes.AsNoTracking().AsQueryable().Where(x => !x.Deleted);
+                if(!string.IsNullOrWhiteSpace(request.SearchString))
+                {
+                    queryable = queryable.Where(x => x.Name.ToLower().Trim().Contains(request.SearchString.ToLower().Trim()));
+                }
+                var result = await queryable.PaginateAsync<RoomTypeEntity, RoomTypeDTO>(request, _mapper, cancellationToken);
                 return RequestResult<PaginationResponse<RoomTypeDTO>>.Succeed(new PaginationResponse<RoomTypeDTO>
                 {
                     PageNumber = request.PageNumber,

@@ -1,6 +1,7 @@
 ﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Service.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceType;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
+@using BaseSolution.BlazorServer.Extensions
 <MudDialog>
     <DialogContent>
         @if (_isLoadingList)
@@ -19,7 +20,7 @@
                         }
                     </MudSelect>
                     <MudTextField @bind-Value="@serviceCreateRequest.Name" For="@(() => serviceCreateRequest.Name)" Label="Tên dịch vụ"></MudTextField>
-                    <MudTextField @bind-Value="@serviceCreateRequest.Unit" For="@(() => serviceCreateRequest.Unit)" Label="Đơn vị tính"></MudTextField>
+                    <MudAutocomplete T="string" Label="Đơn vị tính" @bind-Value="serviceCreateRequest.Unit" SearchFunc="SearchAutoComplete" AdornmentIcon="@Icons.Material.Filled.Search"></MudAutocomplete>
                     <MudNumericField @bind-Value="@serviceCreateRequest.Price" For="@(() => serviceCreateRequest.Price)" Label="Giá" Variant="Variant.Text" Min="1000" Step="1000"></MudNumericField>
                     <MudTextField @bind-Value="@serviceCreateRequest.Description" For="@(() => serviceCreateRequest.Description)" Label="Mô tả"></MudTextField>
                 </MudPaper>
@@ -54,6 +55,16 @@
     MudForm _form;
     #endregion
     #region Code xử lý
+    private async Task<IEnumerable<string>> SearchAutoComplete(string value)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+            return UtilityExtentions.CacDonViTinh.Take(10);
+        return UtilityExtentions.GetRecommendedStrings(value,UtilityExtentions.CacDonViTinh);
+    }
     protected override async Task OnInitializedAsync()
     {
         await LoadData();

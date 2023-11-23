@@ -4,5 +4,6 @@ namespace BaseSolution.Application.DataTransferObjects.RoomType.Request
 {
     public class ViewRoomTypeWithPaginationRequest : PaginationRequest
     {
+        public string? SearchString { get; set; }
     }
 }

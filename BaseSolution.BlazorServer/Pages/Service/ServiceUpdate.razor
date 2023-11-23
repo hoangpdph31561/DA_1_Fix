@@ -1,6 +1,7 @@
 ﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Service;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Service.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceType;
+@using BaseSolution.BlazorServer.Extensions;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
 <MudDialog>
     <DialogContent>
@@ -27,7 +28,7 @@
                     </MudGrid>
                     <MudGrid>
                         <MudItem xs="12" sm="6">
-                            <MudTextField @bind-Value="serviceUpdateRequest.Unit" For="@(() => serviceUpdateRequest.Unit)" Label="Đơn vị tính"></MudTextField>
+                            <MudAutocomplete T="string" Label="Đơn vị tính" @bind-Value="serviceUpdateRequest.Unit" SearchFunc="SearchAutoComplete" AdornmentIcon="@Icons.Material.Filled.Search"></MudAutocomplete>
                         </MudItem>
                         <MudItem xs="12" sm="6">
                             <MudNumericField @bind-Value="@serviceUpdateRequest.Price" For="@(() => serviceUpdateRequest.Price)" Label="Giá" Variant="Variant.Text" Min="1000" Step="1000"></MudNumericField>
@@ -83,6 +84,16 @@
     private List<ServiceTypeDTO>? lstServiceType;
     #endregion
     #region Code xử lý
+    private async Task<IEnumerable<string>> SearchAutoComplete(string value)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+            return UtilityExtentions.CacDonViTinh.Take(10);
+        return UtilityExtentions.GetRecommendedStrings(value, UtilityExtentions.CacDonViTinh);
+    }
     protected async override Task OnInitializedAsync()
     {
         await LoadData();

@@ -1,0 +1,137 @@
+﻿@page "/customer/customerRoomType"
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType.Request
+@using BaseSolution.BlazorServer.Respository.Interfaces
+<MudPaper Elevation="0" Class="custom-list-display-border">
+    @if (_isLoadingAll)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="m-3" />
+    }
+    else
+    {
+        @* <MudGrid>
+            <MudItem xs="12" md="3" lg="2">
+                <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Checkin" DateFormat="dd/MM/yyyy" Date="@(new System.DateTime(2023,12,11))" />
+            </MudItem>
+            <MudItem xs="12" md="3" lg="2">
+                <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Checkout" DateFormat="dd/MM/yyyy" Date="@(new System.DateTime(2023,12,15))" />
+            </MudItem>
+            <MudItem xs="12" md="3" lg="2">
+                <MudSelect Label="Loại phòng" @bind-Value="_idRoomDetail">
+                    @foreach (var item in _lstRoomDetail)
+                    {
+                        <MudSelectItem Value="@item.Id.ToString()">@item.NameOfRoomType</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" md="3" lg="2">
+                <MudSelect Label="Số người tối đa" @bind-Value="_idRoomDetail">
+                    @foreach (var item in _lstRoomDetail)
+                    {
+                        <MudSelectItem Value="@item.Id.ToString()">@item.MaxPeopleStay</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" md="3" lg="2">
+                <MudSelect Label="Giá" @bind-Value="_idRoomDetail">
+                    @foreach (var item in _lstRoomDetail)
+                    {
+                        <MudSelectItem Value="@item.Id.ToString()">@item.Price</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+        </MudGrid> *@
+        <MudTable Items="@_RoomTypelVM.Data" Style="position:relative;" Elevation="0">
+            <HeaderContent>
+                <MudTh>STT</MudTh>
+                <MudTh>Tên loại phòng</MudTh>
+                <MudTh>Số lượng tiện ích </MudTh>
+                <MudTh>Số lượng phòng</MudTh>
+                <MudTh>Hành động</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@(_lstRoomType.IndexOf(context) + 1)</MudTd>
+                <MudTd>@context.Name</MudTd>
+                <MudTd>@context.NumberOfAmenityRoomDetail <MudChip Icon="@Icons.Material.Filled.ListAlt" OnClick="@(() => OpenAmenity(context.Id))"></MudChip></MudTd>
+                <MudTd>@context.AmountOfRoomType</MudTd>
+                <MudTd>
+                        <MudChip Color="Color.Primary" OnClick="@(() => OpenDetail(context.Id))" Disabled="@_isDisableControls">Đặt phòng</MudChip>
+                </MudTd>
+                </RowTemplate>
+            </MudTable>
+        <CustomPagination Class="my-1" HasNext="@_RoomTypelVM.HasNext" OnPageChange="@(async e => await OnPaginationButtonClickTab1(e))" CurrentPageNumber="@_RoomTypelVM.PageNumber"></CustomPagination>
+        <MudDivider />
+    }
+</MudPaper>
+@code {
+    [Inject]
+    public IRoomTypeRepo _roomTypeRepo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    private Guid _idRoomType = Guid.Empty;
+    private Guid _idRoomDetail = Guid.Empty;
+    #region
+    private PaginationResponse<RoomTypeDTO> _RoomTypelVM;
+    private List<RoomTypeDTO> _lstRoomType;
+    private ViewRoomTypeWithPaginationRequest _roomTypeRequest = new();
+    private PaginationResponse<RoomDetailDTO> _roomDetailslVM;
+    private List<RoomDetailDTO> _lstRoomDetail;
+
+    #endregion
+    #region
+    private bool _isLoadingAll = true;
+    private bool closeAdd = true;
+    private bool closeDetail = true;
+    private bool _isDisableControls = false;
+    #endregion
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    #region RoomType
+    private async Task LoadData()
+    {
+        _RoomTypelVM = await _roomTypeRepo.GetRoomType(_roomTypeRequest);
+        _lstRoomType = _RoomTypelVM.Data!.ToList();
+        _isLoadingAll = false;
+    }
+    private async Task OnSearchTab(string? searchString)
+    {
+        _isLoadingAll = true;
+        await LoadData();
+    }
+    private async Task OpenDetail(Guid _idRoomType)
+    {
+        var parameters = new DialogParameters<CustomerRoomDetail>();
+        parameters.Add(x => x.idRoomType, _idRoomType);
+        var dialog = await _dialogService.ShowAsync<CustomerRoomDetail>("Danh sách phòng có thể đặt", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
+    }
+    private async Task OpenAmenity(Guid _idRoomType)
+    {
+        var parameters = new DialogParameters<CustomerArmenityRoomDetails>();
+        parameters.Add(x => x.idRoomType, _idRoomType);
+        var dialog = await _dialogService.ShowAsync<CustomerArmenityRoomDetails>("Danh sách tiện ích", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
+    }
+    
+    private async Task OnPaginationButtonClickTab1(int pageNumber)
+    {
+        if (_isDisableControls) return;
+        _roomTypeRequest.PageNumber = pageNumber;
+        await LoadData();
+    }
+    #endregion
+}

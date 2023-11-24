@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using BaseSolution.Application.DataTransferObjects.RoomBookingDetail;
 using BaseSolution.Application.DataTransferObjects.RoomBookingDetail.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
+using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Infrastructure.ViewModels.RoomBookingDetail;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,16 +31,24 @@ namespace BaseSolution.API.Controllers
         {
             RoomBookingDetailListWithPaginationViewModel vm = new(_roomBookingDetailReadOnlyRepository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-
-            return Ok(vm);
+            if (vm.Success)
+            {
+                PaginationResponse<RoomBookingDetailDTO> result = (PaginationResponse<RoomBookingDetailDTO>)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
         }
         [HttpGet("getRoomBookingDetailByOther")]
         public async Task<IActionResult> GetListRoomBookingDetailByOther([FromQuery] ViewRoomBookingDetailWithPaginationRequest request, CancellationToken cancellationToken)
         {
             RoomBookingDetailWithPaginationByOtherViewModel vm = new(_roomBookingDetailReadOnlyRepository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-
-            return Ok(vm);
+            if (vm.Success)
+            {
+                PaginationResponse<RoomBookingDetailDTO> result = (PaginationResponse<RoomBookingDetailDTO>)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
         }
 
         [HttpGet("{id}")]

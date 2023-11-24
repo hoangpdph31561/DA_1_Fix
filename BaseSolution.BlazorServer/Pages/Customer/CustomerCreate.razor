@@ -24,8 +24,8 @@
         </MudPaper>
         <MudPaper Class="pa-4 mt-4">
             <div class="d-flex align-center justify-space-between">
-                <MudTextField T="string" Label="Nhập code" Required="true" @bind-Value="createRequest.ApprovedCode" @onchange="@HandleValidSubmit"></MudTextField>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@Login">Đăng nhập</MudButton>
+                <MudTextField T="string" Label="Nhập code" Required="true" @bind-Value="createRequest.ApprovedCode" ></MudTextField>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto"  OnClick="@Login">Đăng nhập</MudButton>
             </div>
         </MudPaper>
     </MudItem>
@@ -47,18 +47,13 @@
     public ISnackbar _snackbar { get; set; }
     [Inject]
     public ISendMailService sendMailService { get; set; }
-    public CustomerCreateRequest createRequest = new();
-    public CustomerDTO customer;
-    private async Task HandleValidSubmit()
-    {
-        string apCode = createRequest.ApprovedCode;
-        var result = await sendMailService.ConfirmCode(apCode);
-    }
+    public CustomerCreateRequest createRequest = new CustomerCreateRequest();
 
     private async Task SendEmail()
     {
         if (!isCodeSent)
         {
+            var existingCustomer = await customerRepo.SignUpOrSignIn(createRequest);
             if (string.IsNullOrWhiteSpace(createRequest.Email))
             {
                 await _dialogService.ShowMessageBox("Lỗi", "Vui lòng nhập địa chỉ email!");
@@ -75,27 +70,37 @@
     {
         if (isCodeSent && isFormLocked)
         {
-            var confirm = await _dialogService.ShowMessageBox(
-                "Thông báo",
-                "Xác nhận đăng nhập?",
-                "Xác nhận",
-                cancelText: "Hủy"
-            );
-
-            if (confirm == true)
+            var checkCode = await customerRepo.VerifyCode(createRequest.ApprovedCode,createRequest.IdentificationNumber);
+            if (!checkCode)
             {
-                isFormLocked = true;
+                await _dialogService.ShowMessageBox("Lỗi", "Vui lòng nhập đúng mã code!");
+                return;
+            }
+            else
+            {
+                var confirm = await _dialogService.ShowMessageBox(
+               "Thông báo",
+               "Xác nhận đăng nhập?",
+               "Xác nhận",
+               cancelText: "Hủy"
+           );
 
-                var result = await customerRepo.CreateCustomer(createRequest);
-                if (result == true)
+                if (confirm == true)
                 {
-                    _snackbar.Add("Thêm thành công", Severity.Success);
-                }
-                else
-                {
-                    _snackbar.Add("Thêm thất bại", Severity.Error);
+                    isFormLocked = true;
+
+                    var result = await customerRepo.CreateCustomer(createRequest);
+                    if (result == true)
+                    {
+                        _snackbar.Add("Thêm thành công", Severity.Success);
+                    }
+                    else
+                    {
+                        _snackbar.Add("Thêm thất bại", Severity.Error);
+                    }
                 }
             }
+           
         }
     }
 }

@@ -9,7 +9,10 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
     {
         public RoomTypeProfile()
         {
-            CreateMap<RoomTypeEntity, RoomTypeDTO>();
+            CreateMap<RoomTypeEntity, RoomTypeDTO>()
+                .ForMember(desc => desc.NumberOfAmenityRoomDetail, opt => opt.MapFrom(src => src.AmenityRoomDetails.Count()))
+                .ForMember(desc => desc.AmountOfRoomType, opt => opt.MapFrom(src => src.RoomDetails.Count()));
+
             CreateMap<RoomTypeCreateRequest, RoomTypeEntity>();
             CreateMap<RoomTypeUpdateRequest, RoomTypeEntity>();
             CreateMap<RoomTypeDeleteRequest, RoomTypeEntity>();

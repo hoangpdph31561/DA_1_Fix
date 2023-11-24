@@ -12,7 +12,7 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
         public string Description { get; set; } = string.Empty;
         public double RoomSize { get; set; }
         public List<string> Images { get; set; } = new List<string>();
-        public EntityStatus Status { get; set; }
+        public RoomStatus Status { get; set; }
         public Guid FloorId { get; set; }
         public Guid RoomTypeId { get; set; }
     }

@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using BaseSolution.Application.DataTransferObjects.RoomType;
 using BaseSolution.Application.DataTransferObjects.RoomType.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
+using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Infrastructure.ViewModels.RoomType;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,14 +30,24 @@ namespace BaseSolution.API.Controllers
         {
             RoomTypeListWithPaginationViewModel vm = new(_RoomTypeReadOnlyRespository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-            return Ok(vm);
+            if (vm.Success)
+            {
+                PaginationResponse<RoomTypeDTO> result = (PaginationResponse<RoomTypeDTO>)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRoomTypeById(Guid id, CancellationToken cancellationToken)
         {
             RoomTypeViewModel vm = new(_RoomTypeReadOnlyRespository, _localizationService);
             await vm.HandleAsync(id, cancellationToken);
-            return Ok(vm);
+            if (vm.Success)
+            {
+                RoomTypeDTO result = (RoomTypeDTO)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
         }
         [HttpPost]
         public async Task<IActionResult> CreateNewRoomType(RoomTypeCreateRequest request, CancellationToken cancellationToken)

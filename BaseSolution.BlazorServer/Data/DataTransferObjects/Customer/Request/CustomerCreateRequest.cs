@@ -9,6 +9,6 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
         public string PhoneNumber { get; set; } = string.Empty;
         public string? ApprovedCode { get; set; }
         public DateTimeOffset? ApprovedCodeExpiredTime { get; set; }
-        public EntityStatus Status { get; set; }
+        public EntityStatus Status { get; set; } = EntityStatus.Locked;
     }
 }

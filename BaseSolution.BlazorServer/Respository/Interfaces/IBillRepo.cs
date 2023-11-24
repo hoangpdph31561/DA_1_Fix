@@ -7,5 +7,6 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
     public interface IBillRepo
     {
         Task<PaginationResponse<BillDTO>> GetAllBill(ViewCustomerBillWithPaginationRequest request);
+
     }
 }

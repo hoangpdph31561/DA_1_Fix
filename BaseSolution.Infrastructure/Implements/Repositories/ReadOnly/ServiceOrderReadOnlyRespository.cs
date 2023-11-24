@@ -12,7 +12,6 @@ using BaseSolution.Infrastructure.Database.AppDbContext;
 using BaseSolution.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
 {
     public class ServiceOrderReadOnlyRespository : IServiceOrderReadOnlyRespository
@@ -26,6 +25,28 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             _mapper = mapper;
             _localizationService = localizationService;
         }
+
+        public async Task<RequestResult<List<ServiceOrderDTO>>> GetServiceOrderByIdCustomerAsync(Guid idCustomer, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var getList = _appReadOnlyDbContext.ServiceOrders.AsNoTracking().ProjectTo<ServiceOrderDTO>(_mapper.ConfigurationProvider);
+                var listByType = await getList.Where(c => c.CustomerId == idCustomer).ToListAsync();
+                return RequestResult<List<ServiceOrderDTO>>.Succeed(listByType);
+            }
+            catch (Exception e)
+            {
+                return RequestResult<List<ServiceOrderDTO>>.Fail(_localizationService["ServiceOrder is not found"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "ServiceOrder"
+                    }
+                });
+            }
+        }
+
         public async Task<RequestResult<ServiceOrderDTO?>> GetServiceOrderByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             try
@@ -85,7 +106,6 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 });
             }
         }
-
         public async Task<RequestResult<PaginationResponse<ServiceOrderDTO>>> GetServicesByOtherAsync(ViewServiceOrderWithPaginationRequest request, CancellationToken cancellationToken)
         {
             try

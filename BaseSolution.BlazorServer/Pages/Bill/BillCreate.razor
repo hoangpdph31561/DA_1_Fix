@@ -1,5 +1,6 @@
-﻿@* @using BaseSolution.BlazorServer.Data.DataTransferObjects.Bill.Request;
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Bill.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
 <MudDialog>
@@ -12,10 +13,13 @@
         {
             <MudForm Model="@billRequest" @ref="_form">
                 <MudPaper Elevation="0">
-                    <MudTextField @bind-Value="@billRequest.Ma" For="@(() => billRequest.)" Label="Mã hóa đơn"></MudTextField>
-                    <MudTextField @bind-Value="@roomBookingCreateRequest.CodeBooking" For="@(() => roomBookingCreateRequest.CodeBooking)" Label="Ngày xuất"></MudTextField>
-                    <MudTextField @bind-Value="@roomBookingCreateRequest.BookingType" For="@(() => roomBookingCreateRequest.BookingType)" Label="Loại bill"></MudTextField>
-                    <MudCheckBox @bind-Checked="@Label_CheckBox2" Label="Dịch vụ" Color="Color.Primary"></MudCheckBox>
+                    <MudSelect T="string" Label="Khách hàng" Class="mb-2"
+                               AnchorOrigin="Origin.BottomCenter" @bind-Value="@customerId" For="@(() => customerId)">
+                        @foreach (var item in lstCustomer)
+                        {
+                            <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
+                        }
+                    </MudSelect>
                 </MudPaper>
             </MudForm>
         }
@@ -23,7 +27,7 @@
     <DialogActions>
         <MudButton OnClick="OnClickCancel">Hủy</MudButton>
         <MudButton OnClick="Reset">Khôi phục</MudButton>
-        <MudButton OnClick="CreateNewRoomBooking">Lưu</MudButton>
+        <MudButton OnClick="CreateBill">Lưu</MudButton>
     </DialogActions>
 </MudDialog>
 @code {
@@ -31,17 +35,15 @@
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
     [Inject]
-    public IRoomBookingRespo roomBookingRespo { get; set; }
-    [Inject]
-    public IServiceOrderRepo serviceOrderRepo { get; set; }
-    [Inject]
     public IDialogService _dialogService { get; set; }
     [Inject]
     public ISnackbar _snackbar { get; set; }
 
+    [Inject]
+    public ICustomerRepo cumtomerRespo { get; set; }
+    [Inject]
+    public IBillRespo billRepo { get; set; }
 
-
-    private ViewRoomDetailWithPaginationRequest roomDetailRequest = new();
 
     private BillCreateRequest billRequest = new();
 
@@ -49,8 +51,9 @@
     private PaginationResponse<RoomDetailDTO> roomDetailVM;
     private PaginationResponse<CustomerDTO> CustomerVM;
     List<CustomerDTO> lstCustomer = new();
-    private string roomDetailId;
     private string customerId;
+
+    private ViewCustomerWithPaginationRequest customer = new();
 
     private bool _isLoadingList = true;
     MudForm _form;
@@ -62,8 +65,6 @@
     }
     private async Task LoadData()
     {
-        roomDetailVM = await roomDetailRespo.GetAllRoomDetailsByStatus(roomDetailRequest);
-        lstRoomDetails = roomDetailVM.Data!.ToList();
 
         CustomerVM = await cumtomerRespo.GetCustomer(customer);
         lstCustomer = CustomerVM.Data!.ToList();
@@ -74,26 +75,22 @@
     {
         MudDialog.Cancel();
     }
-    private void Reset()
-    {
-        roomBookingCreateRequest = new();
-    }
-    private async Task CreateNewRoomBooking()
+    private void Reset() => customer = new();
+    private async Task CreateBill()
     {
         await _form.Validate();
         if (!_form.IsValid) return;
         var confirm = await _dialogService.ShowMessageBox
         (
             "Thông báo",
-            "Xác nhận thêm phòng?",
+            "Xác nhận thêm hóa đơn?",
             "Xác nhận",
             cancelText: "Hủy"
         );
         if (confirm == true)
         {
-            roomBookingCreateRequest.RoomDetailId = Guid.Parse(roomDetailId);
-            roomBookingCreateRequest.CustomerId = Guid.Parse(customerId);
-            var result = await roomBookingRespo.CreateNewRoomBooking(roomBookingCreateRequest);
+            billRequest.CustomerId = Guid.Parse(customerId);
+            var result = await billRepo.CreateNewBill(billRequest);
             if (result == true)
             {
                 MudDialog.Close(DialogResult.Ok(true));
@@ -114,4 +111,3 @@
   
     #endregion
 }
- *@

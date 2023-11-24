@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using BaseSolution.Application.DataTransferObjects.AmenityRoomDetail;
 using BaseSolution.Application.DataTransferObjects.AmenityRoomDetail.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
+using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Infrastructure.ViewModels.AmenityRoomDetail;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,7 +30,13 @@ namespace BaseSolution.API.Controllers
         {
             AmenityRoomDetailListWithPaginationViewModel vm = new(_AmenityRoomDetailReadOnlyRespository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-            return Ok(vm);
+            if (vm.Success)
+            {
+                PaginationResponse<AmenityRoomDetailDTO> result = new();
+                result = (PaginationResponse<AmenityRoomDetailDTO>)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAmenityRoomDetailById(Guid id, CancellationToken cancellationToken)

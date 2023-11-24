@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using BaseSolution.Application.DataTransferObjects.RoomDetail;
 using BaseSolution.Application.DataTransferObjects.RoomDetail.Request;
+using BaseSolution.Application.DataTransferObjects.RoomType;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Services;
 using BaseSolution.Application.ValueObjects.Common;
@@ -21,13 +22,13 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
 {
     public class RoomDetailReadOnlyRepository : IRoomDetailReadOnlyRepository
     {
-        private readonly DbSet<RoomDetailEntity> _RoomDetailEntities;
+        private readonly AppReadOnlyDbContext _dbContext;
         private readonly IMapper _mapper;
         private readonly ILocalizationService _localizationService;
 
         public RoomDetailReadOnlyRepository(IMapper mapper, ILocalizationService localizationService, AppReadOnlyDbContext dbContext)
         {
-            _RoomDetailEntities = dbContext.Set<RoomDetailEntity>();
+            _dbContext = dbContext;
             _mapper = mapper;
             _localizationService = localizationService;
         }
@@ -35,7 +36,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                var RoomDetail = await _RoomDetailEntities.AsNoTracking().Where(c => c.Id == idRoomDetail && !c.Deleted).ProjectTo<RoomDetailDto>(_mapper.ConfigurationProvider)
+                var RoomDetail = await _dbContext.RoomDetails.Where(c => c.Id == idRoomDetail && !c.Deleted).ProjectTo<RoomDetailDto>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(cancellationToken);
 
                 return RequestResult<RoomDetailDto?>.Succeed(RoomDetail);
@@ -53,12 +54,39 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             }
         }
 
+        public async Task<RequestResult<List<RoomDetailDto>>> GetRoomDetailByIdRoomTypeAsync(Guid idRoomType, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var getList = await _dbContext.RoomDetails.ToListAsync();
+                var listByType = getList.Where(c => c.RoomTypeId == idRoomType);
+                var result = new List<RoomDetailDto>();
+                foreach (var item in listByType)
+                {
+                    var data = _mapper.Map<RoomDetailDto>(item);
+                    result.Add(data);
+                }
+                return RequestResult<List<RoomDetailDto>>.Succeed(result);
+            }
+            catch (Exception e)
+            {
+                return RequestResult<List<RoomDetailDto>>.Fail(_localizationService["RoomDetail is not found"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "RoomDetail"
+                    }
+                });
+            }
+        }
+
         public async Task<RequestResult<PaginationResponse<RoomDetailDto>>> GetRoomDetailWithPaginationByAdminAsync(ViewRoomDetailWithPaginationRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                IQueryable<RoomDetailEntity> queryable = _RoomDetailEntities.AsNoTracking().AsQueryable();
-                var result = await _RoomDetailEntities.AsNoTracking()
+                IQueryable<RoomDetailEntity> queryable = _dbContext.RoomDetails.AsQueryable();
+                var result = await _dbContext.RoomDetails
                     .PaginateAsync<RoomDetailEntity, RoomDetailDto>(request, _mapper, cancellationToken);
 
                 return RequestResult<PaginationResponse<RoomDetailDto>>.Succeed(new PaginationResponse<RoomDetailDto>()

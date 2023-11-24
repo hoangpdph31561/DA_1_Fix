@@ -1,6 +1,8 @@
-﻿namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request
+﻿using BaseSolution.BlazorServer.Data.ValueObjects.Pagination;
+
+namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request
 {
-    public class ViewRoombookingPaginationRequest
+    public class ViewRoombookingPaginationRequest : PaginationRequest
     {
         public string? SearchString { get; set; }
     }

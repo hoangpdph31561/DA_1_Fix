@@ -7,6 +7,8 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        public int NumberOfAmenityRoomDetail { get; set; }
+        public int AmountOfRoomType { get; set; }
         public EntityStatus Status { get; set; }
         //Số lượng loại phòng này trong khách sạn
         public int NumberOfRoomDetails { get; set; }

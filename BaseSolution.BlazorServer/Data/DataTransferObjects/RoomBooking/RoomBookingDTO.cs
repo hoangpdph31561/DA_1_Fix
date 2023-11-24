@@ -12,6 +12,9 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking
         public BookingType BookingType { get; set; }
         public float TotalAmount { get; set; }
         public EntityStatus Status { get; set; } = EntityStatus.Active;
-
+        public DateTimeOffset CreatedTime { get; set; }
+        public decimal PrePaid { get; set; } = 0;
+        public string NameRoomType { get; set; } = string.Empty;
+        public decimal RoomPrice { get; set; }
     }
 }

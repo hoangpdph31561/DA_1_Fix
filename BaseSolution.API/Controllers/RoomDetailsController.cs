@@ -53,7 +53,20 @@ namespace BaseSolution.API.Controllers
 
             return Ok(vm);
         }
+        [HttpGet("idRoomType")]
+        public async Task<List<RoomDetailDto>> GetRoomDetailByIdRoomType( Guid idRoomType, CancellationToken cancellationToken)
+        {
+            RoomDetailViewModelByRoomTypeId vm = new(_RoomDetailReadOnlyRepository, _localizationService);
 
+            await vm.HandleAsync(idRoomType, cancellationToken);
+            if (vm.Success)
+            {
+                List<RoomDetailDto> result = (List<RoomDetailDto>)vm.Data;
+                return result;
+            }
+
+            return new List<RoomDetailDto>();
+        }
         [HttpPost]
         public async Task<IActionResult> Post(RoomDetailCreateRequest request, CancellationToken cancellationToken)
         {

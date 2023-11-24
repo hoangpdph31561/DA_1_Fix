@@ -30,7 +30,7 @@ namespace BaseSolution.API.Controllers
         {
             RoomTypeListWithPaginationViewModel vm = new(_RoomTypeReadOnlyRespository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-            if(vm.Success)
+            if (vm.Success)
             {
                 PaginationResponse<RoomTypeDTO> result = (PaginationResponse<RoomTypeDTO>)vm.Data;
                 return Ok(result);
@@ -42,7 +42,7 @@ namespace BaseSolution.API.Controllers
         {
             RoomTypeViewModel vm = new(_RoomTypeReadOnlyRespository, _localizationService);
             await vm.HandleAsync(id, cancellationToken);
-            if(vm.Success)
+            if (vm.Success)
             {
                 RoomTypeDTO result = (RoomTypeDTO)vm.Data;
                 return Ok(result);

@@ -20,6 +20,12 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             return result;
         }
 
+
+        public async Task<PaginationResponse<RoomDetailDTO>> GetAllRoomDetailsByStatus(ViewRoomDetailWithPaginationRequest request)
+        {
+            string url = $"/api/RoomDetails/getRoomBookingDetailByStatus?PageNumber={request.PageNumber}&PageSize={request.PageSize}";
+            var result = await _httpClient.GetFromJsonAsync<PaginationResponse<RoomDetailDTO>>(url);
+
         public async Task<RoomDetailDTO> GetRoomDetailById(Guid id)
         {
             var result = await _httpClient.GetFromJsonAsync<RoomDetailDTO>($"api/RoomDetails/{id}");
@@ -29,6 +35,7 @@ namespace BaseSolution.BlazorServer.Respository.Implements
         public async Task<List<RoomDetailDTO>> GetRoomDetailByIdRoomType(Guid id)
         {
             var result = await _httpClient.GetFromJsonAsync<List<RoomDetailDTO>>($"api/RoomDetails/idRoomType?idRoomType={id}");
+
             return result;
         }
     }

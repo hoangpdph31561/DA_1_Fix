@@ -1,19 +1,21 @@
-﻿@page "/roombooking"
+﻿@page "/bill"
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Amenity;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Amenity.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Bill;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Bill.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
 <PageTitle>Quản lý tiện ích khách sạn</PageTitle>
-<CustomListDisplayP2 Label="@("Danh sách các phòng đã đặt ")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
+<CustomListDisplayP2 Label="@("Danh sách các bill đã đặt ")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>
         <MudChip Icon="@Icons.Material.Filled.Add" @onclick="async() => await OpenAdd()" Color="Color.Primary">Thêm</MudChip>
     </HeaderContent>
     <BodyContent>
         <MudPaper Elevation="0" Class="custom-list-display-border">
-            @if(lstRoomBooking == null)
+            @if (lstBill == null)
             {
                 <MudText>Không có data</MudText>
             }
@@ -24,31 +26,27 @@
             else
             {
                 <MudCard Class="p-3" Elevation="2">
-                    <MudTable Items="@roomBookingVM.Data">
+                    <MudTable Items="@billVM.Data">
                         <HeaderContent>
                             <MudTh>STT</MudTh>
-                            <MudTh>Nhân viên</MudTh>
-                            <MudTh> Khách hàng</MudTh>
-                            <MudTh>Thông tin phòng</MudTh>
-                            <MudTh>Kiểu đặt phòng</MudTh>
+                            <MudTh>Mã hóa đơn</MudTh>
+                            <MudTh>Ngày xuất</MudTh>
+                            <MudTh>Loại bill</MudTh>
                             <MudTh>Tổng tiền</MudTh>
                             <MudTh>Trạng thái</MudTh>
                             <MudTh></MudTh>
                         </HeaderContent>
                         <RowTemplate>
-                            <MudTd>@(lstRoomBooking.IndexOf(context) + 1)</MudTd>
-                                <MudTd>@context.StaffName</MudTd>
-                                <MudTd>@context.NameCustomer</MudTd>
-                                <MudTh>@context.NameBuilding / @context.NameFloor / @context.NameRoom</MudTh>
-                                <MudTh>@context.BookingType</MudTh>
+                            <MudTd>@(lstBill.IndexOf(context) + 1)</MudTd>
+                                <MudTd>@context.Id</MudTd>
+                                <MudTd>@context.CreatedTime</MudTd>
+                                <MudTh>@context.BillType</MudTh>
                                 <MudTh>@context.TotalAmount</MudTh>
                                 <MudTd><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTd>
-                                <MudTd>
-                                </MudTd>
                             </RowTemplate>
                         </MudTable>
                         <MudDivider />
-                        <CustomPagination Class="my-1" HasNext="@roomBookingVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="roomBookingVM.PageNumber"></CustomPagination>
+                        <CustomPagination Class="my-1" HasNext="@billVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="billVM.PageNumber"></CustomPagination>
                     </MudCard>
             }
         </MudPaper>
@@ -57,16 +55,16 @@
 @code {
     #region Khai báo
     [Inject]
-    public IRoomBookingRespo roomBookingRespo { get; set; }
+    public IBillRespo billRepo { get; set; }
     [Inject]
     public IDialogService _dialogService { get; set; }
     public ISnackbar _snackbar { get; set; }
-    private PaginationResponse<RoomBookingDto> roomBookingVM;
+    private PaginationResponse<BillDTO> billVM;
     private bool _isLoadingAll = true;
     private bool _isLoadingList = true;
     private bool _isDisableControls = false;
-    private ViewRoombookingPaginationRequest roomBookingRequest = new();
-    private List<RoomBookingDto> lstRoomBooking;
+    private ViewBillWithPaginationRequest request = new();
+    private List<BillDTO> lstBill;
     #endregion
     #region Code xử lý
     protected override async Task OnInitializedAsync()
@@ -75,8 +73,8 @@
     }
     private async Task LoadData()
     {
-        roomBookingVM = await roomBookingRespo.GetAllRoomBooking(roomBookingRequest);
-        lstRoomBooking = roomBookingVM.Data!.ToList();
+        billVM = await billRepo.GetAllBill(request);
+        lstBill = billVM.Data!.ToList();
         _isLoadingList = false;
         _isLoadingAll = false;
     }
@@ -84,34 +82,33 @@
     {
         if (_isDisableControls) return;
         _isLoadingList = true;
-        roomBookingRequest.PageNumber = pageNumber;
+        request.PageNumber = pageNumber;
         await LoadData();
     }
-   
     private async Task OnSearch(string? searchString)
     {
         _isLoadingList = true;
-        roomBookingRequest.PageNumber = 1;
-        roomBookingRequest.SearchString = searchString;
+        request.PageNumber = 1;
+        request.Search = searchString;
         await LoadData();
 
     }
-    // private async Task OpenDetail(Guid idRoomBooking)
-    // {
-    //     var parameters = new DialogParameters<RoomBookingUpdate>();
-    //     parameters.Add(x => x.idRoomBooking, idRoomBooking);
-    //     var dialog = await _dialogService.ShowAsync<RoomBookingUpdate>("Chi tiết phòng", parameters);
-    //     var result = await dialog.Result;
-    //     if (!result.Canceled)
-    //     {
-    //         await LoadData();
-    //     }
-    // }
+    private async Task OpenDetail(Guid idAmenity)
+    {
+        // var parameters = new DialogParameters<AmenityUpdate>();
+        // parameters.Add(x => x.idAmenity, idAmenity);
+        // var dialog = await _dialogService.ShowAsync<AmenityUpdate>("Chi tiết tiện ích", parameters);
+        // var result = await dialog.Result;
+        // if (!result.Canceled)
+        // {
+        //     await LoadData();
+        // }
+    }
     #endregion
     #region Code event
     private async Task OpenAdd()
     {
-        var dialog = await _dialogService.ShowAsync<RoombookingCreate>("Thêm phòng đặt ");
+        var dialog = await _dialogService.ShowAsync<CreateBill>("Thêm bill cho khách sạn");
         var result = await dialog.Result;
         if (!result.Canceled)
         {

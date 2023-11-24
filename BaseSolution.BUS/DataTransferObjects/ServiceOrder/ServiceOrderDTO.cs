@@ -9,11 +9,12 @@ namespace BaseSolution.Application.DataTransferObjects.ServiceOrder
 {
     public class ServiceOrderDTO
     {
+        public Guid Id { get; set; }
         public DateTimeOffset CreatedTime { get; set; }
         public int Quantity { get; set; } // số lượng 
         public decimal Price { get; set; }
         public float TotalAmount { get; set; }
-        public EntityStatus Status { get; set; } = EntityStatus.Active;
+        public EntityStatus Status { get; set; } 
 
         // base on 
         public string CustomerName { get; set; } = string.Empty; // Tên khách hàng

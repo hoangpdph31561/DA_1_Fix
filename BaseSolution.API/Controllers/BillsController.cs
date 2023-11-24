@@ -45,10 +45,11 @@ namespace BaseSolution.API.Controllers
         {
             BillListWithPaginationByOtherViewModel vm = new(_billReadOnlyRespository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-            if (vm.Success)
+
+            if(vm.Success)
             {
-                PaginationResponse<BillDTO> result = new();
-                result = (PaginationResponse<BillDTO>)vm.Data;
+                PaginationResponse<BillDTO> result = (PaginationResponse<BillDTO>)vm.Data;
+
                 return Ok(result);
             }
             return BadRequest(vm);

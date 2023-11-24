@@ -13,7 +13,8 @@ namespace BaseSolution.Application.DataTransferObjects.Bill
         public DateTimeOffset CreatedTime { get; set; }
         public Guid? RoomBookingId { get; set; }
         public Guid? ServiceOrderId { get; set; }
-        public EntityStatus Status { get; set; } = EntityStatus.Active;
+        public string BillType { get; set; }
+        public EntityStatus Status { get; set; }
         public Guid? CreatedBy { get; set; }
         public string? CreatedUserName { get; set; }
 
@@ -21,7 +22,7 @@ namespace BaseSolution.Application.DataTransferObjects.Bill
         public int TotalService { get; set; } // tổng số lượng của 1 dịch vụ 
          public decimal ServicePrice { get; set; } // giá của dịch vụ 
         public float ServiceAmount { get; set; } // ServiceAmount = TotalService x ServicePrice
-        public float RoomPrice { get; set; }
+        public decimal RoomPrice { get; set; }
         public float TotalAmount { get; set; } // TotalAmount = TotalService + RoomPrice
     }
 }

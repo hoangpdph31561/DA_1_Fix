@@ -68,7 +68,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                     item.ServiceAmount = (float)(item.TotalService * item.ServicePrice);
 
                     // tính  tổng tiền 
-                    item.TotalAmount = item.ServiceAmount + item.RoomPrice;
+                    item.TotalAmount = item.ServiceAmount + (float)item.RoomPrice;
                 }
                 return RequestResult<PaginationResponse<BillDTO>>.Succeed(new PaginationResponse<BillDTO>()
                 {
@@ -96,22 +96,22 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             {
                 var query =  _appReadOnlyDbContext.Bills.AsNoTracking().Where(x => !x.Deleted).ProjectTo<BillDTO>(_mapper.ConfigurationProvider);
 
-                if (string.IsNullOrWhiteSpace(request.SearchString))
+                if (!string.IsNullOrWhiteSpace(request.SearchString))
                 {
                     query = query.Where(x => x.CreatedTime == request.CreatedTime);
                 }
                  var result = await query.PaginateAsync(request, cancellationToken);
 
-                foreach (var item in result.Data!)
-                {
-                    var userCreated = await _appReadOnlyDbContext.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == item.CreatedBy, cancellationToken) == null ? "N/A" : _appReadOnlyDbContext.Users.AsNoTracking().First(x => x.Id == item.CreatedBy)!.Name;
-                    item.CreatedUserName = userCreated;
+                //foreach (var item in result.Data!)
+                //{
+                //    var userCreated = await _appReadOnlyDbContext.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == item.CreatedBy, cancellationToken) == null ? "N/A" : _appReadOnlyDbContext.Users.AsNoTracking().First(x => x.Id == item.CreatedBy)!.Name;
+                //    item.CreatedUserName = userCreated;
+                //    item.ServiceAmount = (float)(item.TotalService * item.ServicePrice);
+                //    item.BillType = item.RoomBookingId == null ? item.BillType = "Bill dịch vụ" : item.BillType = "Bill phòng";
+                //    // tính  tổng tiền 
+                //    item.TotalAmount = item.ServiceAmount + (float)item.RoomPrice;
 
-                    item.ServiceAmount = (float)(item.TotalService * item.ServicePrice);
-
-                    // tính  tổng tiền 
-                    item.TotalAmount = item.ServiceAmount + item.RoomPrice;
-                }
+                //}
                 return RequestResult<PaginationResponse<BillDTO>>.Succeed(new PaginationResponse<BillDTO>()
                 {
                     PageNumber = request.PageNumber,

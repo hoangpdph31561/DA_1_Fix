@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using BaseSolution.Application.DataTransferObjects.ServiceOrder;
 using BaseSolution.Application.DataTransferObjects.ServiceOrder.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
+using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Infrastructure.ViewModels.ServiceOrder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -43,7 +45,12 @@ namespace BaseSolution.API.Controllers
         {
             ServiceOrderListWithPaginationViewModelByOther vm = new(_serviceOrderReadOnly, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-            return Ok(vm);
+            if(vm.Success)
+            {
+                PaginationResponse<ServiceOrderDTO> result = (PaginationResponse<ServiceOrderDTO>)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
         }
         [HttpPost]
         public async Task<IActionResult> CreateNewServiceOrder(ServiceOrderCreateRequest request, CancellationToken cancellationToken)

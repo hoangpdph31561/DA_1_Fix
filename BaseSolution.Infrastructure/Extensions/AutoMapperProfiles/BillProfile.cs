@@ -15,15 +15,12 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
         public BillProfile()
         {
             CreateMap<BillEntity, BillDTO>()
-
-                // lấy ra tổng số lượng của từng dịch vụ 
-                .ForMember(des => des.TotalService,
-                           opt => opt.MapFrom(src => src.ServiceOrder.ServiceOrderDetails.Count()))
+                // lấy ra tổng số lượng dịch vụ của khách hàng đó
+                .ForMember(des => des.TotalService, opt => opt.MapFrom(src => src.Customer.ServiceOrders.Select(x => x.ServiceOrderDetails).Count()))
                 // lấy ra giá của từng dịch vụ 
-                .ForMember(des => des.ServicePrice,
-                           opt => opt.MapFrom(src => src.ServiceOrder.ServiceOrderDetails.Select(x => x.Price).FirstOrDefault()));
-             
-
+                .ForMember(des => des.ServicePrice, opt => opt.MapFrom(src => src.ServiceOrder.ServiceOrderDetails.Select(x => x.Price).FirstOrDefault()))
+                .ForMember(des => des.RoomPrice, opt => opt.MapFrom(src => src.Customer.RoomBookings.SelectMany(x => x.RoomBookingDetails).Select(x => x.Price).FirstOrDefault()))
+                ;
             CreateMap<BillCreateRequest, BillEntity>();
             CreateMap<BillUpdateRequest, BillEntity>();
         }

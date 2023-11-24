@@ -10,5 +10,11 @@ namespace BaseSolution.Application.DataTransferObjects.RoomType
         public EntityStatus Status { get; set; }
         //Số lượng loại phòng này trong khách sạn
         public int NumberOfRoomDetails { get; set; }
+        //Giá max của phòng
+        public decimal MaxPriceOfRoom { get; set; }
+        //Giá min của phòng
+        public decimal MinPriceOfRoom { get; set; }
+        //Số lượng tiện ích có trong loại phòng
+        public int NumberOfAmenities { get; set; }
     }
 }

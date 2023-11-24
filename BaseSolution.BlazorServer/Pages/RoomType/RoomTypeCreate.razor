@@ -1,0 +1,71 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType.Request
+@using BaseSolution.BlazorServer.Respository.Interfaces
+<MudDialog>
+    <DialogContent>
+        <MudPaper Elevation="0">
+            <MudForm Model="roomTypeCreateRequest" @bind-IsValid="success" @ref="_form">
+                <MudTextField Class="mb-2" @bind-Value="roomTypeCreateRequest.Name" For="@(() => roomTypeCreateRequest.Name)" Label="Tên loại phòng"></MudTextField>
+                <MudTextField Class="mb-2" @bind-Value="roomTypeCreateRequest.Description" For="@(() => roomTypeCreateRequest.Description)" Label="Mô tả"></MudTextField>
+            </MudForm>
+
+        </MudPaper>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@OnClickCancel">Hủy</MudButton>
+        <MudButton @onclick="Reset">Làm mới</MudButton>
+        <MudButton @onclick="CreateNewBuilding" Disabled="@(!success)">Lưu</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    [Inject]
+    public IRoomTypeRespo roomTypeRespo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    private RoomTypeCreateRequest roomTypeCreateRequest = new();
+    private bool success;
+    MudForm _form;
+    private void OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+    private async Task CreateNewBuilding()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+        var confirm = await _dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận thêm loại phòng?",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            var result = await roomTypeRespo.CreateNewRoomType(roomTypeCreateRequest);
+            if (result == true)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                _snackbar.Add("Thêm thành công", Severity.Success);
+            }
+            else
+            {
+                OnClickCancel();
+                _snackbar.Add
+                (
+                    "Thêm thất bại",
+                     Severity.Error
+                );
+            }
+            Reset();
+        }
+    }
+    private void Reset()
+    {
+        roomTypeCreateRequest = new RoomTypeCreateRequest();
+    }
+}

@@ -3,7 +3,7 @@
 @using BaseSolution.BlazorServer.Respository.Interfaces
 
 @page "/customer/customerUpdate"
-<CustomListDisplayP2 Label="@("Thông tin cá nhân")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls">
+<CustomListDisplayP2 Label="@("Thông tin cá nhân")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="OnSearch">
     <HeaderContent>
 
     </HeaderContent>
@@ -27,7 +27,7 @@
                         <RowTemplate>
                             <MudTd>@context.Name</MudTd>
                             <MudTd>@context.IdentificationNumber</MudTd>
-                            <MudTd>@context.Email"</MudTd>
+                            <MudTd>@context.Email</MudTd>
                             <MudTh>@context.PhoneNumber</MudTh>
                             <MudTd>
                                   <MudChip Icon="@Icons.Material.Filled.Details" Color="Color.Primary" Disabled="@_isDisableControls">Chi tiết</MudChip>
@@ -40,12 +40,12 @@
     </BodyContent>
 </CustomListDisplayP2>
 @code {
-    [Inject]
-    public ICustomerRepo customerRepo { get; set; }
-    [Inject]
-    public IDialogService _dialogService { get; set; }
-    [Inject]
-    public ISnackbar _snackbar { get; set; }
+        [Inject]
+        public ICustomerRepo customerRepo { get; set; }
+        [Inject]
+        public IDialogService _dialogService { get; set; }
+        [Inject]
+        public ISnackbar _snackbar { get; set; }
     private PaginationResponse<CustomerDTO> customerVM;
     private bool _isLoadingAll = true;
     private bool _isLoadingList = true;
@@ -61,7 +61,20 @@
     private async Task LoadData()
     {
         customerVM = await customerRepo.GetCustomer(customerRequest);
+
         _isLoadingList = false;
         _isLoadingAll = false;
+    }
+    private async Task OnSearch(string? searchString)
+    {
+        _isLoadingList = true;
+        customerRequest.PageNumber = 1;
+        customerRequest.Name = searchString;
+        await LoadData().ContinueWith((re) =>
+        {
+            _isLoadingAll = false;
+            _isLoadingList = false;
+        });
+
     }
 }

@@ -26,10 +26,16 @@ builder.Services.AddTransient<IRoomDetailRespo, RoomDetailRespo>();
 builder.Services.AddTransient<ICustomerRepo, CustomerRepo>();
 builder.Services.AddTransient<ISendMailService, SendMailService>();
 builder.Services.AddTransient<IServiceTypeRespo, ServiceTypeRespo>();
+builder.Services.AddTransient<IRoomBookingRepo, RoomBookingRepo>();
+builder.Services.AddTransient<IBillRepo, BillRepo>();
+builder.Services.AddTransient<IRoomTypeRepo, RoomTypeRepo>();
+builder.Services.AddTransient<IAmenityRoomDetailRepo, AmenityRoomDetailRepo>();
 builder.Services.AddTransient<IServiceRespo, ServiceRespo>();
 builder.Services.AddTransient<IRoomBookingRespo, RoomBookingRespo>();
 builder.Services.AddTransient<IBillRespo, BillRespo>();
 builder.Services.AddTransient<IServiceOrderRepo, ServiceOrderRepo>();
+builder.Services.AddTransient<IRoomTypeRespo, RoomTypeRespo>();
+
 #endregion
 var app = builder.Build();
 

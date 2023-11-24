@@ -1,4 +1,5 @@
 ﻿using BaseSolution.BlazorServer.Respository.Interfaces;
+using System.Net.Mail;
 using System.Text.Json;
 
 namespace BaseSolution.BlazorServer.Respository.Implements
@@ -29,7 +30,10 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             {
                 return true;
             }
-            return false;
+            else
+            {
+                return false;
+            }     
         }
     }
 }

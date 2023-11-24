@@ -25,9 +25,6 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
         {
             try
             {
-                entity.ApprovedCodeExpiredTime = DateTime.UtcNow;
-                entity.CreatedTime = DateTimeOffset.UtcNow;
-
                 await _dbContext.Customers.AddAsync(entity);
                 await _dbContext.SaveChangesAsync(cancellationToken);
 

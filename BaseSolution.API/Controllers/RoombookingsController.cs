@@ -30,8 +30,13 @@ public class RoombookingsController : ControllerBase
     {
         RoombookingListWithPaginationViewModel vm = new(_roombookingrReadOnlyRespository, _localizationService);
         await vm.HandleAsync(request, cancellationToken);
+        if (vm.Success)
+        {
+            PaginationResponse<RoombookingDTO> result = (PaginationResponse<RoombookingDTO>)vm.Data;
+            return Ok(result);
+        }
+        return BadRequest(vm);
 
-        return Ok(vm);
     }
       [HttpGet("getRoomBookingByOther")]
     public async Task<IActionResult> GetListRoomBookingDetailByOther([FromQuery] ViewRoombookingWithPaginationRequest request, CancellationToken cancellationToken)
@@ -40,6 +45,7 @@ public class RoombookingsController : ControllerBase
         await vm.HandleAsync(request, cancellationToken);
 
         if(vm.Success)
+
         {
             PaginationResponse<RoombookingDTO> result = (PaginationResponse<RoombookingDTO>)vm.Data;
             return Ok(result);

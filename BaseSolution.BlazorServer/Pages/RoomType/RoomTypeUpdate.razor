@@ -1,0 +1,120 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType.Request
+@using BaseSolution.BlazorServer.Respository.Interfaces
+<MudDialog>
+    <DialogContent>
+        @if (roomType == null)
+        {
+            <MudText>Không có tiện ích của bạn</MudText>
+        }
+        else
+        {
+            <MudForm Model="updateRoomTypeRequest" @ref="_form" @bind-IsValid="_formIsValid">
+                <MudPaper Width="100%" Elevation="0">
+                    <MudTextField @bind-Value="updateRoomTypeRequest.Name" For="@(() => updateRoomTypeRequest.Name)" Label="Tên loại phòng"></MudTextField>
+                    <MudTextField @bind-Value="updateRoomTypeRequest.Description" For="@(() => updateRoomTypeRequest.Description)" Label="Mô tả"></MudTextField>
+                    <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="updateRoomTypeRequest.Status" For="@(() => updateRoomTypeRequest.Status)">
+                        <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.InActive">Không hoạt động</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.Pending">Chờ</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.PendingForActivation">Chờ hoạt động</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.PendingForConfirmation">Chờ kích hoạt</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.PendingForApproval">Chờ chấp thuận</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.Locked">Khóa</MudSelectItem>
+                    </MudSelect>
+                </MudPaper>
+            </MudForm>
+        }
+    </DialogContent>
+    <DialogActions>
+        @if(roomType == null)
+        {
+            <MudButton @onclick="OnClickCancel">Hủy</MudButton>
+        }
+        else
+        {
+            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+            <MudButton OnClick="@(async() => await Reset())">Khôi phục</MudButton>
+            <MudButton OnClick="@(async() => await UpdateRoomType())">Lưu</MudButton>
+        }
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #region Khai báo
+    [Parameter]
+    public Guid id { get; set; }
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    [Inject]
+    public IRoomTypeRespo roomTypeRespo { get; set; }
+    [Inject]
+    public IDialogService dialogService { get; set; }
+    [Inject]
+    public ISnackbar snackbar { get; set; }
+    MudForm _form;
+    private bool _formIsValid;
+    private RoomTypeUpdateRequest updateRoomTypeRequest = new();
+    private RoomTypeDTO? roomType;
+    #endregion
+    #region Code xử lý
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        roomType = await roomTypeRespo.GetRoomTypeById(id);
+        updateRoomTypeRequest.Id = roomType.Id;
+        updateRoomTypeRequest.Name = roomType.Name;
+        updateRoomTypeRequest.Status = roomType.Status;
+        updateRoomTypeRequest.Description = roomType.Description;
+    }
+    private void OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+    private bool CheckChangeData()
+    {
+        return roomType!.Name != updateRoomTypeRequest.Name || roomType.Status != updateRoomTypeRequest.Status || roomType.Description != updateRoomTypeRequest.Description;
+    }
+    private async Task UpdateRoomType()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+        var confirm = await dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận sửa loại phòng",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            var result = await roomTypeRespo.UpdateRoomType(updateRoomTypeRequest);
+            if (result)
+            {
+                if (CheckChangeData())
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    snackbar.Add("Sửa thành công", Severity.Success);
+                }
+                else
+                {
+                    OnClickCancel();
+                    snackbar.Add("Không có thay đổi dữ liệu để cập nhật", Severity.Warning);
+                }
+            }
+            else
+            {
+                snackbar.Add("Sửa thất bại", Severity.Error);
+            }
+            await Reset();
+        }
+    }
+    private async Task Reset()
+    {
+        await LoadData();
+    }
+    #endregion
+}

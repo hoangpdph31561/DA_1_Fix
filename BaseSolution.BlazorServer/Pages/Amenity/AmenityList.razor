@@ -17,8 +17,8 @@
             }
             else
             {
-                <MudCard Class="p-3" Elevation="2">
-                    <MudTable Items="@amenityVM.Data">
+                <MudCard Class="p-3" Elevation="0">
+                    <MudTable Items="@amenityVM.Data" Style="position: relative;" Elevation="0">
                         <HeaderContent>
                             <MudTh>STT</MudTh>
                             <MudTh>Tên tiện ích</MudTh>
@@ -131,10 +131,8 @@
         if (!result.Canceled)
         {
             await LoadData();
-        }
+        }   
     }
-    #endregion
-    #region Code event
     private async Task OpenAdd()
     {
         var dialog = await _dialogService.ShowAsync<AmenityCreate>("Thêm tiện ích cho khách sạn");
@@ -146,4 +144,7 @@
         }
     }
     #endregion
+    
+    
+    
 }

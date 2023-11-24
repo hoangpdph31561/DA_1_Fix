@@ -22,5 +22,6 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking
         public decimal RoomPrice { get; set; }
         public float TotalAmount { get; set; }
 
+
     }
 }

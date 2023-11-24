@@ -9,7 +9,8 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
     {
         public AmenityRoomDetailProfile()
         {
-            CreateMap<AmenityRoomDetailEntity, AmenityRoomDetailDTO>();
+            CreateMap<AmenityRoomDetailEntity, AmenityRoomDetailDTO>()
+                .ForMember(desc => desc.NameOfAmenity, opt => opt.MapFrom(src => src.Amenity.Name));
             CreateMap<AmenityRoomDetailCreateRequest, AmenityRoomDetailEntity>();
             CreateMap<AmenityRoomDetailUpdateRequest, AmenityRoomDetailEntity>();
             CreateMap<AmenityRoomDetailDeleteRequest, AmenityRoomDetailEntity>();

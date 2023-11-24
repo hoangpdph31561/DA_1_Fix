@@ -108,7 +108,7 @@
     #region Code event
     private async Task OpenAdd()
     {
-        var dialog = await _dialogService.ShowAsync<CreateBill>("Thêm bill cho khách sạn");
+        var dialog = await _dialogService.ShowAsync<BillCreate>("Thêm bill cho khách sạn");
         var result = await dialog.Result;
         if (!result.Canceled)
         {

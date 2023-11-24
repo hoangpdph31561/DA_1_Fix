@@ -5,6 +5,9 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request;
+@using BaseSolution.BlazorServer.Pages.Customer;
+@using BaseSolution.BlazorServer.Pages.Service;
+@using BaseSolution.BlazorServer.Pages.ServiceOrder;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
 <PageTitle>Quản lý tiện ích khách sạn</PageTitle>
 <CustomListDisplayP2 Label="@("Danh sách các phòng đã đặt ")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
@@ -27,20 +30,20 @@
                     <MudTable Items="@roomBookingVM.Data">
                         <HeaderContent>
                             <MudTh>STT</MudTh>
-                            <MudTh>Nhân viên</MudTh>
                             <MudTh> Khách hàng</MudTh>
                             <MudTh>Thông tin phòng</MudTh>
                             <MudTh>Kiểu đặt phòng</MudTh>
+                            <MudTh>Số lượng dịch vụ</MudTh>
                             <MudTh>Tổng tiền</MudTh>
                             <MudTh>Trạng thái</MudTh>
                             <MudTh></MudTh>
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd>@(lstRoomBooking.IndexOf(context) + 1)</MudTd>
-                                <MudTd>@context.StaffName</MudTd>
                                 <MudTd>@context.NameCustomer</MudTd>
                                 <MudTh>@context.NameBuilding / @context.NameFloor / @context.NameRoom</MudTh>
                                 <MudTh>@context.BookingType</MudTh>
+                                <MudTh>@context.TotalService <MudChip Icon="@Icons.Material.Filled.ListAlt" OnClick="@(() => OpenService(context.CustomerId))"></MudChip></MudTh>
                                 <MudTh>@context.TotalAmount</MudTh>
                                 <MudTd><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTd>
                                 <MudTd>
@@ -87,7 +90,7 @@
         roomBookingRequest.PageNumber = pageNumber;
         await LoadData();
     }
-   
+
     private async Task OnSearch(string? searchString)
     {
         _isLoadingList = true;
@@ -96,17 +99,17 @@
         await LoadData();
 
     }
-    // private async Task OpenDetail(Guid idRoomBooking)
-    // {
-    //     var parameters = new DialogParameters<RoomBookingUpdate>();
-    //     parameters.Add(x => x.idRoomBooking, idRoomBooking);
-    //     var dialog = await _dialogService.ShowAsync<RoomBookingUpdate>("Chi tiết phòng", parameters);
-    //     var result = await dialog.Result;
-    //     if (!result.Canceled)
-    //     {
-    //         await LoadData();
-    //     }
-    // }
+    private async Task OpenService(Guid CustomerId)
+    {
+        var parameters = new DialogParameters<GetServiceOrderByIdCustomer>();
+        parameters.Add(x => x.idCustomer, CustomerId);
+        var dialog = await _dialogService.ShowAsync<GetServiceOrderByIdCustomer>("Danh sách dịch vụ", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
+    }
     #endregion
     #region Code event
     private async Task OpenAdd()

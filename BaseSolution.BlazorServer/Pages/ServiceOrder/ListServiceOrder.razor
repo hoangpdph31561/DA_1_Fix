@@ -32,7 +32,6 @@
                         <HeaderContent>
                             <MudTh>STT</MudTh>
                             <MudTh>Khách hàng</MudTh>
-                            <MudTh>Nhân Viên</MudTh>
                             <MudTh>Dịch vụ</MudTh>
                             <MudTh>Ngày đặt</MudTh>
                             <MudTh>Số lượng</MudTh>
@@ -44,7 +43,6 @@
                         <RowTemplate>
                             <MudTd>@(lstServiceOrder.IndexOf(context) + 1)</MudTd>
                                 <MudTd>@context.CustomerName</MudTd>
-                                <MudTd>@context.UserName</MudTd>
                                 <MudTh>@context.Name</MudTh>
                                 <MudTh>@context.CreatedTime</MudTh>
                                 <MudTh>@context.Quantity</MudTh>
@@ -117,13 +115,13 @@
     #region Code event
     private async Task OpenAdd()
     {
-        // var dialog = await _dialogService.ShowAsync<AmenityCreate>("Thêm tiện ích cho khách sạn");
-        // var result = await dialog.Result;
-        // if (!result.Canceled)
-        // {
-        //     await LoadData();
-        //     StateHasChanged();
-        // }
+        var dialog = await _dialogService.ShowAsync<ServicerOrderCreate>("Thêm dịch vụ đã đặt");
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+            StateHasChanged();
+        }
     }
     #endregion
 }

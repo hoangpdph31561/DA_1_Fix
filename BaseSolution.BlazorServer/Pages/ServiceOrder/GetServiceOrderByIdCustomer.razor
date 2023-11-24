@@ -1,0 +1,78 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Service;
+@using BaseSolution.BlazorServer.Respository.Interfaces
+<MudDialog>
+    <DialogContent>
+        @if (_lstServiceOrder == null)
+        {
+            <MudText>Không có dịch vụ nào nào</MudText>
+        }
+        else
+        {
+            <MudTable Items="_lstServiceOrder.DistinctBy(x => x.Name).ToList()">
+                <RowTemplate>
+                    <MudTd>@(_lstServiceOrder.IndexOf(context) + 1)</MudTd>
+                        <MudTd>@context.Name</MudTd>
+                    </RowTemplate>
+                </MudTable>
+        }
+    </DialogContent>
+    <DialogActions>
+        @if (serviceOderInfo == null)
+        {
+            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+        }
+        else
+        {
+            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+        }
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #region
+    [Parameter]
+    public Guid idCustomer { get; set; }
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    [Inject]
+    public IServiceOrderRepo serviceOrderRepo { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    [Inject]
+    public IDialogService dialogService { get; set; }
+
+    private ServiceOrderDTO? serviceOderInfo;
+
+
+    private PaginationResponse<ServiceOrderDTO> _ServiceOrderlVM = new PaginationResponse<ServiceOrderDTO>();
+    private List<ServiceOrderDTO>? _lstServiceOrder;
+
+    private ViewRoomDetailWithPaginationRequest roomDetailRequest = new();
+    bool _isDisableControls = false;
+    #endregion
+
+    protected async override Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        _ServiceOrderlVM.Data = await serviceOrderRepo.GetRoomDetailByIdCustomer(idCustomer);
+        _lstServiceOrder = _ServiceOrderlVM.Data!.ToList();
+    }
+    public async Task OpenAdd(Guid idRoomDetail)
+    {
+
+    }
+    public async Task OpenDetail(Guid idRoomDetail)
+    {
+
+    }
+    private void OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+}

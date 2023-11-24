@@ -25,7 +25,11 @@ namespace BaseSolution.BlazorServer.Respository.Implements
         {
             try
             {
-                string url = $"/api/Roombookings/getRoomBookingByOther?PageNumber={request.PageNumber}&PageSize={request.PageSize}";
+                string url = $"/api/RoomBookings/getRoomBookingByDetail?PageNumber={request.PageNumber}&PageSize={request.PageSize}";
+                if (!String.IsNullOrEmpty(request.SearchString))
+                {
+                    url = $"/api/RoomBookings/getRoomBookingByDetail?SearchString={request.SearchString}&PageNumber={request.PageNumber}&PageSize={request.PageSize}";
+                }
                 var result = await _httpClient.GetFromJsonAsync<PaginationResponse<RoomBookingDto>>(url);
                 return result;
             }

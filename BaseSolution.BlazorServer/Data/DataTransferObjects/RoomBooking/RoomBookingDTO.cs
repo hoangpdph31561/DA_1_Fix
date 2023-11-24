@@ -7,7 +7,9 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking
         public Guid Id { get; set; }
         public EntityStatus Status { get; set; } 
         public BookingType BookingType { get; set; }
-
+        public DateTimeOffset CreatedTime { get; set; }
+        public string NameRoomType { get; set; }
+        public decimal PrePaid { get; set; }
         // Base on
         public Guid CustomerId { get; set; }
         public Guid RoomDetailId { get; set; }

@@ -25,7 +25,9 @@ namespace BaseSolution.BlazorServer.Respository.Implements
         {
             string url = $"/api/RoomDetails/getRoomBookingDetailByStatus?PageNumber={request.PageNumber}&PageSize={request.PageSize}";
             var result = await _httpClient.GetFromJsonAsync<PaginationResponse<RoomDetailDTO>>(url);
-
+            return result;
+           
+        }
         public async Task<RoomDetailDTO> GetRoomDetailById(Guid id)
         {
             var result = await _httpClient.GetFromJsonAsync<RoomDetailDTO>($"api/RoomDetails/{id}");

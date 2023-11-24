@@ -116,7 +116,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             try
             {
 
-                var result = await _RoomDetailEntities.AsNoTracking().Where(x => x.Status == RoomStatus.Vacant)
+                var result = await _dbContext.RoomDetails.AsNoTracking().Where(x => x.Status == RoomStatus.Vacant)
                 .PaginateAsync<RoomDetailEntity, RoomDetailDto>(request, _mapper, cancellationToken);
                 return RequestResult<PaginationResponse<RoomDetailDto>>.Succeed(new PaginationResponse<RoomDetailDto>()
                 {

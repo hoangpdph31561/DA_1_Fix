@@ -23,6 +23,8 @@ namespace BaseSolution.Infrastructure.ViewModels.RoomDetail
 
         public override async Task HandleAsync(Guid idRoomType, CancellationToken cancellationToken)
         {
+            throw new NotImplementedException();
+            /*
             try
             {
                 var result = await _RoomDetailReadOnlyRepository.GetRoomDetailByIdRoomTypeAsync(idRoomType, cancellationToken);
@@ -45,6 +47,7 @@ namespace BaseSolution.Infrastructure.ViewModels.RoomDetail
                 }
             };
             }
+            */
         }
     }
 }

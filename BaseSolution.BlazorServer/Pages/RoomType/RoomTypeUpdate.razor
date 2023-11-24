@@ -1,18 +1,19 @@
-﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceType.Request;
-@using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceType;
-@using BaseSolution.BlazorServer.Respository.Interfaces;
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType.Request
+@using BaseSolution.BlazorServer.Respository.Interfaces
 <MudDialog>
     <DialogContent>
-        @if (serviceType == null)
+        @if (roomType == null)
         {
-            <MudText>Không có loại dịch vụ của bạn</MudText>
+            <MudText>Không có tiện ích của bạn</MudText>
         }
         else
         {
-            <MudForm Model="updateServiceTypeRequest" @ref="_form" @bind-IsValid="_formIsValid">
+            <MudForm Model="updateRoomTypeRequest" @ref="_form" @bind-IsValid="_formIsValid">
                 <MudPaper Width="100%" Elevation="0">
-                    <MudTextField @bind-Value="updateServiceTypeRequest.Name" For="@(() => updateServiceTypeRequest.Name)" Label="Tên tiện ích"></MudTextField>
-                    <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="updateServiceTypeRequest.Status" For="@(() => updateServiceTypeRequest.Status)">
+                    <MudTextField @bind-Value="updateRoomTypeRequest.Name" For="@(() => updateRoomTypeRequest.Name)" Label="Tên loại phòng"></MudTextField>
+                    <MudTextField @bind-Value="updateRoomTypeRequest.Description" For="@(() => updateRoomTypeRequest.Description)" Label="Mô tả"></MudTextField>
+                    <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="updateRoomTypeRequest.Status" For="@(() => updateRoomTypeRequest.Status)">
                         <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
                         <MudSelectItem Value="EntityStatus.InActive">Không hoạt động</MudSelectItem>
                         <MudSelectItem Value="EntityStatus.Pending">Chờ</MudSelectItem>
@@ -26,7 +27,7 @@
         }
     </DialogContent>
     <DialogActions>
-        @if (serviceType == null)
+        @if(roomType == null)
         {
             <MudButton @onclick="OnClickCancel">Hủy</MudButton>
         }
@@ -34,7 +35,7 @@
         {
             <MudButton OnClick="OnClickCancel">Hủy</MudButton>
             <MudButton OnClick="@(async() => await Reset())">Khôi phục</MudButton>
-            <MudButton OnClick="@(async() => await UpdateServiceType())">Lưu</MudButton>
+            <MudButton OnClick="@(async() => await UpdateRoomType())">Lưu</MudButton>
         }
     </DialogActions>
 </MudDialog>
@@ -42,20 +43,20 @@
 @code {
     #region Khai báo
     [Parameter]
-    public Guid idServiceType { get; set; }
+    public Guid id { get; set; }
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
     [Inject]
-    public IServiceTypeRespo serviceTypeRespo { get; set; }
+    public IRoomTypeRespo roomTypeRespo { get; set; }
     [Inject]
     public IDialogService dialogService { get; set; }
     [Inject]
     public ISnackbar snackbar { get; set; }
     MudForm _form;
     private bool _formIsValid;
-    private ServiceTypeUpdateRequest updateServiceTypeRequest = new();
-    private ServiceTypeDTO? serviceType;
-    #endregion 
+    private RoomTypeUpdateRequest updateRoomTypeRequest = new();
+    private RoomTypeDTO? roomType;
+    #endregion
     #region Code xử lý
     protected override async Task OnInitializedAsync()
     {
@@ -63,10 +64,11 @@
     }
     private async Task LoadData()
     {
-        serviceType = await serviceTypeRespo.GetServiceTypeById(idServiceType);
-        updateServiceTypeRequest.Id = serviceType.Id;
-        updateServiceTypeRequest.Name = serviceType.Name;
-        updateServiceTypeRequest.Status = serviceType.Status;
+        roomType = await roomTypeRespo.GetRoomTypeById(id);
+        updateRoomTypeRequest.Id = roomType.Id;
+        updateRoomTypeRequest.Name = roomType.Name;
+        updateRoomTypeRequest.Status = roomType.Status;
+        updateRoomTypeRequest.Description = roomType.Description;
     }
     private void OnClickCancel()
     {
@@ -74,22 +76,22 @@
     }
     private bool CheckChangeData()
     {
-        return serviceType!.Name != updateServiceTypeRequest.Name || serviceType.Status != updateServiceTypeRequest.Status;
+        return roomType!.Name != updateRoomTypeRequest.Name || roomType.Status != updateRoomTypeRequest.Status || roomType.Description != updateRoomTypeRequest.Description;
     }
-    private async Task UpdateServiceType()
+    private async Task UpdateRoomType()
     {
         await _form.Validate();
         if (!_form.IsValid) return;
         var confirm = await dialogService.ShowMessageBox
         (
             "Thông báo",
-            "Xác nhận sửa loại dịch vụ",
+            "Xác nhận sửa loại phòng",
             "Xác nhận",
             cancelText: "Hủy"
         );
         if (confirm == true)
         {
-            var result = await serviceTypeRespo.UpdateServiceType(updateServiceTypeRequest);
+            var result = await roomTypeRespo.UpdateRoomType(updateRoomTypeRequest);
             if (result)
             {
                 if (CheckChangeData())

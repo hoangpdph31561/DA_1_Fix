@@ -24,7 +24,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
         {
             try
             {
-                entity.CreatedTime = DateTimeOffset.Now;
+                entity.CreatedTime = DateTimeOffset.UtcNow;
                 await _appReadWriteDbContext.RoomTypes.AddAsync(entity);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
                 return RequestResult<Guid>.Succeed(entity.Id);
@@ -54,7 +54,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 var RoomType = await GetRoomTypeByIdAsync(request.Id, cancellationToken);
                 RoomType!.Deleted = true;
                 RoomType.DeletedBy = request.DeletedBy;
-                RoomType.DeletedTime = DateTimeOffset.Now;
+                RoomType.DeletedTime = DateTimeOffset.UtcNow;
                 RoomType.Status = EntityStatus.Deleted;
                 _appReadWriteDbContext.RoomTypes.Update(RoomType);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
@@ -81,9 +81,9 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
 
                 RoomType!.Name = string.IsNullOrEmpty(entity.Name) ? RoomType.Name : entity.Name;
                 RoomType.Description = string.IsNullOrEmpty(entity.Description) ? RoomType.Description : entity.Description;
-                RoomType.Status = entity.Status == EntityStatus.Active ? EntityStatus.Active : EntityStatus.InActive;
+                RoomType.Status = entity.Status;
                 RoomType.ModifiedBy = entity.ModifiedBy;
-                RoomType.ModifiedTime = DateTimeOffset.Now;
+                RoomType.ModifiedTime = DateTimeOffset.UtcNow;
                 _appReadWriteDbContext.RoomTypes.Update(RoomType);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
                 return RequestResult<int>.Succeed(1);

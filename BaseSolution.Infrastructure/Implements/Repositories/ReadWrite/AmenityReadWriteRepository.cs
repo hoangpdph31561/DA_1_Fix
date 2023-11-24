@@ -24,7 +24,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
         {
             try
             {
-                entity.CreatedTime = DateTimeOffset.Now;
+                entity.CreatedTime = DateTimeOffset.UtcNow;
                 await _appReadWriteDbContext.Amenities.AddAsync(entity);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
                 return RequestResult<Guid>.Succeed(entity.Id);
@@ -54,7 +54,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 var amenity = await GetAmenityByIdAsync(request.Id, cancellationToken);
                 amenity!.Deleted = true;
                 amenity.DeletedBy = request.DeletedBy;
-                amenity.DeletedTime = DateTimeOffset.Now;
+                amenity.DeletedTime = DateTimeOffset.UtcNow;
                 amenity.Status = EntityStatus.Deleted;
                 _appReadWriteDbContext.Amenities.Update(amenity);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
@@ -83,7 +83,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 amenity.Description = string.IsNullOrEmpty(entity.Description) ? amenity.Description : entity.Description;
                 amenity.Status = entity.Status == EntityStatus.Active ? EntityStatus.Active : EntityStatus.InActive;
                 amenity.ModifiedBy = entity.ModifiedBy;
-                amenity.ModifiedTime = DateTimeOffset.Now;
+                amenity.ModifiedTime = DateTimeOffset.UtcNow;
                 _appReadWriteDbContext.Amenities.Update(amenity);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
                 return RequestResult<int>.Succeed(1);

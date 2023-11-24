@@ -54,7 +54,11 @@ namespace BaseSolution.API.Controllers
         {
             RoomTypeCreateViewModel vm = new(_RoomTypeReadOnlyRespository, _RoomTypeReadWriteRespository, _mapper, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-            return Ok(vm);
+            if(vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
         }
 
         [HttpPut]
@@ -62,17 +66,26 @@ namespace BaseSolution.API.Controllers
         {
             RoomTypeUpdateViewModel vm = new(_RoomTypeReadWriteRespository, _mapper, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-            return Ok(vm);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
+            
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteRoomType(RoomTypeDeleteRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> DeleteRoomType([FromQuery]RoomTypeDeleteRequest request, CancellationToken cancellationToken)
         {
             RoomTypeDeleteViewModel vm = new(_RoomTypeReadWriteRespository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);
 
-            return Ok(vm);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
         }
     }
 }

@@ -1,0 +1,118 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Service.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceType;
+@using BaseSolution.BlazorServer.Respository.Interfaces;
+@using BaseSolution.BlazorServer.Extensions
+<MudDialog>
+    <DialogContent>
+        @if (_isLoadingList)
+        {
+            <LoadingIndicator></LoadingIndicator>
+        }
+        else
+        {
+            <MudForm Model="@serviceCreateRequest" @ref="_form">
+                <MudPaper Elevation="0" >
+                    <MudSelect T="string" Label="Loại dịch vụ" Class="mb-2" 
+                             AnchorOrigin="Origin.BottomCenter" @bind-Value="@_selectedServiceTypeId" For="@(() => _selectedServiceTypeId)">
+                        @foreach (var item in lstServiceType)
+                        {
+                            <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudTextField @bind-Value="@serviceCreateRequest.Name" For="@(() => serviceCreateRequest.Name)" Label="Tên dịch vụ"></MudTextField>
+                    <MudAutocomplete T="string" Label="Đơn vị tính" @bind-Value="serviceCreateRequest.Unit" SearchFunc="SearchAutoComplete" AdornmentIcon="@Icons.Material.Filled.Search"></MudAutocomplete>
+                    <MudNumericField @bind-Value="@serviceCreateRequest.Price" For="@(() => serviceCreateRequest.Price)" Label="Giá" Variant="Variant.Text" Min="1000" Step="1000"></MudNumericField>
+                    <MudTextField @bind-Value="@serviceCreateRequest.Description" For="@(() => serviceCreateRequest.Description)" Label="Mô tả"></MudTextField>
+                </MudPaper>
+            </MudForm>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+        <MudButton OnClick="Reset">Khôi phục</MudButton>
+        <MudButton OnClick="CreateNewFloor">Lưu</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    #region Khai báo
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    [Inject]
+    public IServiceTypeRespo serviceTypeRespo { get; set; }
+    [Inject]
+    public IServiceRespo serviceRespo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    private PaginationResponse<ServiceTypeDTO> serviceTypeVM;
+    private List<ServiceTypeDTO> lstServiceType;
+    private ServiceCreateRequest serviceCreateRequest = new();
+    private bool _isLoadingList = true;
+    private string _selectedServiceTypeId;
+    MudForm _form;
+    #endregion
+    #region Code xử lý
+    private async Task<IEnumerable<string>> SearchAutoComplete(string value)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+            return UtilityExtentions.CacDonViTinh.Take(10);
+        return UtilityExtentions.GetRecommendedStrings(value,UtilityExtentions.CacDonViTinh);
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        serviceTypeVM = await serviceTypeRespo.GetAllServiceTypes(new Data.DataTransferObjects.ServiceType.Request.ViewServiceTypeWithPaginationRequest { PageSize = int.MaxValue - 1 });
+        lstServiceType = serviceTypeVM.Data!.ToList();
+        _isLoadingList = false;
+    }
+    private void OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+    private void Reset()
+    {
+        serviceCreateRequest = new();
+    }
+    private async Task CreateNewFloor()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+        var confirm = await _dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận thêm tầng vào tòa nhà?",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            serviceCreateRequest.ServiceTypeId = Guid.Parse(_selectedServiceTypeId);
+            var result = await serviceRespo.CreateNewService(serviceCreateRequest);
+            if (result == true)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                _snackbar.Add("Thêm thành công", Severity.Success);
+            }
+            else
+            {
+                _snackbar.Add
+                (
+                    "Thêm thất bại",
+                     Severity.Error
+                );
+            }
+            Reset();
+        }
+    }
+    #endregion
+}

@@ -1,0 +1,161 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Service;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Service.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceType;
+@using BaseSolution.BlazorServer.Extensions;
+@using BaseSolution.BlazorServer.Respository.Interfaces;
+<MudDialog>
+    <DialogContent>
+        @if (service == null || lstServiceType.Count == 0)
+        {
+            <MudText>Không có tầng nào</MudText>
+        }
+        else
+        {
+            <MudForm Model="serviceUpdateRequest" @ref="@_form" @bind-IsValid="@_formIsValid">
+                <MudPaper Width="100%" Elevation="0">
+                    <MudGrid>
+                        <MudItem xs="12" sm="6">
+                            <MudTextField @bind-Value="serviceUpdateRequest.Name" For="@(() => serviceUpdateRequest.Name)" Label="Tên dịch vụ"></MudTextField>
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudSelect T="Guid" Label="Loại dịch vụ" AnchorOrigin="Origin.BottomCenter" @bind-Value="serviceUpdateRequest.ServiceTypeId" For="@(() => serviceUpdateRequest.ServiceTypeId)">
+                                @foreach (var item in lstServiceType!)
+                                {
+                                    <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                    </MudGrid>
+                    <MudGrid>
+                        <MudItem xs="12" sm="6">
+                            <MudAutocomplete T="string" Label="Đơn vị tính" @bind-Value="serviceUpdateRequest.Unit" SearchFunc="SearchAutoComplete" AdornmentIcon="@Icons.Material.Filled.Search"></MudAutocomplete>
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudNumericField @bind-Value="@serviceUpdateRequest.Price" For="@(() => serviceUpdateRequest.Price)" Label="Giá" Variant="Variant.Text" Min="1000" Step="1000"></MudNumericField>
+                        </MudItem>
+                    </MudGrid>
+                    <MudTextField @bind-Value="@serviceUpdateRequest.Description" For="@(() => serviceUpdateRequest.Description)" Label="Mô tả"></MudTextField>
+                    <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="serviceUpdateRequest.Status" For="@(() => serviceUpdateRequest.Status)">
+                        <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.InActive">Không hoạt động</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.Pending">Chờ</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.PendingForActivation">Chờ hoạt động</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.PendingForConfirmation">Chờ kích hoạt</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.PendingForApproval">Chờ chấp thuận</MudSelectItem>
+                        <MudSelectItem Value="EntityStatus.Locked">Khóa</MudSelectItem>
+                    </MudSelect>
+                </MudPaper>
+            </MudForm>
+        }
+    </DialogContent>
+    <DialogActions>
+        @if (service == null)
+        {
+            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+        }
+        else
+        {
+            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+            <MudButton OnClick="Reset">Khôi phục</MudButton>
+            <MudButton OnClick="UpdateService">Lưu</MudButton>
+        }
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #region Khai báo
+    [Parameter]
+    public Guid idService { get; set; }
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    [Inject]
+    public IServiceTypeRespo serviceTypeRespo { get; set; }
+    [Inject]
+    public IDialogService dialogService { get; set; }
+    [Inject]
+    public ISnackbar snackbar { get; set; }
+    [Inject]
+    public IServiceRespo serviceRespo { get; set; }
+    MudForm _form;
+    private bool _formIsValid;
+    private ServiceDTO? service;
+    private ServiceUpdateRequest serviceUpdateRequest = new();
+    private PaginationResponse<ServiceTypeDTO> serviceTypeVM;
+    private List<ServiceTypeDTO>? lstServiceType;
+    #endregion
+    #region Code xử lý
+    private async Task<IEnumerable<string>> SearchAutoComplete(string value)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+            return UtilityExtentions.CacDonViTinh.Take(10);
+        return UtilityExtentions.GetRecommendedStrings(value, UtilityExtentions.CacDonViTinh);
+    }
+    protected async override Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        service = await serviceRespo.GetServiceById(idService);
+        serviceTypeVM = await serviceTypeRespo.GetAllServiceTypes(new Data.DataTransferObjects.ServiceType.Request.ViewServiceTypeWithPaginationRequest { PageSize = int.MaxValue - 1 });
+        lstServiceType = serviceTypeVM.Data!.ToList();
+        serviceUpdateRequest.Id = service.Id;
+        serviceUpdateRequest.Status = service.Status;
+        serviceUpdateRequest.Unit = service.Unit;
+        serviceUpdateRequest.Price = service.Price;
+        serviceUpdateRequest.Name = service.Name;
+        serviceUpdateRequest.Description = service.Description;
+        serviceUpdateRequest.ServiceTypeId = service.ServiceTypeId;
+    }
+    private void OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+    private async Task Reset()
+    {
+        await LoadData();
+    }
+    private bool CheckChangeData()
+    {
+        return service!.Status != serviceUpdateRequest.Status || service.Unit != serviceUpdateRequest.Unit || service.Price != serviceUpdateRequest.Price || service.Name != serviceUpdateRequest.Name || service.Description != serviceUpdateRequest.Description || service.ServiceTypeId != serviceUpdateRequest.ServiceTypeId;
+    }
+    private async Task UpdateService()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+        var confirm = await dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận sửa dịch vụ",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            var result = await serviceRespo.UpdateService(serviceUpdateRequest);
+            if (result)
+            {
+                if (CheckChangeData())
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    snackbar.Add("Sửa thành công", Severity.Success);
+                }
+                else
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    snackbar.Add("Không có thay đổi dữ liệu để cập nhật", Severity.Warning);
+                }
+            }
+            else
+            {
+                snackbar.Add("Sửa thất bại", Severity.Error);
+            }
+            await Reset();
+        }
+    }
+    #endregion
+}

@@ -1,0 +1,189 @@
+﻿@page "/service"
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Service.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Service;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceType.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceType;
+@using BaseSolution.BlazorServer.Respository.Interfaces;
+<PageTitle>Danh sách dịch vụ khách sạn</PageTitle>
+<CustomListDisplayP2 Label="Danh sách dịch vụ trong khách sạn" IsLoading="lstServiceType == null" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
+    <HeaderContent>
+        <MudChip Icon="@Icons.Material.Filled.Add" OnClick="@(async() => await OpenAdd())" Color="Color.Primary">Thêm</MudChip>
+    </HeaderContent>
+    <AdditionalSearchBarColumn>
+        <MudSelect Variant="Variant.Outlined" Style="background-color: white;" AnchorOrigin="Origin.BottomCenter" Label="Tòa nhà" @bind-Value="_idServiceType">
+            @foreach (var item in lstServiceType!)
+            {
+                <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
+            }
+        </MudSelect>
+    </AdditionalSearchBarColumn>
+    <BodyContent>
+        <MudPaper Elevation="0">
+            @if (_isLoadingList)
+            {
+                <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="m-3" />
+            }
+            else
+            {
+                <MudTable Items="@serviceVM.Data" Style="position: relative;" Elevation="0">
+                    <HeaderContent>
+                        <MudTh>STT</MudTh>
+                        <MudTh>Tên dịch vụ</MudTh>
+                        <MudTh>Loại dịch vụ</MudTh>
+                        <MudTh>Số lượng đã đặt</MudTh>
+                        <MudTh>Đơn vị tính</MudTh>
+                        <MudTh>Giá</MudTh>
+                        <MudTh>Trạng thái</MudTh>
+                        <MudTh>Thao tác</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>@(lstService.IndexOf(context) + 1)</MudTd>
+                            <MudTd>@context.Name</MudTd>
+                            <MudTd>@context.ServiceTypeName</MudTd>
+                            <MudTd>@context.TotalOrders</MudTd>
+                            <MudTd>@context.Unit</MudTd>
+                            <MudTd>@context.Price</MudTd>
+                            <MudTh><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTh>
+                            <MudTd>
+                                <MudChip Icon="@Icons.Filled.MenuOpen" Color="Color.Primary" OnClick="@( async() => await OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
+                                <MudChip Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@( async() => await OnDelete(context.Id))" Disabled="@_isDisableControls">Xóa</MudChip>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                <CustomPagination Class="my-1" HasNext="@serviceVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="@serviceVM.PageNumber"></CustomPagination>
+            }
+        </MudPaper>
+    </BodyContent>
+</CustomListDisplayP2>
+@code {
+    #region Khai báo
+    [Inject]
+    public IServiceRespo serviceRespo { get; set; }
+    [Inject]
+    public IServiceTypeRespo serviceTypeRespo { get; set; }
+    [Inject]
+    public IDialogService dialogService { get; set; }
+    [Inject]
+    public ISnackbar snackbar { get; set; }
+    private ViewServiceTypeWithPaginationRequest serviceTypeViewRequest = new()
+    {
+        PageSize = int.MaxValue - 1
+    };
+    private ViewServiceWithPaginationRequest serviceViewRequest = new();
+    private PaginationResponse<ServiceTypeDTO> serviceTypeVM;
+    private PaginationResponse<ServiceDTO> serviceVM;
+    private List<ServiceTypeDTO> lstServiceType;
+    private List<ServiceDTO> lstService;
+    private ServiceDeleteRequest serviceDeleteRequest = new();
+    private bool _isLoadingAll = true;
+    private bool _isLoadingList = true;
+    private bool _isDisableControls = false;
+    private string _idServiceType = Guid.Empty.ToString();
+    private string _idServiceTypeCurrent = Guid.Empty.ToString();
+    #endregion
+    #region Code xử lý
+    private async Task LoadData()
+    {
+        serviceViewRequest.ServiceTypeId = Guid.Parse(_idServiceType);
+        serviceVM = await serviceRespo.GetAllServices(serviceViewRequest);
+        lstService = serviceVM.Data!.ToList();
+        _isLoadingList = false;
+    }
+    protected async override Task OnInitializedAsync()
+    {
+        serviceTypeVM = await serviceTypeRespo.GetAllServiceTypes(serviceTypeViewRequest);
+        lstServiceType = serviceTypeVM.Data!.ToList();
+        if (lstServiceType != null)
+        {
+            if (lstServiceType.Any())
+            {
+                _idServiceType = lstServiceType[0].Id.ToString();
+                serviceViewRequest.ServiceTypeId = Guid.Parse(_idServiceType);
+                await LoadData();
+            }
+            else
+            {
+                serviceViewRequest = new();
+                _isDisableControls = true;
+                _isLoadingList = false;
+                _idServiceType = "";
+                _idServiceTypeCurrent = "";
+            }
+        }
+    }
+    private async Task OnSearch(string? searchString)
+    {
+        if (_isDisableControls) return;
+        _isLoadingList = true;
+        serviceViewRequest.PageNumber = 1;
+        serviceViewRequest.SearchString = searchString;
+        await LoadData();
+    }
+    private async Task OpenAdd()
+    {
+        var dialog = await dialogService.ShowAsync<ServiceCreate>("Thêm dịch vụ mới");
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
+
+    }
+    private async Task OpenDetail(Guid idService)
+    {
+        var parameters = new DialogParameters<ServiceUpdate>();
+        parameters.Add(x => x.idService, idService);
+        var dialog = await dialogService.ShowAsync<ServiceUpdate>("Chi tiết dịch vụ", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
+    }
+    private async Task OnPaginationButtonClick(int pageNumber)
+    {
+        if (_isDisableControls) return;
+        _isLoadingList = true;
+        serviceViewRequest.PageNumber = pageNumber;
+        await LoadData();
+    }
+    private async Task OnDelete(Guid id)
+    {
+
+        var confirm = await dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận xóa dịch vụ?",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            serviceDeleteRequest.Id = id;
+            var removeConfirm = await serviceRespo.DeleteService(serviceDeleteRequest);
+            if (removeConfirm)
+            {
+                snackbar.Add("Xóa thành công", Severity.Success);
+            }
+            else
+            {
+                snackbar.Add("Xóa thất bại", Severity.Error);
+            }
+            await LoadData();
+        }
+
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_idServiceType != _idServiceTypeCurrent)
+        {
+            _isLoadingList = true;
+            _idServiceTypeCurrent = _idServiceType;
+            serviceViewRequest.PageNumber = 1;
+            await LoadData();
+            StateHasChanged();
+        }
+
+    }
+    #endregion
+}

@@ -1,11 +1,6 @@
-﻿using BaseSolution.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BaseSolution.BlazorServer.Data.ValueObjects.Common;
 
-namespace BaseSolution.Application.DataTransferObjects.Services
+namespace BaseSolution.BlazorServer.Data.DataTransferObjects.Service
 {
     public class ServiceDTO
     {
@@ -19,7 +14,6 @@ namespace BaseSolution.Application.DataTransferObjects.Services
         //Tên loại dịch vụ
         public string ServiceTypeName { get; set; } = string.Empty;
         //Số lượng đã đặt
-        public double  TotalOrders { get; set; }
-
+        public double TotalOrders { get; set; }
     }
 }

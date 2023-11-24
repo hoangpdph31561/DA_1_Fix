@@ -89,6 +89,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
 
                 // Update value to existed Service
                 Service!.Name = string.IsNullOrWhiteSpace(entity.Name) ? Service.Name : entity.Name;
+                Service.Status = entity.Status;
                 Service.Description = entity.Description;
                 Service.Unit = entity.Unit;
                 Service.ModifiedBy = entity.ModifiedBy;

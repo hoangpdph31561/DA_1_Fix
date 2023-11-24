@@ -54,7 +54,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             {
                 var query =  _dbContext.RoomBookingDetails.AsNoTracking().ProjectTo<RoomBookingDetailDTO>(_mapper.ConfigurationProvider);
                 
-                if(string.IsNullOrWhiteSpace(request.SearchString))
+                if(!string.IsNullOrWhiteSpace(request.SearchString))
                 {
                     query = query.Where(x => x.NameCustomer.Contains(request.SearchString!));
                 }
@@ -88,7 +88,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             {
                 var query = _dbContext.RoomBookingDetails.AsNoTracking().Where(x => x.Status != EntityStatus.Deleted).ProjectTo<RoomBookingDetailDTO>(_mapper.ConfigurationProvider);
 
-                if (string.IsNullOrWhiteSpace(request.SearchString))
+                if (!string.IsNullOrWhiteSpace(request.SearchString))
                 {
                     query = query.Where(x => x.NameCustomer.Contains(request.SearchString!));
                 }

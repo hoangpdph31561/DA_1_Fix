@@ -7,6 +7,7 @@ using BaseSolution.Application.Interfaces.Services;
 using BaseSolution.Application.ValueObjects.Common;
 using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Application.ValueObjects.Response;
+using BaseSolution.Domain.Enums;
 using BaseSolution.Infrastructure.Database.AppDbContext;
 using BaseSolution.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -52,9 +53,9 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             try
             {
 
-                var query = _appReadOnlyDbContext.ServiceOrders.AsNoTracking().Where(x => !x.Deleted).ProjectTo<ServiceOrderDTO>(_mapper.ConfigurationProvider);
+                var query = _appReadOnlyDbContext.ServiceOrders.AsNoTracking().ProjectTo<ServiceOrderDTO>(_mapper.ConfigurationProvider);
 
-                if (string.IsNullOrWhiteSpace(request.SearchString))
+                if (!string.IsNullOrWhiteSpace(request.SearchString))
                 {
                     query = query.Where(x => x.CustomerName.Contains(request.SearchString!));
                 }
@@ -90,9 +91,9 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             try
             {
 
-                var query = _appReadOnlyDbContext.ServiceOrders.AsNoTracking().Where(x => !x.Deleted).ProjectTo<ServiceOrderDTO>(_mapper.ConfigurationProvider);
+                var query = _appReadOnlyDbContext.ServiceOrders.AsNoTracking().ProjectTo<ServiceOrderDTO>(_mapper.ConfigurationProvider).Where(x => x.Status != EntityStatus.Deleted);
 
-                if (string.IsNullOrWhiteSpace(request.SearchString))
+                if (!string.IsNullOrWhiteSpace(request.SearchString))
                 {
                     query = query.Where(x => x.CustomerName.Contains(request.SearchString!));
                 }

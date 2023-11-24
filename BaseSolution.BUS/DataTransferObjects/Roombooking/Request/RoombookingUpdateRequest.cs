@@ -5,10 +5,11 @@ namespace BaseSolution.Application.DataTransferObjects.Roombooking.Request
     public class RoombookingUpdateRequest
     {
         public Guid Id { get; set; }
+        public Guid RoomDetailId { get; set; }
         public BookingType BookingType { get; set; }
         public Guid CustomerId { get; set; }
-        public Guid? UserId { get; set; }
-        public EntityStatus Status { get; set; } = EntityStatus.Active;
+        public string NameCustomer { get; set; }
+        public EntityStatus Status { get; set; } 
         public Guid? ModifiedBy { get; set; }
     }
 }

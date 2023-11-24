@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <Folder Include="Data\DataTransferObjects\RoomBookingDetail\Request\" />
-    <Folder Include="Data\DataTransferObjects\ServiceOrder\Request\" />
   </ItemGroup>
 
 </Project>

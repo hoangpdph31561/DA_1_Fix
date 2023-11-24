@@ -1,6 +1,6 @@
-﻿using BaseSolution.Domain.Enums;
+﻿using BaseSolution.BlazorServer.Data.ValueObjects.Common;
 
-namespace BaseSolution.Application.DataTransferObjects.Roombooking.Request
+namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request
 {
     public class RoombookingCreateRequest
     {
@@ -8,6 +8,8 @@ namespace BaseSolution.Application.DataTransferObjects.Roombooking.Request
         public Guid RoomDetailId { get; set; }
         public BookingType BookingType { get; set; }
         public string CodeBooking { get; set; }
+
+
 
     }
 }

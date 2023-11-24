@@ -19,7 +19,6 @@ namespace BaseSolution.Application.DataTransferObjects.RoomDetail
         public Guid FloorId { get; set; }
         public Guid RoomTypeId { get; set; }
         public EntityStatus Status { get; set; } = EntityStatus.Active;
-
         public DateTimeOffset CreatedTime { get; set; }
         public Guid? CreatedBy { get; set; }
         public DateTimeOffset ModifiedTime { get; set; }

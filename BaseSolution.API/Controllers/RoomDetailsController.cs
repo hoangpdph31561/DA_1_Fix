@@ -44,6 +44,23 @@ namespace BaseSolution.API.Controllers
 
             return BadRequest(vm);
         }
+
+          [HttpGet("getRoomBookingDetailByStatus")]
+        public async Task<IActionResult> GetListRoomDetailByStatus([FromQuery] ViewRoomDetailWithPaginationRequest request, CancellationToken cancellationToken)
+        {
+            RoomDetailWithPaginationByStatusViewModel vm = new(_RoomDetailReadOnlyRepository, _localizationService);
+
+            await vm.HandleAsync(request, cancellationToken);
+            if(vm.Success)
+            {
+                PaginationResponse<RoomDetailDto> result = (PaginationResponse<RoomDetailDto>)vm.Data;
+                return Ok(result);
+            }
+
+            return BadRequest(vm);
+        }
+
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRoomDetailById(Guid id, CancellationToken cancellationToken)
         {

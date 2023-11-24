@@ -4,14 +4,23 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking
 {
     public class RoomBookingDto
     {
-        public string NameCustomer { get; set; } = string.Empty; // Tên khách hàng
-        public string UserName { get; set; } = string.Empty; // tên nhân viên 
-        public string NameBuilding { get; set; } = string.Empty;
-        public string NameFloor { get; set; } = string.Empty;
-        public string CountServices { get; set; }
+        public Guid Id { get; set; }
+        public EntityStatus Status { get; set; } 
         public BookingType BookingType { get; set; }
+
+        // Base on
+        public Guid CustomerId { get; set; }
+        public Guid RoomDetailId { get; set; }
+        public string NameCustomer { get; set; } // Tên khách hàng
+        public string StaffName { get; set; } // tên nhân viên 
+        public string NameBuilding { get; set; }
+        public string NameFloor { get; set; } 
+        public string NameRoom { get; set; } 
+        public int CountServices { get; set; } // tổng số lượng của 1 dịch vụ 
+        public decimal ServicePrice { get; set; } // giá của dịch vụ 
+        public float ServiceAmount { get; set; } // ServiceAmount = TotalService x ServicePrice
+        public decimal RoomPrice { get; set; }
         public float TotalAmount { get; set; }
-        public EntityStatus Status { get; set; } = EntityStatus.Active;
 
     }
 }

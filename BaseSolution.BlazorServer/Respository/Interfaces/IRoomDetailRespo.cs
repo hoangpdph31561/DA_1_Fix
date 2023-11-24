@@ -7,5 +7,6 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
     public interface IRoomDetailRespo
     {
         Task<PaginationResponse<RoomDetailDTO>> GetAllRoomDetails(ViewRoomDetailWithPaginationRequest request);
+        Task<PaginationResponse<RoomDetailDTO>> GetAllRoomDetailsByStatus(ViewRoomDetailWithPaginationRequest request);
     }
 }

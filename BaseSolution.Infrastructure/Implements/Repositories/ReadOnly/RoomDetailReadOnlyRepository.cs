@@ -8,6 +8,7 @@ using BaseSolution.Application.ValueObjects.Common;
 using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Application.ValueObjects.Response;
 using BaseSolution.Domain.Entities;
+using BaseSolution.Domain.Enums;
 using BaseSolution.Infrastructure.Database.AppDbContext;
 using BaseSolution.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -61,6 +62,34 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 var result = await _RoomDetailEntities.AsNoTracking()
                     .PaginateAsync<RoomDetailEntity, RoomDetailDto>(request, _mapper, cancellationToken);
 
+                return RequestResult<PaginationResponse<RoomDetailDto>>.Succeed(new PaginationResponse<RoomDetailDto>()
+                {
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize,
+                    HasNext = result.HasNext,
+                    Data = result.Data
+                });
+            }
+            catch (Exception e)
+            {
+                return RequestResult<PaginationResponse<RoomDetailDto>>.Fail(_localizationService["List of RoomDetail are not found"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "list of RoomDetail"
+                    }
+                });
+            }
+        }
+
+        public async Task<RequestResult<PaginationResponse<RoomDetailDto>>> GetRoomDetailWithPaginationByStatusAsync(ViewRoomDetailWithPaginationRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+
+                var result = await _RoomDetailEntities.AsNoTracking().Where(x => x.Status == RoomStatus.Vacant)
+                .PaginateAsync<RoomDetailEntity, RoomDetailDto>(request, _mapper, cancellationToken);
                 return RequestResult<PaginationResponse<RoomDetailDto>>.Succeed(new PaginationResponse<RoomDetailDto>()
                 {
                     PageNumber = request.PageNumber,

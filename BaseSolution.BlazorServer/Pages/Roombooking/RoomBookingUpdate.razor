@@ -1,0 +1,162 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Service;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Service.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceType;
+@using BaseSolution.BlazorServer.Pages.Customer;
+@using BaseSolution.BlazorServer.Respository.Interfaces;
+<MudDialog>
+    <DialogContent>
+            <MudForm Model="roombookingUpdate" @ref="@_form" @bind-IsValid="@_formIsValid">
+                <MudPaper Width="100%" Elevation="0">
+                    <MudGrid>
+                    <MudSelect T="Guid" Label="Khách hàng" AnchorOrigin="Origin.BottomCenter" @bind-Value="roombookingUpdate.CustomerId" For="@(() => roombookingUpdate.CustomerId)">
+                            @foreach (var item in lstCustomer)
+                            {
+                                <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                        <MudChip Icon="@Icons.Material.Filled.Add" @onclick="async() => await OpenAdd()" Color="Color.Primary">Thêm khách hàng mới</MudChip>
+
+                    <MudSelect T="Guid" Label="Phòng" AnchorOrigin="Origin.BottomCenter" @bind-Value="roombookingUpdate.RoomDetailId" For="@(() => roombookingUpdate.RoomDetailId)">
+                            @foreach (var item in lstRoomDetails)
+                            {
+                                <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudGrid>
+                    <MudGrid>
+                        <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="roombookingUpdate.BookingType" For="@(() => roombookingUpdate.BookingType)" Label="Kiểu đặt phòng"></MudTextField>
+                        </MudItem>
+                    </MudGrid>
+                </MudPaper>
+            </MudForm>
+        
+    </DialogContent>
+    <DialogActions>
+        @if (roombooking == null)
+        {
+            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+        }
+        else
+        {
+            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+            <MudButton OnClick="Reset">Khôi phục</MudButton>
+            <MudButton OnClick="UpdateService">Lưu</MudButton>
+        }
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #region Khai báo
+    [Parameter]
+    public Guid idRoomBooking { get; set; }
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    [Inject]
+    public IRoomDetailRespo roomDetailRespo { get; set; }
+    [Inject]
+    public IRoomBookingRespo roomBookingRespo { get; set; }
+    [Inject]
+    public ICustomerRepo cumtomerRespo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    MudForm _form;
+    private bool _formIsValid;
+    private RoomBookingDto? roombooking;
+    private PaginationResponse<RoomDetailDTO> roomDetailVM;
+    List<RoomDetailDTO> lstRoomDetails = new();
+
+    private PaginationResponse<CustomerDTO> CustomerVM;
+    List<CustomerDTO> lstCustomer = new();
+    RoombookingUpdateRequest roombookingUpdate = new();
+    private ViewRoomDetailWithPaginationRequest roomDetailRequest = new();
+    private ViewCustomerWithPaginationRequest customer = new();
+    #endregion
+
+    #region Code xử lý
+    protected async override Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        roombooking = await roomBookingRespo.GetRoomBookingById(idRoomBooking);
+
+        roomDetailVM = await roomDetailRespo.GetAllRoomDetails(roomDetailRequest);
+        lstRoomDetails = roomDetailVM.Data!.ToList();
+
+
+        CustomerVM = await cumtomerRespo.GetCustomer(customer);
+        lstCustomer = CustomerVM.Data!.ToList();
+
+        roombookingUpdate.Id = roombooking.Id;
+        roombookingUpdate.RoomDetailId = roombooking.RoomDetailId;
+        roombookingUpdate.CustomerId = roombooking.CustomerId;
+        roombookingUpdate.BookingType = roombooking.BookingType;
+
+    }
+    private void OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+    private async Task Reset()
+    {
+        await LoadData();
+    }
+    private bool CheckChangeData()
+    {
+        return roombooking!.RoomDetailId != roombookingUpdate.RoomDetailId || roombooking.CustomerId != roombookingUpdate.CustomerId || roombooking.BookingType != roombookingUpdate.BookingType;
+    }
+    private async Task UpdateService()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+        var confirm = await _dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận sửa thông tin phòng",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            var result = await roomBookingRespo.UpdateRoomBooking(roombookingUpdate);
+            if (result)
+            {
+                if (CheckChangeData())
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    _snackbar.Add("Sửa thành công", Severity.Success);
+                }
+                else
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    _snackbar.Add("Không có thay đổi dữ liệu để cập nhật", Severity.Warning);
+                }
+            }
+            else
+            {
+                _snackbar.Add("Sửa thất bại", Severity.Error);
+            }
+            await Reset();
+        }
+    }
+    private async Task OpenAdd()
+    {
+        var dialog = await _dialogService.ShowAsync<CustomerCreate>("Thêm khách hàng đặt ");
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            StateHasChanged();
+        }
+    }
+    #endregion
+}

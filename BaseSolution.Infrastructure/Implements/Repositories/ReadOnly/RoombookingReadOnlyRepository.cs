@@ -60,11 +60,9 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                     query = query.Where(x => x.NameCustomer.Contains(request.SearchString!));
                 }
                 var result = await query.PaginateAsync(request, cancellationToken);
-
                 foreach (var item in result.Data!)
                 {
-                    item.ServiceAmount = (float)(item.CountServices * item.ServicePrice);
-                    item.TotalAmount = item.ServiceAmount + (float)item.RoomPrice;
+                    item.TotalAmount = (float)item.RoomPrice;
                 }
                 return RequestResult<PaginationResponse<RoombookingDTO>>.Succeed(new PaginationResponse<RoombookingDTO>
                 {
@@ -102,8 +100,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
 
                 foreach (var item in result.Data!)
                 {
-                    item.ServiceAmount = (float)(item.CountServices * item.ServicePrice);
-                    item.TotalAmount = item.ServiceAmount + (float)item.RoomPrice;
+                    item.TotalAmount = (float)item.RoomPrice;
                 }
                 return RequestResult<PaginationResponse<RoombookingDTO>>.Succeed(new PaginationResponse<RoombookingDTO>
                 {

@@ -3,7 +3,5 @@
     public class BillCreateRequest
     {
         public Guid CustomerId { get; set; }
-        
-
     }
 }

@@ -15,7 +15,11 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
     {
         public RoomDetailProfiles()
         {
-            CreateMap<RoomDetailEntity,RoomDetailDto>();
+            CreateMap<RoomDetailEntity,RoomDetailDto>()
+                .ForMember(dest => dest.FloorName, opt => opt.MapFrom(src => src.Floor.Name))
+                .ForMember(dest => dest.RoomTypeName, opt => opt.MapFrom(src => src.RoomType.Name))
+                .ForMember(dest => dest.BuildingId, opt => opt.MapFrom(src => src.Floor.BuildingId))
+                .ForMember(dest => dest.BuildingName, opt => opt.MapFrom(src => src.Floor.Building.Name));
             CreateMap<RoomDetailCreateRequest, RoomDetailEntity>();
             CreateMap<RoomDetailUpdateRequest, RoomDetailEntity>();
             CreateMap<RoomDetailDeleteRequest, RoomDetailEntity>();

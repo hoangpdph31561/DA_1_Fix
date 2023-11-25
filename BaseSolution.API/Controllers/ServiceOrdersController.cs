@@ -52,6 +52,18 @@ namespace BaseSolution.API.Controllers
             }
             return BadRequest(vm);
         }
+        [HttpGet("ServiceOrdersByIdCustomer")]
+        public async Task<IActionResult> GetServiceOrdersByIdCustomer(Guid idCustomer, CancellationToken cancellationToken)
+        {
+            ServiceOrderListWithPaginationByIdCustomerViewModel vm = new(_serviceOrderReadOnly, _localizationService);
+            await vm.HandleAsync(idCustomer, cancellationToken);
+            if(vm.Success)
+            {
+                List<ServiceOrderDTO> result = (List<ServiceOrderDTO>)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
+        }
         [HttpPost]
         public async Task<IActionResult> CreateNewServiceOrder(ServiceOrderCreateRequest request, CancellationToken cancellationToken)
         {

@@ -1,0 +1,174 @@
+﻿@page "/roomdetail"
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Building
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Floor
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType
+@using BaseSolution.BlazorServer.Respository.Interfaces
+<PageTitle>Quản lý phòng chi tiết</PageTitle>
+@if (isLoading)
+{
+    <LoadingIndicator />
+}
+else
+{
+    <MudPaper Elevation="0">
+        <MudPaper Elevation="0" Class="ma-1">
+            <MudPaper Elevation="0" Class="pa-2">
+                <MudPaper Class="d-flex align-center px-2" Elevation="0">
+                    <MudPaper Elevation="0" Class="mr-auto">
+                        <MudText Typo="Typo.h5" Style="font-weight:500;">Quản lý phòng chi tiết khách sạn</MudText>
+                    </MudPaper>
+                    <MudChip Icon="@Icons.Material.Filled.Add" Color="Color.Primary">Thêm</MudChip>
+                </MudPaper>
+            </MudPaper>
+            <MudPaper Elevation="0" Class="pa-2">
+                <MudGrid>
+                    <MudItem xs="3">
+                        <MudSelect T="Guid" Label="Tòa nhà" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" @bind-Value="@idBuilding" Style="background-color: white;">
+                            <MudSelectItem Value="Guid.Empty">Chưa chọn tòa nhà</MudSelectItem>
+                            @foreach (var item in lstBuilding)
+                        {
+                            <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+                        }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="3">
+                        <MudSelect T="Guid" Label="Tầng" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Style="background-color: white;" @bind-Value="idFloor">
+                            <MudSelectItem Value="Guid.Empty">Chưa chọn tầng</MudSelectItem>
+                            @if(lstFloor != null)
+                            {
+                                foreach (var item in lstFloor)
+                            {
+                                <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+                            }
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="3">
+                        <MudSelect T="Guid" Label="Loại phòng" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Style="background-color: white;" @bind-Value="idRoomType">
+                            <MudSelectItem Value="Guid.Empty">Chưa chọn loại phòng</MudSelectItem>
+                            @foreach (var item in lstRoomType)
+                        {
+                            <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+                        }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="3">
+                        <MudTextField @bind-Value="SearchString" Immediate Variant="Variant.Outlined" Style="background-color: white;" DebounceInterval="200" Label="Tìm kiếm" MaxLength="200" AdornmentIcon="@Icons.Material.Filled.Search" Adornment="Adornment.End"></MudTextField>
+                     </MudItem>
+                 </MudGrid>
+             </MudPaper>
+             <MudPaper Elevation="0" Class="pa-2">
+                 @if (isLoadingList)
+                {
+                    <LoadingIndicator />
+                }
+                else
+                {   
+                    <MudCard Class="pa-3" Elevation="0">
+                        <MudTable Items="@roomDetailVM.Data" Style="position: relative;" Elevation="0">
+                            <HeaderContent>
+                                <MudTh>STT</MudTh>
+                                <MudTh>Tên phòng</MudTh>
+                                <MudTh>Tòa</MudTh>
+                                <MudTh>Tầng</MudTh>
+                                <MudTh>Loại phòng</MudTh>
+                                <MudTh>Số người tối đa</MudTh>
+                                <MudTh>Giá</MudTh>
+                                <MudTh>Trạng thái</MudTh>
+                                <MudTh>Hành động</MudTh>
+
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd>@(lstRoomDetail.IndexOf(context)+1)</MudTd>
+                                <MudTd>@context.Name</MudTd>
+                                <MudTd>@context.BuildingName</MudTd>
+                                <MudTd>@context.FloorName</MudTd>
+                                <MudTd>@context.RoomTypeName</MudTd>
+                                <MudTd>@context.MaxPeopleStay</MudTd>
+                                <MudTd>@context.Price</MudTd>
+                                <MudTd><BadgeRoomStatus Status="@context.Status"></BadgeRoomStatus></MudTd>
+                                <MudTd>
+                                        <MudChip Icon="@Icons.Material.Filled.Info" Color="Color.Info">Chi tiết</MudChip>
+                                        <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" >Sửa</MudChip>
+                                        <MudChip Icon="@Icons.Material.Filled.Delete" Color="Color.Error" >Xóa</MudChip>
+                                </MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    </MudCard>
+                    <CustomPagination Class="my-1" HasNext="@roomDetailVM.HasNext"  CurrentPageNumber="@roomDetailVM.PageNumber"></CustomPagination>
+                }
+            </MudPaper>
+        </MudPaper>
+    </MudPaper>
+}
+@code {
+    #region Khai báo
+    [Inject]
+    public IRoomDetailRespo roomDetailRespo { get; set; }
+    [Inject]
+    public IBuildingRespo buildingRespo { get; set; }
+    [Inject]
+    public IFloorRespo floorRespo { get; set; }
+    [Inject]
+    public IRoomTypeRespo roomTypeRespo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    private PaginationResponse<BuildingDTO> buildingVM;
+    private PaginationResponse<FloorDTO> floorVM;
+    private PaginationResponse<RoomTypeDTO> roomTypeVM;
+    private PaginationResponse<RoomDetailDTO> roomDetailVM;
+    private List<BuildingDTO> lstBuilding;
+    private List<FloorDTO> lstFloor;
+    private List<RoomTypeDTO> lstRoomType;
+    private List<RoomDetailDTO> lstRoomDetail;
+    private ViewRoomDetailWithPaginationRequest roomDetailRequest = new();
+    public bool isLoading { get; set; } = true;
+    public bool isLoadingList { get; set; } = true;
+    public string SearchString { get; set; }
+    public Guid idBuilding { get; set; } = Guid.Empty;
+    public Guid idRoomType { get; set; } = Guid.Empty;
+    public Guid idFloor { get; set; } = Guid.Empty;
+    public Guid idBuildingCurrent { get; set; } = Guid.Empty;
+    #endregion
+    #region Code xử lý
+    private async Task LoadData()
+    {
+        buildingVM = await buildingRespo.GetAllBuilding(new Data.DataTransferObjects.Building.Request.ViewBuildingWithPaginationRequest
+            {
+                PageSize = int.MaxValue - 1,
+            });
+        lstBuilding = buildingVM.Data!.ToList();
+        roomTypeVM = await roomTypeRespo.GetAllRoomTypes(new Data.DataTransferObjects.RoomType.Request.ViewRoomTypeWithPaginationRequest
+            {
+                PageSize = int.MaxValue - 1,
+            });
+        lstRoomType = roomTypeVM.Data!.ToList();
+        roomDetailVM = await roomDetailRespo.GetAllRoomDetails(roomDetailRequest);
+        lstRoomDetail = roomDetailVM.Data!.ToList();
+        isLoading = false;
+        isLoadingList = false;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(idBuilding != Guid.Empty || idBuilding != idBuildingCurrent)
+        {
+            idBuildingCurrent = idBuilding;
+            floorVM = await floorRespo.GetAllFloors(new Data.DataTransferObjects.Floor.Request.ViewFloorWithPaginationRequest
+                {
+                    PageSize = int.MaxValue - 1,
+                    BuildingId = idBuildingCurrent
+                });
+            lstFloor = floorVM.Data!.ToList();
+            StateHasChanged();
+        }
+    }
+    #endregion
+}

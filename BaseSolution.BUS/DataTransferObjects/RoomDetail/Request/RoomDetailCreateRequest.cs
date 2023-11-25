@@ -16,5 +16,6 @@ namespace BaseSolution.Application.DataTransferObjects.RoomDetail.Request
         public List<string> Images { get; set; } = new List<string>();
         public Guid FloorId { get; set; }
         public Guid RoomTypeId { get; set; }
+        public Guid? CreatedBy { get; set; }
     }
 }

@@ -1,11 +1,6 @@
-﻿using BaseSolution.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BaseSolution.BlazorServer.Data.ValueObjects.Common;
 
-namespace BaseSolution.Application.DataTransferObjects.RoomDetail.Request
+namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request
 {
     public class RoomDetailUpdateRequest
     {

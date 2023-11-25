@@ -67,8 +67,13 @@ namespace BaseSolution.API.Controllers
             RoomDetailViewModel vm = new(_RoomDetailReadOnlyRepository, _localizationService);
 
             await vm.HandleAsync(id, cancellationToken);
+            if(vm.Success)
+            {
+                RoomDetailDto result = (RoomDetailDto)vm.Data;
+                return Ok(result);
+            }
 
-            return Ok(vm);
+            return BadRequest(vm);
         }
 
         [HttpGet("idRoomType")]
@@ -92,7 +97,11 @@ namespace BaseSolution.API.Controllers
             RoomDetailCreateViewModel vm = new(_RoomDetailReadOnlyRepository, _RoomDetailReadWriteRepository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);
-            return Ok(vm);
+            if(vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
         }
 
         [HttpPut]
@@ -101,17 +110,25 @@ namespace BaseSolution.API.Controllers
             RoomDetailUpdateViewModel vm = new(_RoomDetailReadWriteRepository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);
-            return Ok(vm);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(RoomDetailDeleteRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> Delete([FromQuery]RoomDetailDeleteRequest request, CancellationToken cancellationToken)
         {
             RoomDetailDeleteViewModel vm = new(_RoomDetailReadWriteRepository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);
 
-            return Ok(vm);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
         }
     }
 }

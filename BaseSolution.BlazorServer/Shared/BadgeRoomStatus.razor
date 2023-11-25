@@ -1,0 +1,61 @@
+﻿@{
+    RoomStatus statusValue = Status;
+}
+@switch (statusValue)
+{
+    case RoomStatus.Vacant:
+        <MudChip Color="Color.Success">Trống</MudChip>
+        break;
+    case RoomStatus.OutOfOrder:
+        <MudChip Color="Color.Default">Không sử dụng</MudChip>
+
+        break;
+    case RoomStatus.Occupied:
+        <MudChip Color="Color.Warning">Đang thuê</MudChip>
+
+        break;
+    case RoomStatus.Reserved:
+        <MudChip Color="Color.Secondary">Đã đặt</MudChip>
+
+        break;
+    case RoomStatus.Cleaned:
+        <MudChip Color="Color.Info">Đã dọn phòng</MudChip>
+
+        break;
+    case RoomStatus.Dirty:
+        <MudChip Color="Color.Dark">Phòng bẩn</MudChip>
+
+        break;
+    case RoomStatus.Inspected:
+        <MudChip Style="@($"color:{Colors.LightGreen.Accent3};")">Đã kiểm tra</MudChip>
+
+        break;
+    case RoomStatus.DoNotDisturb:
+        <MudChip Color="Color.Error">Không làm phiền</MudChip>
+        break;
+    case RoomStatus.CheckIn:
+        <MudChip Style="@($"color:{Colors.Red.Darken4};")">Đang check in</MudChip>
+        break;
+    case RoomStatus.CheckOut:
+        <MudChip Style="@($"color:{Colors.Orange.Accent1};")">Đang check out</MudChip>
+        break;
+}
+
+@code {
+    [Parameter]
+    public RoomStatus Status { get; set; }
+    /*
+    * Vacant = 1,
+    OutOfOrder = 2,
+    Deleted = 3,
+    Occupied = 4,
+    Reserved = 5,
+    Cleaned = 6,
+    Dirty = 7,
+    Inspected = 8,
+    DoNotDisturb = 9,
+    CheckIn = 10,
+     CheckOut = 11
+    */
+    
+}

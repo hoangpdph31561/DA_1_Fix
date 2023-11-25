@@ -6,7 +6,6 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public string NameOfRoomType { get; set; } = string.Empty;
         public decimal Price { get; set; }
         public int MaxPeopleStay { get; set; }
         public string Description { get; set; } = string.Empty;
@@ -15,5 +14,13 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
         public RoomStatus Status { get; set; }
         public Guid FloorId { get; set; }
         public Guid RoomTypeId { get; set; }
+        //Tên tầng 
+        public string FloorName { get; set; } = string.Empty;
+        //Tên loại phòng
+        public string RoomTypeName { get; set; } = string.Empty;
+        //ID tòa nhà
+        public Guid BuildingId { get; set; }
+        //Tên tòa nhà
+        public string BuildingName { get; set; } = string.Empty;
     }
 }

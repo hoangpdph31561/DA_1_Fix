@@ -1,11 +1,11 @@
-﻿using BaseSolution.Domain.Enums;
+﻿using BaseSolution.BlazorServer.Data.ValueObjects.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BaseSolution.Application.DataTransferObjects.Customer.Request
+namespace BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
 {
     public class CustomerUpdateRequest
     {

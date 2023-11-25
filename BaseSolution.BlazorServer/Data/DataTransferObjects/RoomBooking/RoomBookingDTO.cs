@@ -23,7 +23,8 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking
         public float ServiceAmount { get; set; } // ServiceAmount = TotalService x ServicePrice
         public decimal RoomPrice { get; set; }
         public float TotalAmount { get; set; }
-
+        public DateTimeOffset CheckInBooking { get; set; }
+        public DateTimeOffset CheckOutBooking { get; set; }
 
     }
 }

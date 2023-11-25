@@ -24,6 +24,7 @@ namespace BaseSolution.Application.DataTransferObjects.Roombooking
         public decimal PrePaid { get; set; } = 0;
         public DateTimeOffset CreatedTime { get; set; }
         public string NameRoomType { get; set; } = string.Empty;
-
+        public DateTimeOffset CheckInBooking { get; set; }
+        public DateTimeOffset CheckOutBooking { get; set; }
     }
 }

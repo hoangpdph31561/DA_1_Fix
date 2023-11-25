@@ -11,10 +11,17 @@
         <MudSpacer />
         <div class="row-auto">
             <div>
-                <MudNavLink Href="/login-customer" Icon="@Icons.Material.Filled.Login"></MudNavLink> 
-                <MudNavLink Href="/login-customer" Icon="@Icons.Material.Filled.Logout"></MudNavLink>
+                <MudNavLink Href="/login-customer" Icon="@Icons.Material.Filled.Login"></MudNavLink>
+
             </div>
         </div>
+        <div class="col-auto">
+            <div>
+                <MudNavLink Href="r" Icon="@Icons.Material.Filled.Logout"></MudNavLink>
+            </div>
+        </div>
+
+
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
         <MudDrawerHeader>

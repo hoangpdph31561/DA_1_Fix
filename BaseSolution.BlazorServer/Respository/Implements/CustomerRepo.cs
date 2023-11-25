@@ -46,5 +46,18 @@ namespace BaseSolution.BlazorServer.Respository.Implements
 
             return existingCustomer;
         }
+
+        public async Task<CustomerDTO> GetCustomerById(Guid id)
+        {
+            var result = await _httpClient.GetFromJsonAsync<CustomerDTO>($"/api/Customers/{id}");
+
+            return result;
+        }
+
+        public async Task<bool> UpdateCustomer(CustomerUpdateRequest request)
+        {
+            var result = await _httpClient.PutAsJsonAsync("/api/Customers", request);
+            return result.IsSuccessStatusCode;
+        }
     }
 }

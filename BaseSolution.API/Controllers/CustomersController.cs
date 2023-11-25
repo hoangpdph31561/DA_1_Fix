@@ -151,6 +151,7 @@ namespace BaseSolution.API.Controllers
                 if (detailCustomer.Data?.ApprovedCodeExpiredTime < DateTime.Now)
                 {
                     await SendGmailAsync(customerCreateRequest.Email);
+                    customerCreateRequest.ApprovedCode = _verifyCode;
                     var newCustomers = new CustomerEntity()
                     {
                         Id = detailCustomer.Data.Id,
@@ -165,8 +166,10 @@ namespace BaseSolution.API.Controllers
                     await _CustomerReadWriteRepository.UpdateCustomerAsync(newCustomers, cancellationToken);
                     return Ok("Mã đã được gửi, vui lòng kiểm tra email!");
                 }
-                else if (detailCustomer.Data.Email != customerCreateRequest.Email)
+                else if (detailCustomer.Data!.Email != customerCreateRequest.Email)
                 {
+                    await SendGmailAsync(customerCreateRequest.Email);
+                    customerCreateRequest.ApprovedCode = _verifyCode;
                     var newCustomers = new CustomerEntity()
                     {
                         Id = detailCustomer.Data.Id,
@@ -175,11 +178,12 @@ namespace BaseSolution.API.Controllers
                         Name = customerCreateRequest.Name,
                         ApprovedCode = customerCreateRequest.ApprovedCode,
                         CreatedTime = DateTime.Now,
+                        IdentificationNumber = customerCreateRequest.IdentificationNumber,
                         ApprovedCodeExpiredTime = DateTime.Now.AddMinutes(5),
                         Status = Domain.Enums.EntityStatus.PendingForConfirmation,
                     };
                     await _CustomerReadWriteRepository.UpdateCustomerAsync(newCustomers, cancellationToken);
-                    await SendGmailAsync(customerCreateRequest.Email);
+                    
                 }
             }
             return Ok("Gửi mã thành công");

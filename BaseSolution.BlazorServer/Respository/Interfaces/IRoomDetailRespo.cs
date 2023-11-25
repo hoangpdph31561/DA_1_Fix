@@ -13,6 +13,9 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
 
         Task<RoomDetailDTO> GetRoomDetailById(Guid id);
         Task<List<RoomDetailDTO>> GetRoomDetailByIdRoomType(Guid id);
+        Task<bool> CreateNewRoomDetail(RoomDetailCreateRequest request);
+        Task<bool> UpdateRoomDetail(RoomDetailUpdateRequest request);
+        Task<bool> DeleteRoomDetail(RoomDetailDeleteRequest request);
 
     }
 }

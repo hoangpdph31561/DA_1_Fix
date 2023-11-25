@@ -18,6 +18,7 @@ namespace BaseSolution.Application.DataTransferObjects.ServiceOrder
 
         // base on 
         public string CustomerName { get; set; } = string.Empty; // Tên khách hàng
+        public Guid CustomerId { get; set; }
         public string UserName { get; set; } = string.Empty; // tên nhân viên 
         public string Name { get; set; } = string.Empty; // tên dịch vụ
         public Guid? RoomBookingDetailId { get; set; } // ncheck xem dịch vụ được đặt theo phong hay riêng 

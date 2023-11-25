@@ -8,8 +8,6 @@ namespace BaseSolution.Application.DataTransferObjects.ServiceOrder.Request
 {
     public class ServiceOrderCreateRequest
     {
-        public Guid? RoomBookingDetailId { get; set; }
         public Guid CustomerId { get; set; }
-        public Guid? CreatedBy { get; set; }
     }
 }

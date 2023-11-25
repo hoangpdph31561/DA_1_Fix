@@ -1,0 +1,115 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Bill.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceOrder.Request;
+@using BaseSolution.BlazorServer.Respository.Interfaces;
+<MudDialog>
+    <DialogContent>
+        @if (_isLoadingList)
+        {
+            <LoadingIndicator></LoadingIndicator>
+        }
+        else
+        {
+            <MudForm Model="@serviceOderRequest" @ref="_form">
+                <MudPaper Elevation="0">
+                    <MudSelect T="string" Label="Khách hàng" Class="mb-2"
+                               AnchorOrigin="Origin.BottomCenter" @bind-Value="@customerId" For="@(() => customerId)">
+                        @foreach (var item in lstCustomer)
+                        {
+                            <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudPaper>
+            </MudForm>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+        <MudButton OnClick="Reset">Khôi phục</MudButton>
+        <MudButton OnClick="CreateNewServiceOder">Lưu</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    #region Khai báo
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+
+    [Inject]
+    public ICustomerRepo cumtomerRespo { get; set; }
+    [Inject]
+    public IServiceOrderRepo ServiceOderRepo { get; set; }
+
+
+    private ServiceOrderCreateRequest serviceOderRequest = new();
+
+
+    private PaginationResponse<CustomerDTO> CustomerVM;
+    List<CustomerDTO> lstCustomer = new();
+    private string customerId;
+
+    private ViewCustomerWithPaginationRequest customer = new();
+
+    private bool _isLoadingList = true;
+    MudForm _form;
+    #endregion
+    #region Code xử lý
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+
+        CustomerVM = await cumtomerRespo.GetCustomer(customer);
+        lstCustomer = CustomerVM.Data!.ToList();
+
+        _isLoadingList = false;
+    }
+    private void OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+    private void Reset()
+    {
+        customer = new();
+    }
+    private async Task CreateNewServiceOder()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+        var confirm = await _dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận thêm dịch vụ ?",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            serviceOderRequest.CustomerId = Guid.Parse(customerId);
+            var result = await ServiceOderRepo.CreateNewService(serviceOderRequest);
+            if (result == true)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                _snackbar.Add("Thêm thành công", Severity.Success);
+            }
+            else
+            {
+                _snackbar.Add
+                (
+                    "Thêm thất bại",
+                     Severity.Error
+                );
+            }
+            Reset();
+        }
+    }
+
+    #endregion
+}

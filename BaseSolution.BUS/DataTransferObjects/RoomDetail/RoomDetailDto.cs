@@ -18,13 +18,15 @@ namespace BaseSolution.Application.DataTransferObjects.RoomDetail
         public List<string> Images { get; set; } = new List<string>();
         public Guid FloorId { get; set; }
         public Guid RoomTypeId { get; set; }
-        public EntityStatus Status { get; set; } = EntityStatus.Active;
-        public DateTimeOffset CreatedTime { get; set; }
-        public Guid? CreatedBy { get; set; }
-        public DateTimeOffset ModifiedTime { get; set; }
-        public Guid? ModifiedBy { get; set; }
-        public bool Deleted { get; set; }
-        public Guid? DeletedBy { get; set; }
-        public DateTimeOffset DeletedTime { get; set; }
+        public RoomStatus Status { get; set; }
+        //Tên tầng 
+        public string FloorName { get; set; } = string.Empty;
+        //Tên loại phòng
+        public string RoomTypeName { get; set; } = string.Empty;
+        //ID tòa nhà
+        public Guid BuildingId { get; set; }
+        //Tên tòa nhà
+        public string BuildingName { get; set; } = string.Empty;
+
     }
 }

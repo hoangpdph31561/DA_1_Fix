@@ -12,11 +12,10 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
         {
             CreateMap<ServiceOrderEntity, ServiceOrderDTO>()
                 .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer.Name))
-                .ForMember(des => des.Price, opt => opt.MapFrom(src => src.ServiceOrderDetails.Select(x => x.Price).First()))
-                .ForMember(des => des.Quantity, opt => opt.MapFrom(src => src.ServiceOrderDetails.Count()))
-                .ForMember(des => des.CustomerName, opt => opt.MapFrom(src => src.Customer.Name))
-                .ForMember(des => des.UserName, opt => opt.MapFrom(src => src.RoomBookingDetail.RoomBooking.User.Name))
-                .ForMember(des => des.Name, opt => opt.MapFrom(src => src.ServiceOrderDetails.Select(x => x.Service.Name).First()));
+                .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.Customer.Id))
+                .ForMember(des => des.Price, opt => opt.MapFrom(src => src.Customer.ServiceOrders.SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Price).First()))
+                .ForMember(des => des.Quantity, opt => opt.MapFrom(src => src.Customer.ServiceOrders.Select(x => x.ServiceOrderDetails).Count()))
+                .ForMember(des => des.Name, opt => opt.MapFrom(src => src.Customer.ServiceOrders.SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Name).First()))
                  ;
 
             CreateMap<ServiceOrderCreateRequest, ServiceOrderEntity>();

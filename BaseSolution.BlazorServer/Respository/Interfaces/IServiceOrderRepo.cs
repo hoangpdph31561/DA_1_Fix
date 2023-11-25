@@ -7,5 +7,7 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
     public interface IServiceOrderRepo
     {
         Task<PaginationResponse<ServiceOrderDTO>> GetAllServices(ViewServiceOrderWithPaginationRequest request);
+        Task<bool> CreateNewService(ServiceOrderCreateRequest request);
+        Task<List<ServiceOrderDTO>> GetRoomDetailByIdCustomer(Guid id);
     }
 }

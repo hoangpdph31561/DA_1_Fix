@@ -27,7 +27,7 @@
                     <RowTemplate>
                         <MudTd>@(lstBill.IndexOf(context) + 1)</MudTd>
                         <MudTd>@context.CreatedTime</MudTd>
-                        <MudTd>@context.ServiceOrderId</MudTd>
+                        <MudTd>@context.BillType</MudTd>
                         <MudTd>@context.TotalAmount </MudTd>
                         <MudTh><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTh>
                     </RowTemplate>

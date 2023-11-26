@@ -6,7 +6,7 @@
 
 <MudDialog>
     <DialogContent>
-        @if (roomTypeInfo == null || roomTypeInfo.NumberOfAmenityRoomDetail == 0)
+        @if (_roomTypeInfo == null || _roomTypeInfo.NumberOfAmenityRoomDetail == 0)
         {
             <MudText>Không có tiện ích nào</MudText>
         }
@@ -28,7 +28,7 @@
         }
     </DialogContent>
     <DialogActions>
-        @if (roomTypeInfo == null)
+        @if (_roomTypeInfo == null)
         {
             <MudButton OnClick="OnClickCancel">Hủy</MudButton>
         }
@@ -56,10 +56,9 @@
     public IRoomTypeRepo roomTypeRespo { get; set; }
     MudForm _form;
     private bool _formIsValid;
-    private RoomTypeDTO? roomTypeInfo;
-    private PaginationResponse<AmenityRoomDetailDTO> amenityRoomDetail;
+    private RoomTypeDTO? _roomTypeInfo;
+    private PaginationResponse<AmenityRoomDetailDTO> _amenityRoomDetail;
     private List<AmenityRoomDetailDTO>? lstAmenityRoomDetail;
-    private AmenityRoomDetailUpdateRequest amenityRoomDetailUpdateRequest = new();
     private ViewAmenityRoomDetailWithPaginationRequest amenityRoomDetailRequest = new();
     #endregion
     protected async override Task OnInitializedAsync()
@@ -68,9 +67,9 @@
     }
     private async Task LoadData()
     {
-        roomTypeInfo = await roomTypeRespo.GetRoomTypeById(idRoomType);
-        amenityRoomDetail = await amenityRoomDetailRepo.GetAllAmentityRoomDetail(amenityRoomDetailRequest);
-        lstAmenityRoomDetail = amenityRoomDetail.Data!.ToList();
+        _roomTypeInfo = await roomTypeRespo.GetRoomTypeById(idRoomType);
+        _amenityRoomDetail = await amenityRoomDetailRepo.GetAllAmentityRoomDetail(amenityRoomDetailRequest);
+        lstAmenityRoomDetail = _amenityRoomDetail.Data!.ToList();
         
     }
     private void OnClickCancel()

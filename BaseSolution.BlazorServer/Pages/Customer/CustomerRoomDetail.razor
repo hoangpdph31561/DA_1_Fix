@@ -26,7 +26,7 @@
                     <MudTd>@context.MaxPeopleStay</MudTd>
                     <MudTh>@context.RoomSize</MudTh>
                     <MudTh>
-                           <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@( async() => await OpenDetail(context.Id))" Disabled="@_isDisableControls">Xem phòng</MudChip>
+                          <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@( async() => await OpenDetail(context.Id))" Disabled="@_isDisableControls">Xem phòng</MudChip>
                           <MudChip Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@( async() => await OpenAdd(context.Id))" Disabled="@_isDisableControls">Đặt phòng</MudChip>
                     </MudTh>
                     </RowTemplate>
@@ -59,14 +59,14 @@
     [Inject]
     public ISnackbar _snackbar { get; set; }
     [Inject]
-    public IDialogService dialogService { get; set; }
+    public IDialogService _dialogService { get; set; }
     [Inject]
     public IRoomTypeRepo roomTypeRespo { get; set; }
     private RoomTypeDTO? roomTypeInfo;
 
     private PaginationResponse<RoomDetailDTO> _roomDetailVM = new PaginationResponse<RoomDetailDTO>();
     private List<RoomDetailDTO>? _lstRoomDetail;
-    private ViewRoomDetailWithPaginationRequest roomDetailRequest = new();
+    private ViewRoomDetailWithPaginationRequest _roomDetailRequest = new();
     bool _isDisableControls = false;
     #endregion
 
@@ -82,7 +82,12 @@
     }
     public async Task OpenAdd(Guid idRoomDetail)
     {
-        
+        var dialog = await _dialogService.ShowAsync<RoomBookingCreate>("Đặt phòng");
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
     }
     public async Task OpenDetail(Guid idRoomDetail)
     {

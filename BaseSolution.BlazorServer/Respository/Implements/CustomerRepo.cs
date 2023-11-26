@@ -15,7 +15,7 @@ namespace BaseSolution.BlazorServer.Respository.Implements
         public async Task<PaginationResponse<CustomerDTO>> GetCustomer(ViewCustomerWithPaginationRequest request)
         {
             string url = $"/api/Customers?PageNumber={request.PageNumber}&PageSize={request.PageSize}";
-            if (!string.IsNullOrEmpty(request.Name))
+            if (!String.IsNullOrEmpty(request.Name))
             {
                 url = $"/api/Customers?Name={request.Name}&PageNumber={request.Name}&PageNumber={request.PageNumber}&PageSize={request.PageSize}";
             }

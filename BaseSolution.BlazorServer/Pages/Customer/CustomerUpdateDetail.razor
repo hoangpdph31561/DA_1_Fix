@@ -11,17 +11,13 @@
         {
             <MudForm Model="customerUpdateRequest" @ref="@_form" @bind-IsValid="@_formIsValid">
                 <MudPaper Width="100%" Elevation="0">
-                    <MudGrid>
-                        <MudItem xs="12" sm="6">
-                            <MudTextField @bind-Value="customerUpdateRequest.Name" For="@(() => customerUpdateRequest.Name)" Label="Tên"></MudTextField>
-                        </MudItem>
-                        <MudItem xs="12" sm="6">
-                            <MudTextField @bind-Value="customerUpdateRequest.PhoneNumber" For="@(() => customerUpdateRequest.PhoneNumber)" Label="Số điện thoại"></MudTextField>
-                        </MudItem>
-                        <MudItem xs="12" sm="6">
-                            <MudTextField @bind-Value="customerUpdateRequest.Email" For="@(() => customerUpdateRequest.Email)" Label="Email"></MudTextField>
-                        </MudItem>
-                    </MudGrid>
+
+                    <MudTextField @bind-Value="customerUpdateRequest.Name" For="@(() => customerUpdateRequest.Name)" Label="Tên"></MudTextField>
+
+                    <MudTextField @bind-Value="customerUpdateRequest.PhoneNumber" For="@(() => customerUpdateRequest.PhoneNumber)" Label="Số điện thoại"></MudTextField>
+
+                    <MudTextField @bind-Value="customerUpdateRequest.Email" For="@(() => customerUpdateRequest.Email)" Label="Email"></MudTextField>
+                    
                 </MudPaper>
             </MudForm>
         }
@@ -34,8 +30,8 @@
         else
         {
             <MudButton OnClick="OnClickCancel">Hủy</MudButton>
-            <MudButton OnClick="Reset">Khôi phục</MudButton>
-            <MudButton OnClick="Update">Lưu</MudButton>
+            <MudButton OnClick="@(async() => await Reset())">Khôi phục</MudButton>
+            <MudButton OnClick="@(async() => await Update())">Lưu</MudButton>
         }
     </DialogActions>
 </MudDialog>
@@ -53,9 +49,8 @@
     [Inject]
     public ISnackbar snackbar { get; set; }
     private bool _formIsValid;
-    private CustomerDTO? customerInfo;
     private CustomerUpdateRequest customerUpdateRequest = new();
-
+    private CustomerDTO? customerInfo;
 
     protected async override Task OnInitializedAsync()
     {
@@ -76,10 +71,12 @@
     }
     private async Task Update()
     {
+        await _form.Validate();
+        if (!_form.IsValid) return;
         var confirm = await dialogService.ShowMessageBox
         (
             "Thông báo",
-            "Xác nhận sửa tiện ích",
+            "Xác nhận sửa thông tin người dùng",
             "Xác nhận",
             cancelText: "Hủy"
         );

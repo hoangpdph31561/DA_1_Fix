@@ -23,7 +23,8 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
                      .ForMember(des => des.CheckOutBooking, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.CheckOutBooking).FirstOrDefault()))
                      .ForMember(des => des.TotalService, otp => otp.MapFrom(src => src.Customer.ServiceOrders.Count()))
                      .ForMember(des => des.NameService, otp => otp.MapFrom(src => src.Customer.ServiceOrders.SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Name).FirstOrDefault()))
-                     .ForMember(des => des.RoomPrice, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.RoomDetail.Price).FirstOrDefault()));
+                     .ForMember(des => des.RoomPrice, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.RoomDetail.Price).FirstOrDefault()))
+                     .ForMember(des => des.NameRoomType, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.RoomDetail.RoomType.Name).FirstOrDefault()));
 
 
             CreateMap<RoombookingCreateRequest, RoomBookingEntity>()

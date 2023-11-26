@@ -9,5 +9,6 @@ namespace BaseSolution.Application.DataTransferObjects.Customer.Request
 {
     public class ViewCustomerWithPaginationRequest : PaginationRequest
     {
+        public string Name { get; set; } = string.Empty;
     }
 }

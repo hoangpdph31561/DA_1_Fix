@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <Folder Include="Data\DataTransferObjects\RoomBookingDetail\Request\" />
+    <Folder Include="wwwroot\image\RoomDetail\" />
   </ItemGroup>
 
 </Project>

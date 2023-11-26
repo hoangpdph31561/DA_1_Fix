@@ -1,5 +1,314 @@
-﻿<h3>RoomDetailUpdate</h3>
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Building
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Building.Request
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Floor
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Floor.Request
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType.Request
+@using BaseSolution.BlazorServer.Respository.Interfaces
 
+<MudDialog>
+    <DialogContent>
+        @if(isLoadingList)
+        {
+            <LoadingIndicator/>
+        }
+        else
+        {
+            <MudPaper Elevation="0" Class="ma-1">
+                <MudForm Model="roomDetailUpdateRequest" @ref="_form">
+                    <MudGrid>
+                        <MudItem xs="4">
+                            <MudImage Src="@imageURL" Fluid="true" Class="rounded-lg w-100" Style="border: 1px grey solid;"></MudImage>
+                            <MudFileUpload T="IBrowserFile" Class="align-content-center" FilesChanged="UploadImage">
+                                <ButtonTemplate>
+                                    <MudButton HtmlTag="label"
+                                               Variant="Variant.Filled"
+                                               Color="Color.Primary"
+                                               StartIcon="@Icons.Material.Filled.CloudUpload"
+                                               for="@context">
+                                        Thay đổi ảnh
+                                    </MudButton>
+                                </ButtonTemplate>
+                            </MudFileUpload>
+                        </MudItem>
+                        <MudItem xs="8">
+                            <MudGrid>
+                                <MudItem xs="6">
+                                    <MudSelect T="Guid" @bind-Value="idBuilding" Label="Tòa nhà" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                        @if (idBuilding == Guid.Empty)
+                                        {
+                                            <MudSelectItem Value="Guid.Empty">Không có tòa nào</MudSelectItem>
+                                        }
+                                        else
+                                        {
+                                            @foreach (var item in lstBuilding)
+                                            {
+                                                <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+                                            }
+                                        }
+
+                                    </MudSelect>
+                                </MudItem>
+                                <MudItem xs="6">
+                                    <MudSelect T="Guid" @bind-Value="idFloor" Label="Tầng" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                        @if (!lstFloor.Any())
+                                        {
+                                            <MudSelectItem Value="Guid.Empty">Không có tầng nào</MudSelectItem>
+                                        }
+                                        else
+                                        {
+                                            @foreach (var item in lstFloor)
+                                            {
+                                                <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+                                            }
+                                        }
+
+                                    </MudSelect>
+                                </MudItem>
+                            </MudGrid>
+                            <MudGrid>
+                                <MudItem xs="6">
+                                    <MudSelect T="Guid" @bind-Value="roomDetailUpdateRequest.RoomTypeId" Label="Loại phòng" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                        @if(lstRoomType != null)
+                                        {
+
+                                            @foreach (var item in lstRoomType)
+                                            {
+                                                <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+                                            }
+                                        }
+                                    </MudSelect>
+                                </MudItem>
+                                <MudItem xs="6">
+                                    <MudTextField @bind-Value="roomDetailUpdateRequest.Name" For="@(() => roomDetailUpdateRequest.Name)" Label="Tên phòng"></MudTextField>
+                                </MudItem>
+                            </MudGrid>
+                        </MudItem>
+                    </MudGrid>
+
+                    <MudGrid>
+                        <MudItem xs="6">
+                            <MudNumericField @bind-Value="roomDetailUpdateRequest.RoomSize" For="@(() => roomDetailUpdateRequest.RoomSize)" Label="Diện tích phòng" Min="1" T="double"></MudNumericField>
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudNumericField @bind-Value="roomDetailUpdateRequest.MaxPeopleStay" For="@(() => roomDetailUpdateRequest.MaxPeopleStay)" Label="Số người tối đa" T="int" Min="1"></MudNumericField>
+                        </MudItem>
+                        
+                    </MudGrid>
+                    <MudGrid>
+                        <MudItem xs="6">
+                            <MudNumericField @bind-Value="roomDetailUpdateRequest.Price" For="@(() => roomDetailUpdateRequest.Price)" Label="Giá phòng" T="decimal" Min="100000"></MudNumericField>
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudSelect T="RoomStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="roomDetailUpdateRequest.Status" For="@(() => roomDetailUpdateRequest.Status)">
+                                <MudSelectItem Value="RoomStatus.Vacant">Phòng trống</MudSelectItem>
+                                <MudSelectItem Value="RoomStatus.OutOfOrder">Không sử dụng</MudSelectItem>
+                                <MudSelectItem Value="RoomStatus.Cleaned">Đã dọn phòng</MudSelectItem>
+                                <MudSelectItem Value="RoomStatus.Dirty">Phòng bẩn</MudSelectItem>
+                                <MudSelectItem Value="RoomStatus.Inspected">Đã kiểm tra</MudSelectItem>
+
+                            </MudSelect>
+                        </MudItem>
+                    </MudGrid>
+                    <MudGrid>
+                        <MudItem xs="12">
+                            <MudTextField @bind-Value="roomDetailUpdateRequest.Description" T="string" For="@(() => roomDetailUpdateRequest.Description)" Label="Mô tả phòng" Lines="3"></MudTextField>
+                        </MudItem>
+                    </MudGrid>
+                </MudForm>
+            </MudPaper>
+        }
+    </DialogContent>
+    <DialogActions>
+        @if(isLoadingList)
+        {
+            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+        }
+        else
+        {
+            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+            <MudButton OnClick="Reset">Khôi phục</MudButton>
+            <MudButton OnClick="UpdateRoomDetail">Lưu</MudButton>
+        }
+    </DialogActions>
+</MudDialog>
 @code {
+    #region Khai báo
+    [Parameter]
+    public Guid idRoomDetail { get; set; }
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    [Inject]
+    public IBuildingRespo buildingRespo { get; set; }
+    [Inject]
+    public IRoomDetailRespo roomDetailRespo { get; set; }
+    [Inject]
+    public IRoomTypeRespo roomTypeRespo { get; set; }
+    [Inject]
+    public IDialogService dialogService { get; set; }
+    [Inject]
+    public ISnackbar snackbar { get; set; }
+    [Inject]
+    public IFloorRespo floorRespo { get; set; }
+    MudForm _form;
+    ImageHandle imageHandle = new();
+    private RoomDetailUpdateRequest roomDetailUpdateRequest = new();
+    private RoomDetailDTO? roomDetailInfo;
+    private ViewBuildingWithPaginationRequest buildingRequest = new()
+    {
+        PageSize = int.MaxValue - 1
+    };
+    private ViewFloorWithPaginationRequest floorRequest = new()
+    {
+            PageSize = int.MaxValue - 1
+    };
+    private ViewRoomTypeWithPaginationRequest roomTypeRequest = new()
+    {
+            PageSize = int.MaxValue - 1
+    };
+    private PaginationResponse<BuildingDTO> buildingVM;
+    private PaginationResponse<FloorDTO> floorVM;
+    private PaginationResponse<RoomTypeDTO> roomTypeVM;
+    private List<BuildingDTO> lstBuilding;
+    private List<FloorDTO> lstFloor;
+    private List<RoomTypeDTO> lstRoomType;
+    private Guid idBuilding = Guid.Empty;
+    private Guid idBuildingCurrent = Guid.Empty;
+    private Guid idFloor = Guid.Empty;
+    private bool isLoadingList = true;
+    private string imageURL = string.Empty;
+    #endregion
+    #region Code xử lý
+    private async Task LoadData()
+    {
+        floorRequest.BuildingId = idBuilding;
+        floorVM = await floorRespo.GetAllFloors(floorRequest);
+        lstFloor = floorVM.Data!.ToList();
+        if(!lstFloor.Any())
+        {
+            idFloor = Guid.Empty;
+        }
+        else
+        {
+            idFloor = lstFloor[0].Id;
+        }
+        roomDetailUpdateRequest.Id = roomDetailInfo!.Id;
+        roomDetailUpdateRequest.FloorId = roomDetailInfo.FloorId;
+        roomDetailUpdateRequest.RoomTypeId = roomDetailInfo.RoomTypeId;
+        roomDetailUpdateRequest.Name = roomDetailInfo.Name;
+        roomDetailUpdateRequest.Price = roomDetailInfo.Price;
+        roomDetailUpdateRequest.MaxPeopleStay = roomDetailInfo.MaxPeopleStay;
+        roomDetailUpdateRequest.Description = roomDetailInfo.Description;
+        roomDetailUpdateRequest.Status = roomDetailInfo.Status;
+        roomDetailUpdateRequest.RoomSize = roomDetailInfo.RoomSize;
+        roomDetailUpdateRequest.Images = roomDetailInfo.Images;
+        imageURL = roomDetailUpdateRequest.Images[0];
+        isLoadingList = false;
+    }
+    private bool CheckChangeData()
+    {
+        return roomDetailInfo!.Name != roomDetailUpdateRequest.Name || roomDetailInfo.Status != roomDetailUpdateRequest.Status || roomDetailInfo.FloorId != idFloor || roomDetailInfo.RoomTypeId != roomDetailUpdateRequest.RoomTypeId || roomDetailInfo.Price != roomDetailUpdateRequest.Price || roomDetailInfo.MaxPeopleStay != roomDetailUpdateRequest.MaxPeopleStay || roomDetailInfo.Description != roomDetailUpdateRequest.Description || roomDetailInfo.RoomSize != roomDetailUpdateRequest.RoomSize || CompareList(roomDetailInfo.Images,roomDetailUpdateRequest.Images);
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        roomDetailInfo = await roomDetailRespo.GetRoomDetailById(idRoomDetail);
+        idBuilding = roomDetailInfo.BuildingId;
+        buildingVM = await buildingRespo.GetAllBuilding(buildingRequest);
+        lstBuilding = buildingVM.Data!.ToList();
+        roomTypeVM = await roomTypeRespo.GetAllRoomTypes(roomTypeRequest);
+        lstRoomType = roomTypeVM.Data!.ToList();
+        idFloor = roomDetailInfo.FloorId;
+        await LoadData();
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(idBuilding != idBuildingCurrent)
+        {
+            isLoadingList = true;
+            idBuildingCurrent = idBuilding;
+            await LoadData();
+            StateHasChanged();
+        }
+    }
+    private async Task Reset()
+    {
+        isLoadingList = true;
+        idBuilding = roomDetailInfo!.BuildingId;
+        idBuildingCurrent = Guid.Empty;
+        idFloor = roomDetailInfo.FloorId;
+        await LoadData();
+    }
+    private void OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+    private async Task UpdateRoomDetail()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+        var confirm = await dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận sửa phòng",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            roomDetailUpdateRequest.Images.Clear();
+            roomDetailUpdateRequest.Images.Add(imageURL);
+            roomDetailUpdateRequest.FloorId = idFloor;
+            var floorInfo = await floorRespo.GetFloorById(idFloor);
+            if(floorInfo.NumberOfRoom == floorInfo.NumberOfRoomRent && CheckChangeData())
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Tầng đã đạt tối đa phòng cho thuê", Severity.Warning);
+                return;
 
+            }
+            var result = await roomDetailRespo.UpdateRoomDetail(roomDetailUpdateRequest);
+            if (result)
+            {
+                if (CheckChangeData())
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    snackbar.Add("Sửa thành công", Severity.Success);
+                }
+                else
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    snackbar.Add("Không có thay đổi dữ liệu để cập nhật", Severity.Warning);
+                }
+            }
+            else
+            {
+                snackbar.Add("Sửa thất bại", Severity.Error);
+            }
+            await Reset();
+        }
+    }
+    private async Task UploadImage(IBrowserFile file)
+    {
+        imageURL = @"\image\RoomDetail\" + await imageHandle.AddImage(file, "RoomDetail");
+    }
+    private bool CompareList(List<string> lstRoomInfoImageURL, List<string> lstRoomUpdateImageURL)
+    {
+        if (lstRoomInfoImageURL.Count != lstRoomUpdateImageURL.Count)
+        {
+            return true; // Số lượng phần tử khác nhau, có sự thay đổi.
+        }
+
+        for (int i = 0; i < lstRoomInfoImageURL.Count; i++)
+        {
+            if (lstRoomInfoImageURL[i] != lstRoomUpdateImageURL[i])
+            {
+                return true; // Có phần tử khác nhau, có sự thay đổi.
+            }
+        }
+
+        return false; // Không có sự thay đổi.
+    }
+    #endregion
 }

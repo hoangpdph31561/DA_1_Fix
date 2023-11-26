@@ -19,7 +19,7 @@ else
                     <MudPaper Elevation="0" Class="mr-auto">
                         <MudText Typo="Typo.h5" Style="font-weight:500;">Quản lý phòng chi tiết khách sạn</MudText>
                     </MudPaper>
-                    <MudChip Icon="@Icons.Material.Filled.Add" Color="Color.Primary">Thêm</MudChip>
+                    <MudChip Icon="@Icons.Material.Filled.Add" OnClick="@(async() => await OpenAdd())" Color="Color.Primary">Thêm</MudChip>
                 </MudPaper>
             </MudPaper>
             <MudPaper Elevation="0" Class="pa-2">
@@ -27,10 +27,14 @@ else
                     <MudItem xs="3">
                         <MudSelect T="Guid" Label="Tòa nhà" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" @bind-Value="@idBuilding" Style="background-color: white;">
                             <MudSelectItem Value="Guid.Empty">Chưa chọn tòa nhà</MudSelectItem>
-                            @foreach (var item in lstBuilding)
-                        {
-                            <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
-                        }
+                            @if(lstBuilding != null)
+                            {
+                                @foreach (var item in lstBuilding)
+                                {
+                                    <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+                                }
+                            }
+                            
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="3">
@@ -48,14 +52,18 @@ else
                     <MudItem xs="3">
                         <MudSelect T="Guid" Label="Loại phòng" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Style="background-color: white;" @bind-Value="idRoomType">
                             <MudSelectItem Value="Guid.Empty">Chưa chọn loại phòng</MudSelectItem>
-                            @foreach (var item in lstRoomType)
-                        {
-                            <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
-                        }
+                            @if(lstRoomType != null)
+                            {
+                                @foreach (var item in lstRoomType)
+                                {
+                                    <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+                                }
+                            }
+                            
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="3">
-                        <MudTextField @bind-Value="SearchString" Immediate Variant="Variant.Outlined" Style="background-color: white;" DebounceInterval="200" Label="Tìm kiếm" MaxLength="200" AdornmentIcon="@Icons.Material.Filled.Search" Adornment="Adornment.End"></MudTextField>
+                        <MudTextField @bind-Value="SearchString" Immediate Variant="Variant.Outlined" Style="background-color: white;" DebounceInterval="200" Label="Tìm kiếm" MaxLength="200" AdornmentIcon="@Icons.Material.Filled.Search" Adornment="Adornment.End" OnDebounceIntervalElapsed="@(async () => await OnSearch(SearchString))"></MudTextField>
                      </MudItem>
                  </MudGrid>
              </MudPaper>
@@ -91,13 +99,13 @@ else
                                 <MudTd><BadgeRoomStatus Status="@context.Status"></BadgeRoomStatus></MudTd>
                                 <MudTd>
                                         <MudChip Icon="@Icons.Material.Filled.Info" Color="Color.Info">Chi tiết</MudChip>
-                                        <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" >Sửa</MudChip>
-                                        <MudChip Icon="@Icons.Material.Filled.Delete" Color="Color.Error" >Xóa</MudChip>
+                                        <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@( async() => await OpenDetail(context.Id))">Sửa</MudChip>
+                                        <MudChip Icon="@Icons.Material.Filled.Delete" OnClick="@( async() => await OnDelete(context.Id))" Color="Color.Error">Xóa</MudChip>
                                 </MudTd>
                             </RowTemplate>
                         </MudTable>
                     </MudCard>
-                    <CustomPagination Class="my-1" HasNext="@roomDetailVM.HasNext"  CurrentPageNumber="@roomDetailVM.PageNumber"></CustomPagination>
+                    <CustomPagination Class="my-1" HasNext="@roomDetailVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="@roomDetailVM.PageNumber"></CustomPagination>
                 }
             </MudPaper>
         </MudPaper>
@@ -126,16 +134,29 @@ else
     private List<RoomTypeDTO> lstRoomType;
     private List<RoomDetailDTO> lstRoomDetail;
     private ViewRoomDetailWithPaginationRequest roomDetailRequest = new();
+    private RoomDetailDeleteRequest deleteRoomDetailRequest = new();
     public bool isLoading { get; set; } = true;
     public bool isLoadingList { get; set; } = true;
     public string SearchString { get; set; }
     public Guid idBuilding { get; set; } = Guid.Empty;
     public Guid idRoomType { get; set; } = Guid.Empty;
     public Guid idFloor { get; set; } = Guid.Empty;
+    public Guid idFloorCurrent { get; set; } = Guid.Empty;
     public Guid idBuildingCurrent { get; set; } = Guid.Empty;
+    public Guid idRoomTypeCurrent { get; set; } = Guid.Empty;
     #endregion
     #region Code xử lý
     private async Task LoadData()
+    {
+        roomDetailRequest.BuildingId = idBuilding;
+        roomDetailRequest.FloorId = idFloor;
+        roomDetailRequest.RoomTypeId = idRoomType;
+        roomDetailVM = await roomDetailRespo.GetAllRoomDetails(roomDetailRequest);
+        lstRoomDetail = roomDetailVM.Data!.ToList();
+        isLoading = false;
+        isLoadingList = false;
+    }
+    protected override async Task OnInitializedAsync()
     {
         buildingVM = await buildingRespo.GetAllBuilding(new Data.DataTransferObjects.Building.Request.ViewBuildingWithPaginationRequest
             {
@@ -147,19 +168,14 @@ else
                 PageSize = int.MaxValue - 1,
             });
         lstRoomType = roomTypeVM.Data!.ToList();
-        roomDetailVM = await roomDetailRespo.GetAllRoomDetails(roomDetailRequest);
-        lstRoomDetail = roomDetailVM.Data!.ToList();
-        isLoading = false;
-        isLoadingList = false;
-    }
-    protected override async Task OnInitializedAsync()
-    {
         await LoadData();
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if(idBuilding != Guid.Empty || idBuilding != idBuildingCurrent)
+        if( idBuilding != idBuildingCurrent)
         {
+            isLoading = true;
+            isLoadingList = true;
             idBuildingCurrent = idBuilding;
             floorVM = await floorRespo.GetAllFloors(new Data.DataTransferObjects.Floor.Request.ViewFloorWithPaginationRequest
                 {
@@ -167,7 +183,103 @@ else
                     BuildingId = idBuildingCurrent
                 });
             lstFloor = floorVM.Data!.ToList();
+            await LoadData();
             StateHasChanged();
+
+        }
+        else if(idBuilding == Guid.Empty && idBuildingCurrent != idBuilding)
+        {
+            isLoading = true;
+            isLoadingList = true;
+            idBuildingCurrent = idBuilding;
+            idFloor = Guid.Empty;
+            await LoadData();
+            StateHasChanged();
+
+        }
+        if(idRoomType != idRoomTypeCurrent)
+        {
+            isLoading = true;
+            isLoadingList = true;
+            idRoomTypeCurrent = idRoomType;
+            await LoadData();
+            StateHasChanged();
+        }
+        if(idFloor != idFloorCurrent)
+        {
+            isLoading = true;
+            isLoadingList = true;
+            idFloorCurrent = idFloor;
+            await LoadData();
+            StateHasChanged();
+        }
+    }
+    private async Task OpenAdd()
+    {
+        var dialog = await _dialogService.ShowAsync<RoomDetailCreate>("Thêm phòng mới");
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
+
+    }
+    private async Task OnSearch(string? searchString)
+    {
+
+        isLoadingList = true;
+        roomDetailRequest.PageNumber = 1;
+        roomDetailRequest.SearchString = searchString;
+        await LoadData();
+    }
+    private async Task OnDelete(Guid id)
+    {
+
+        var confirm = await _dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận xóa phòng?",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            deleteRoomDetailRequest.Id = id;
+            RoomDetailDTO roomDetailInfo = await roomDetailRespo.GetRoomDetailById(id);
+            if(roomDetailInfo.Status == RoomStatus.Occupied)
+            {
+                _snackbar.Add("Không xóa phòng đang thuê được", Severity.Error);
+                return;
+            }
+            var removeConfirm = await roomDetailRespo.DeleteRoomDetail(deleteRoomDetailRequest);
+            if (removeConfirm)
+            {
+                _snackbar.Add("Xóa thành công", Severity.Success);
+            }
+            else
+            {
+                _snackbar.Add("Xóa thất bại", Severity.Error);
+            }
+            await LoadData();
+        }
+
+    }
+    private async Task OnPaginationButtonClick(int pageNumber)
+    {
+        
+        isLoadingList = true;
+        roomDetailRequest.PageNumber = pageNumber;
+        await LoadData();
+    }
+    private async Task OpenDetail(Guid idRoomDetail)
+    {
+        var parameters = new DialogParameters<RoomDetailUpdate>();
+        parameters.Add(x => x.idRoomDetail, idRoomDetail);
+        var dialog = await _dialogService.ShowAsync<RoomDetailUpdate>("Chi tiết phòng", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
         }
     }
     #endregion

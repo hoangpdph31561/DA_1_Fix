@@ -18,11 +18,12 @@ namespace BaseSolution.Application.DataTransferObjects.Roombooking
         public string NameRoom { get; set; } 
         public decimal RoomPrice { get; set; }
         public int TotalService { get; set; }
+        public decimal ServicePrice { get; set; }
         public string NameService { get; set; }
         public float TotalAmount { get; set; }
-        public decimal PrePaid { get; set; } = 0;
+        public decimal PrePaid { get; set; } 
         public DateTimeOffset CreatedTime { get; set; }
-        public string NameRoomType { get; set; } = string.Empty;
+        public string NameRoomType { get; set; } 
 
     }
 }

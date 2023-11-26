@@ -15,6 +15,7 @@
                 <RowTemplate>
                     <MudTd>@(_lstServiceOrder.IndexOf(context) + 1)</MudTd>
                         <MudTd>@context.Name</MudTd>
+                        <MudTd>@context.Quantity</MudTd>
                     </RowTemplate>
                 </MudTable>
         }

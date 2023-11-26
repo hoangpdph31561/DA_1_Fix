@@ -56,9 +56,17 @@ public class RoombookingsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetRoomBookingDetailByAdmin(Guid id, CancellationToken cancellationToken)
     {
-        RoombookingViewModel vm = new(_roombookingrReadOnlyRespository, _localizationService);
-        await vm.HandleAsync(id, cancellationToken);
-        return Ok(vm);
+        try
+        {
+            RoombookingViewModel vm = new(_roombookingrReadOnlyRespository, _localizationService);
+            await vm.HandleAsync(id, cancellationToken);
+            return Ok(vm);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+       
     }
 
     [HttpPost]

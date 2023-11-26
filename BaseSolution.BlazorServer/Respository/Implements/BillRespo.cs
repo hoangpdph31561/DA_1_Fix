@@ -33,5 +33,17 @@ namespace BaseSolution.BlazorServer.Respository.Implements
                 throw;
             }
         }
+
+        public async Task<BillDTO> GetBillById(Guid id)
+        {
+            var result = await _httpClient.GetFromJsonAsync<BillDTO>($"/api/Bills/{id}");
+            return result;
+        }
+
+        public async Task<bool> UpdateBill(BillUpdateRequest request)
+        {
+            var result = await _httpClient.PutAsJsonAsync("/api/Bills", request);
+            return result.IsSuccessStatusCode;
+        }
     }
 }

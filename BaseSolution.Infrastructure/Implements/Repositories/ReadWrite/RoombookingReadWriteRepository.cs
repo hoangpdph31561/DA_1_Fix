@@ -88,7 +88,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 roomBooking!.BookingType = entity.BookingType;
                 roomBooking.CustomerId = entity.CustomerId;
                 roomBooking.UserId = entity.UserId;
-                roomBooking!.Status = entity.Status == EntityStatus.Active ? EntityStatus.Active : EntityStatus.InActive;
+                roomBooking!.Status = entity.Status;
                 roomBooking.ModifiedBy = entity.ModifiedBy;
                 roomBooking.ModifiedTime = DateTimeOffset.Now;
                 _appReadWriteDbContext.RoomBookings.Update(roomBooking);

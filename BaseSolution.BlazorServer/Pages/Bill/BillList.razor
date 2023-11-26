@@ -34,7 +34,6 @@
                             <MudTh>Loại bill</MudTh>
                             <MudTh>Tổng tiền</MudTh>
                             <MudTh>Trạng thái</MudTh>
-                            <MudTh></MudTh>
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd>@(lstBill.IndexOf(context) + 1)</MudTd>
@@ -43,6 +42,10 @@
                                 <MudTh>@context.BillType</MudTh>
                                 <MudTh>@context.TotalAmount</MudTh>
                                 <MudTd><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTd>
+
+                                <MudTd>
+                                    <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@(() => OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
+                                </MudTd>
                             </RowTemplate>
                         </MudTable>
                         <MudDivider />
@@ -93,16 +96,16 @@
         await LoadData();
 
     }
-    private async Task OpenDetail(Guid idAmenity)
+    private async Task OpenDetail(Guid idBill)
     {
-        // var parameters = new DialogParameters<AmenityUpdate>();
-        // parameters.Add(x => x.idAmenity, idAmenity);
-        // var dialog = await _dialogService.ShowAsync<AmenityUpdate>("Chi tiết tiện ích", parameters);
-        // var result = await dialog.Result;
-        // if (!result.Canceled)
-        // {
-        //     await LoadData();
-        // }
+        var parameters = new DialogParameters<BillUpdate>();
+        parameters.Add(x => x.idBill, idBill);
+        var dialog = await _dialogService.ShowAsync<BillUpdate>("Chi tiết bill", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
     }
     #endregion
     #region Code event

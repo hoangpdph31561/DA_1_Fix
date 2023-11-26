@@ -62,7 +62,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 var result = await query.PaginateAsync(request, cancellationToken);
                 foreach (var item in result.Data!)
                 {
-                    item.TotalAmount = (float)item.RoomPrice;
+                    item.TotalAmount = (item.TotalService * (float)item.ServicePrice) + (float)item.RoomPrice;
                 }
                 return RequestResult<PaginationResponse<RoombookingDTO>>.Succeed(new PaginationResponse<RoombookingDTO>
                 {
@@ -100,7 +100,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
 
                 foreach (var item in result.Data!)
                 {
-                    item.TotalAmount = (float)item.RoomPrice;
+                    item.TotalAmount = (item.TotalService * (float)item.ServicePrice) + (float)item.RoomPrice;
                 }
                 return RequestResult<PaginationResponse<RoombookingDTO>>.Succeed(new PaginationResponse<RoombookingDTO>
                 {

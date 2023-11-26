@@ -16,6 +16,9 @@ namespace BaseSolution.Application.DataTransferObjects.Roombooking
         public string NameBuilding { get; set; } 
         public string NameFloor { get; set; } 
         public string NameRoom { get; set; } 
+        public int CountServices { get; set; } // tổng số lượng của 1 dịch vụ 
+        public decimal ServicePrice { get; set; } // giá của dịch vụ 
+        public float ServiceAmount { get; set; } // ServiceAmount = TotalService x ServicePrice
         public decimal RoomPrice { get; set; }
         public int TotalService { get; set; }
         public decimal ServicePrice { get; set; }
@@ -23,7 +26,10 @@ namespace BaseSolution.Application.DataTransferObjects.Roombooking
         public float TotalAmount { get; set; }
         public decimal PrePaid { get; set; } 
         public DateTimeOffset CreatedTime { get; set; }
-        public string NameRoomType { get; set; } 
+
+        public string NameRoomType { get; set; } = string.Empty;
+        public DateTimeOffset CheckInBooking { get; set; }
+        public DateTimeOffset CheckOutBooking { get; set; }
 
     }
 }

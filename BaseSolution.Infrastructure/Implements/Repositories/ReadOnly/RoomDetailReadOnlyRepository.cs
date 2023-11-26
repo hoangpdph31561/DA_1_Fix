@@ -37,7 +37,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                var RoomDetail = await _dbContext.RoomDetails.Where(c => c.Id == idRoomDetail && !c.Deleted).ProjectTo<RoomDetailDto>(_mapper.ConfigurationProvider)
+                var RoomDetail = await _dbContext.RoomDetails.AsNoTracking().Where(c => c.Id == idRoomDetail && !c.Deleted).ProjectTo<RoomDetailDto>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(cancellationToken);
 
                 return RequestResult<RoomDetailDto?>.Succeed(RoomDetail);
@@ -86,10 +86,24 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                IQueryable<RoomDetailEntity> queryable = _dbContext.RoomDetails.AsQueryable();
-                var result = await _dbContext.RoomDetails
-                    .PaginateAsync<RoomDetailEntity, RoomDetailDto>(request, _mapper, cancellationToken);
-
+                var queryable = _dbContext.RoomDetails.AsNoTracking().AsQueryable().Where(x => !x.Deleted).ProjectTo<RoomDetailDto>(_mapper.ConfigurationProvider);
+                if(request.BuildingId != null || request.BuildingId != Guid.Empty)
+                {
+                    queryable = queryable.Where(x => x.BuildingId == request.BuildingId);
+                }
+                if(request.FloorId != null || request.FloorId != Guid.Empty)
+                {
+                    queryable = queryable.Where(x => x.FloorId == request.FloorId);
+                }
+                if (request.RoomTypeId != null ||  request.RoomTypeId != Guid.Empty)
+                {
+                    queryable = queryable.Where(x => x.RoomTypeId == request.RoomTypeId);
+                }
+                if (!string.IsNullOrWhiteSpace(request.SearchString))
+                {
+                    queryable = queryable.Where(x => x.Name.ToLower().Trim().Contains(request.SearchString.ToLower().Trim()));
+                }
+                var result = await queryable.PaginateAsync(request, cancellationToken);
                 return RequestResult<PaginationResponse<RoomDetailDto>>.Succeed(new PaginationResponse<RoomDetailDto>()
                 {
                     PageNumber = request.PageNumber,

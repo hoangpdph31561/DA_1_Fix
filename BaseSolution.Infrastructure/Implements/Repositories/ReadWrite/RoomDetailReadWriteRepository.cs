@@ -89,7 +89,14 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
 
                 // Update value to existed RoomDetail
                 RoomDetail!.Name = string.IsNullOrWhiteSpace(entity.Name) ? RoomDetail.Name : entity.Name;
-
+                RoomDetail.Price = entity.Price;
+                RoomDetail.Description = entity.Description;
+                RoomDetail.MaxPeopleStay = entity.MaxPeopleStay;
+                RoomDetail.RoomSize = entity.RoomSize;
+                RoomDetail.RoomTypeId = entity.RoomTypeId;
+                RoomDetail.FloorId = entity.FloorId;
+                RoomDetail.Images = entity.Images;
+                RoomDetail.Status = entity.Status;
                 RoomDetail.ModifiedBy = entity.ModifiedBy;
                 RoomDetail.ModifiedTime = DateTimeOffset.UtcNow;
 

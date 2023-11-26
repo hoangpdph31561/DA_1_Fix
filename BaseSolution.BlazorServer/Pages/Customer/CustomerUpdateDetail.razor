@@ -1,0 +1,118 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
+@using BaseSolution.BlazorServer.Respository.Interfaces
+<MudDialog>
+    <DialogContent>
+        @if (customerInfo == null)
+        {
+            <MudText>Không có thông tin nào</MudText>
+        }
+        else
+        {
+            <MudForm Model="customerUpdateRequest" @ref="@_form" @bind-IsValid="@_formIsValid">
+                <MudPaper Width="100%" Elevation="0">
+                    <MudGrid>
+                        <MudItem xs="12" sm="6">
+                            <MudTextField @bind-Value="customerUpdateRequest.Name" For="@(() => customerUpdateRequest.Name)" Label="Tên"></MudTextField>
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudTextField @bind-Value="customerUpdateRequest.PhoneNumber" For="@(() => customerUpdateRequest.PhoneNumber)" Label="Số điện thoại"></MudTextField>
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudTextField @bind-Value="customerUpdateRequest.Email" For="@(() => customerUpdateRequest.Email)" Label="Email"></MudTextField>
+                        </MudItem>
+                    </MudGrid>
+                </MudPaper>
+            </MudForm>
+        }
+    </DialogContent>
+    <DialogActions>
+        @if (customerInfo == null)
+        {
+            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+        }
+        else
+        {
+            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+            <MudButton OnClick="Reset">Khôi phục</MudButton>
+            <MudButton OnClick="Update">Lưu</MudButton>
+        }
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter]
+    public Guid idCustomer { get; set; }
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    MudForm _form;
+    [Inject]
+    private ICustomerRepo customerRepo { get; set; }
+    [Inject]
+    public IDialogService dialogService { get; set; }
+    [Inject]
+    public ISnackbar snackbar { get; set; }
+    private bool _formIsValid;
+    private CustomerDTO? customerInfo;
+    private CustomerUpdateRequest customerUpdateRequest = new();
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        customerInfo = await customerRepo.GetCustomerById(idCustomer);
+        customerUpdateRequest.Id = customerInfo.Id;
+        customerUpdateRequest.Name = customerInfo.Name;
+        customerUpdateRequest.PhoneNumber = customerInfo.PhoneNumber;
+        customerUpdateRequest.Email = customerInfo.Email;
+    }
+
+    private bool CheckChangeData()
+    {
+        return customerInfo!.Name != customerUpdateRequest.Name || customerInfo.PhoneNumber != customerUpdateRequest.PhoneNumber || customerInfo.Email != customerUpdateRequest.Email;
+    }
+    private async Task Update()
+    {
+        var confirm = await dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận sửa tiện ích",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            var result = await customerRepo.UpdateCustomer(customerUpdateRequest);
+            if (result)
+            {
+                if (CheckChangeData())
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    snackbar.Add("Sửa thành công", Severity.Success);
+                }
+                else
+                {
+                    OnClickCancel();
+                    snackbar.Add("Không có thay đổi dữ liệu để cập nhật", Severity.Warning);
+                }
+            }
+            else
+            {
+                snackbar.Add("Sửa thất bại", Severity.Error);
+            }
+            await Reset();
+        }
+    }
+
+    private void OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+    private async Task Reset()
+    {
+        await LoadData();
+    }
+}

@@ -91,7 +91,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 serviceOrder.RoomBookingDetailId = entity.RoomBookingDetailId;
                 serviceOrder.ModifiedBy = entity.ModifiedBy;
                 serviceOrder.ModifiedTime = DateTimeOffset.UtcNow;
-
+                serviceOrder.Status = entity.Status;
                 _appReadWriteDbContext.ServiceOrders.Update(serviceOrder);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
 

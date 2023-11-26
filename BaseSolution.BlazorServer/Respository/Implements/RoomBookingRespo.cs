@@ -41,8 +41,17 @@ namespace BaseSolution.BlazorServer.Respository.Implements
 
         public async Task<RoomBookingDto> GetRoomBookingById(Guid id)
         {
-            var result = await _httpClient.GetFromJsonAsync<RoomBookingDto>($"/api/Roombookings/{id}");
-            return result;
+            try
+            {
+                var result = await _httpClient.GetFromJsonAsync<RoomBookingDto>($"/api/Roombookings/{id}");
+                return result;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+           
         }
 
         public async Task<bool> UpdateRoomBooking(RoombookingUpdateRequest request)

@@ -36,6 +36,7 @@
                             <MudTh>Số lượng dịch vụ</MudTh>
                             <MudTh>Tổng tiền</MudTh>
                             <MudTh>Trạng thái</MudTh>
+                            <MudTh>Hành động</MudTh>
                             <MudTh></MudTh>
                         </HeaderContent>
                         <RowTemplate>
@@ -47,6 +48,7 @@
                                 <MudTh>@context.TotalAmount</MudTh>
                                 <MudTd><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTd>
                                 <MudTd>
+                                    <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@(() => OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
                                 </MudTd>
                             </RowTemplate>
                         </MudTable>
@@ -120,6 +122,18 @@
         {
             await LoadData();
             StateHasChanged();
+        }
+    }
+
+    private async Task OpenDetail(Guid idRoomBooking)
+    {
+        var parameters = new DialogParameters<RoomBookingUpdate>();
+        parameters.Add(x => x.idRoomBooking, idRoomBooking);
+        var dialog = await _dialogService.ShowAsync<RoomBookingUpdate>("Chi tiết phòng", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
         }
     }
     #endregion

@@ -73,6 +73,7 @@ namespace BaseSolution.Infrastructure.Extensions
             services.AddTransient<IRoleReadWriteRepository, RoleReadWriteRepository>();
             services.AddTransient<IUserReadOnlyRepository, UserReadOnlyRepository>();
             services.AddTransient<IUserReadWriteRepository, UserReadWriteRepository>();
+            services.AddTransient<IRoombookingStatisticReadOnlyRepository, RoombookingStatisticReadOnlyRepository>();
 
             return services;
         }

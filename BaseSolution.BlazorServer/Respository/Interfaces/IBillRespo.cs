@@ -8,5 +8,7 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
     {
         Task<PaginationResponse<BillDTO>> GetAllBill(ViewBillWithPaginationRequest request);
         Task<bool> CreateNewBill(BillCreateRequest request);
+        Task<BillDTO> GetBillById(Guid id);
+        Task<bool> UpdateBill(BillUpdateRequest request);
     }
 }

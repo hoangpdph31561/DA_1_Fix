@@ -18,5 +18,7 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.Bill
         public float ServiceAmount { get; set; } // ServiceAmount = TotalService x ServicePrice
         public float RoomPrice { get; set; }
         public float TotalAmount { get; set; } // TotalAmount = TotalService + RoomPrice
+        public Guid CustomerId { get; set; }
+
     }
 }

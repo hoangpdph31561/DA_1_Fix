@@ -38,5 +38,16 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             var result = await _httpClient.GetFromJsonAsync<List<ServiceOrderDTO>>($"api/ServiceOrders/ServiceOrdersByIdCustomer?idCustomer={id}");
             return result;
         }
+        public async Task<ServiceOrderDTO> GetServiceOrderById(Guid id)
+        {
+            var result = await _httpClient.GetFromJsonAsync<ServiceOrderDTO>($"/api/ServiceOrders/{id}");
+            return result;
+        }
+
+        public async Task<bool> UpdateServiceOrder(ServiceOrderUpdateRequest request)
+        {
+            var result = await _httpClient.PutAsJsonAsync("/api/ServiceOrders", request);
+            return result.IsSuccessStatusCode;
+        }
     }
 }

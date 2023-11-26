@@ -1,11 +1,10 @@
 ﻿using BaseSolution.BlazorServer.Data.ValueObjects.Common;
 
-namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request
+namespace BaseSolution.BlazorServer.Data.DataTransferObjects.Bill.Request
 {
-    public class RoombookingUpdateRequest
+    public class BillUpdateRequest
     {
         public Guid Id { get; set; }
-        public Guid RoomDetailId { get; set; }
         public Guid CustomerId { get; set; }
         public EntityStatus Status { get; set; }
     }

@@ -8,8 +8,6 @@ namespace BaseSolution.Application.DataTransferObjects.Roombooking.Request
         public Guid RoomDetailId { get; set; }
         public BookingType BookingType { get; set; }
         public Guid CustomerId { get; set; }
-        public string NameCustomer { get; set; }
         public EntityStatus Status { get; set; } 
-        public Guid? ModifiedBy { get; set; }
     }
 }

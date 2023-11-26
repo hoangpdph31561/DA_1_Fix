@@ -87,15 +87,15 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             try
             {
                 var queryable = _dbContext.RoomDetails.AsNoTracking().AsQueryable().Where(x => !x.Deleted).ProjectTo<RoomDetailDto>(_mapper.ConfigurationProvider);
-                if(request.BuildingId != null || request.BuildingId != Guid.Empty)
+                if(request.BuildingId != Guid.Empty)
                 {
                     queryable = queryable.Where(x => x.BuildingId == request.BuildingId);
                 }
-                if(request.FloorId != null || request.FloorId != Guid.Empty)
+                if( request.FloorId != Guid.Empty)
                 {
                     queryable = queryable.Where(x => x.FloorId == request.FloorId);
                 }
-                if (request.RoomTypeId != null ||  request.RoomTypeId != Guid.Empty)
+                if ( request.RoomTypeId != Guid.Empty)
                 {
                     queryable = queryable.Where(x => x.RoomTypeId == request.RoomTypeId);
                 }

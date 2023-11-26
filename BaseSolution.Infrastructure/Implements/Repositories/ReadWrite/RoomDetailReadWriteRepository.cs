@@ -53,10 +53,10 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
         {
             try
             {
-                // Get existed RoomDetail
+                // Get existed roomDetail
                 var RoomDetail = await GetRoomDetailByIdAsync(request.Id, cancellationToken);
 
-                // Update value to existed RoomDetail
+                // Update value to existed roomDetail
                 RoomDetail!.Deleted = true;
                 RoomDetail.DeletedBy = request.DeletedBy;
                 RoomDetail.DeletedTime = DateTimeOffset.UtcNow;
@@ -84,23 +84,23 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
         {
             try
             {
-                // Get existed RoomDetail
-                var RoomDetail = await GetRoomDetailByIdAsync(entity.Id, cancellationToken);
+                // Get existed roomDetail
+                var roomDetail = await GetRoomDetailByIdAsync(entity.Id, cancellationToken);
 
-                // Update value to existed RoomDetail
-                RoomDetail!.Name = string.IsNullOrWhiteSpace(entity.Name) ? RoomDetail.Name : entity.Name;
-                RoomDetail.Price = entity.Price;
-                RoomDetail.Description = entity.Description;
-                RoomDetail.MaxPeopleStay = entity.MaxPeopleStay;
-                RoomDetail.RoomSize = entity.RoomSize;
-                RoomDetail.RoomTypeId = entity.RoomTypeId;
-                RoomDetail.FloorId = entity.FloorId;
-                RoomDetail.Images = entity.Images;
-                RoomDetail.Status = entity.Status;
-                RoomDetail.ModifiedBy = entity.ModifiedBy;
-                RoomDetail.ModifiedTime = DateTimeOffset.UtcNow;
+                // Update value to existed roomDetail
+                roomDetail!.Name = entity.Name;
+                roomDetail.Price = entity.Price;
+                roomDetail.Description = entity.Description;
+                roomDetail.MaxPeopleStay = entity.MaxPeopleStay;
+                roomDetail.RoomSize = entity.RoomSize;
+                roomDetail.RoomTypeId = entity.RoomTypeId;
+                roomDetail.FloorId = entity.FloorId;
+                roomDetail.Images = entity.Images;
+                roomDetail.Status = entity.Status;
+                roomDetail.ModifiedBy = entity.ModifiedBy;
+                roomDetail.ModifiedTime = DateTimeOffset.UtcNow;
 
-                _dbContext.RoomDetails.Update(RoomDetail);
+                _dbContext.RoomDetails.Update(roomDetail);
                 await _dbContext.SaveChangesAsync(cancellationToken);
 
                 return RequestResult<int>.Succeed(1);
@@ -119,9 +119,9 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
         }
         private async Task<RoomDetailEntity?> GetRoomDetailByIdAsync(Guid idRoomDetail, CancellationToken cancellationToken)
         {
-            var RoomDetail = await _dbContext.RoomDetails.FirstOrDefaultAsync(c => c.Id == idRoomDetail && !c.Deleted, cancellationToken);
+            var roomDetail = await _dbContext.RoomDetails.FirstOrDefaultAsync(c => c.Id == idRoomDetail && !c.Deleted, cancellationToken);
 
-            return RoomDetail;
+            return roomDetail;
         }
     }
 }

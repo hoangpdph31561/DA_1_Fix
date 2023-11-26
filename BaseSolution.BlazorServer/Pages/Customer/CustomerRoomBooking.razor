@@ -5,16 +5,20 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request
 @using BaseSolution.BlazorServer.Respository.Interfaces
 
-<CustomListDisplay IsLoading="@(_isLoadingAll)" OnSearch="@OnSearch">
+<CustomListDisplay Label="@("Thông tin đặt phòng")" IsLoading="@(_isLoadingAll)" OnSearch="@OnSearch">
     <HeaderContent>
 
     </HeaderContent>
 
     <BodyContent>
         <MudPaper Elevation="0" Class="custom-list-display-border">
-            @if (_isLoadingAll)
+            @if (_lstRoomBooking == null)
             {
-                <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="m-3" />
+                <MudText>Không có phòng</MudText>
+            }
+            @if (_isLoadingList)
+            {
+                <MudProgressLinear Color="Color.Primary" Indeterminate="true"></MudProgressLinear>
             }
             else
             {
@@ -22,6 +26,7 @@
                     <MudTable Items="@_roomBookingVM.Data">
                         <HeaderContent>
                             <MudTh>STT</MudTh>
+                            <MudTh>Tên khách hàng</MudTh>
                             <MudTh>Thời gian đặt</MudTh>
                             <MudTh>Loại phòng</MudTh>
                             <MudTh>Kiểu đặt phòng</MudTh>
@@ -31,16 +36,17 @@
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd>@(_lstRoomBooking.IndexOf(context) + 1)</MudTd>
+                            <MudTd>@context.NameCustomer</MudTd>
                             <MudTd>@context.CreatedTime</MudTd>
                                 <MudTd>@context.NameRoomType</MudTd>
                                 <MudTh>@context.BookingType</MudTh>
                                 <MudTh>@context.PrePaid</MudTh>
                                 <MudTh>@context.RoomPrice</MudTh>
-                                <MudTh>@context.Status</MudTh>
+                                <MudTh><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTh>
                             </RowTemplate>
                         </MudTable>
                         <MudDivider />
-                        <CustomPagination Class="my-1" HasNext="@_roomBookingVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClickTab(e))" CurrentPageNumber="_roomBookingVM.PageNumber"></CustomPagination>
+                        <CustomPagination Class="my-1" HasNext="@_roomBookingVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="_roomBookingVM.PageNumber"></CustomPagination>
                     </MudCard>
             }
         </MudPaper>
@@ -64,7 +70,7 @@
     private ViewRoombookingPaginationRequest _roomBookingRequest = new();
     #endregion
     #region
-
+    private bool _isLoadingList = true;
     private bool _isLoadingAll = true;
     private bool closeAdd = true;
     private bool closeDetail = true;
@@ -79,18 +85,21 @@
         _roomBookingVM = await _roomBookingRepo.GetListRoomBookingByOther(_roomBookingRequest);
         _lstRoomBooking = _roomBookingVM.Data!.ToList();
         _isLoadingAll = false;
+        _isLoadingList = false;
     }
     #region RoomBooking
-    private async Task OnPaginationButtonClickTab(int pageNumber)
+    private async Task OnPaginationButtonClick(int pageNumber)
     {
         if (_isDisableControls) return;
-        _isLoadingAll = true;
+        _isLoadingList = true;
         _roomBookingRequest.PageNumber = pageNumber;
         await LoadData();
     }
     private async Task OnSearch(string? searchString)
     {
         _isLoadingAll = true;
+        _roomBookingRequest.PageNumber = 1;
+        _roomBookingRequest.SearchString = searchString;
         await LoadData();
     }
     #endregion

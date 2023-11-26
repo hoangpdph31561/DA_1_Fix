@@ -30,10 +30,12 @@
                                 <MudTd>@context.Email</MudTd>
                                 <MudTh>@context.PhoneNumber</MudTh>
                                 <MudTd>
-                                    <MudChip Icon="@Icons.Material.Filled.Details" Color="Color.Primary" OnClick="@( async() => await OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
+                                    <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@( async() => await OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
                                 </MudTd>
                             </RowTemplate>
                         </MudTable>
+                        <MudDivider />
+                        <CustomPagination Class="my-1" HasNext="@customerVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="customerVM.PageNumber"></CustomPagination>
                     </MudCard>
             }
         </MudPaper>
@@ -65,17 +67,19 @@
         _isLoadingList = false;
         _isLoadingAll = false;
     }
+    private async Task OnPaginationButtonClick(int pageNumber)
+    {
+        if (_isDisableControls) return;
+        _isLoadingList = true;
+        customerRequest.PageNumber = pageNumber;
+        await LoadData();
+    }
     private async Task OnSearch(string? searchString)
     {
         _isLoadingList = true;
         customerRequest.PageNumber = 1;
         customerRequest.Name = searchString;
-        await LoadData().ContinueWith((re) =>
-        {
-            _isLoadingAll = false;
-            _isLoadingList = false;
-        });
-
+        await LoadData();
     }
     private async Task OpenDetail(Guid idCustomer)
     {

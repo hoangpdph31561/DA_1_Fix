@@ -144,8 +144,9 @@ namespace BaseSolution.API.Controllers
                     Status = Domain.Enums.EntityStatus.PendingForConfirmation,
                 };
                 await _CustomerReadWriteRepository.AddCustomerAsync(newCustomers, cancellationToken);
+                return Ok("Gửi mã thành công!");
             }
-            else
+            else if (checkExsits.Data != null)
             {
                 var detailCustomer = await _CustomerReadOnlyRepository.GetCustomerByIdentificationAsync(customerCreateRequest.IdentificationNumber, cancellationToken);
                 if (detailCustomer.Data?.ApprovedCodeExpiredTime < DateTime.Now)
@@ -159,7 +160,7 @@ namespace BaseSolution.API.Controllers
                         PhoneNumber = customerCreateRequest.PhoneNumber,
                         Name = customerCreateRequest.Name,
                         ApprovedCode = customerCreateRequest.ApprovedCode,
-                        CreatedTime = DateTime.Now,
+                        ModifiedTime = DateTime.Now,
                         ApprovedCodeExpiredTime = DateTime.Now.AddMinutes(5),
                         Status = Domain.Enums.EntityStatus.PendingForConfirmation,
                     };
@@ -177,16 +178,20 @@ namespace BaseSolution.API.Controllers
                         PhoneNumber = customerCreateRequest.PhoneNumber,
                         Name = customerCreateRequest.Name,
                         ApprovedCode = customerCreateRequest.ApprovedCode,
-                        CreatedTime = DateTime.Now,
+                        ModifiedTime = DateTime.Now,
                         IdentificationNumber = customerCreateRequest.IdentificationNumber,
                         ApprovedCodeExpiredTime = DateTime.Now.AddMinutes(5),
                         Status = Domain.Enums.EntityStatus.PendingForConfirmation,
                     };
                     await _CustomerReadWriteRepository.UpdateCustomerAsync(newCustomers, cancellationToken);
-                    
+                    return Ok("Mã đã được gửi, vui lòng kiểm tra email!");
                 }
             }
-            return Ok("Gửi mã thành công");
+            else
+            {
+                return Ok("Không thể gửi mãs!");
+            }
+            return Ok();
         }
         [HttpPost]
         public async Task<IActionResult> Post(CustomerCreateRequest request, CancellationToken cancellationToken)

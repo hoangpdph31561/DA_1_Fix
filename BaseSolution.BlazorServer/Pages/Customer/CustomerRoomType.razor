@@ -4,67 +4,74 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType.Request
 @using BaseSolution.BlazorServer.Respository.Interfaces
-<MudPaper Elevation="0" Class="custom-list-display-border">
-    @if (_isLoadingAll)
-    {
-        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="m-3" />
-    }
-    else
-    {
-        @* <MudGrid>
+<CustomListDisplayP2 Label="@("Đặt phòng")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
+    <HeaderContent>
+      
+    </HeaderContent>
+    <BodyContent>
+        <MudPaper Elevation="0" Class="custom-list-display-border">
+            @if (_isLoadingList)
+            {
+                <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="m-3" />
+            }
+            else
+            {
+                @* <MudGrid>
             <MudItem xs="12" md="3" lg="2">
-                <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Checkin" DateFormat="dd/MM/yyyy" Date="@(new System.DateTime(2023,12,11))" />
+            <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Checkin" DateFormat="dd/MM/yyyy" Date="@(new System.DateTime(2023,12,11))" />
             </MudItem>
             <MudItem xs="12" md="3" lg="2">
-                <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Checkout" DateFormat="dd/MM/yyyy" Date="@(new System.DateTime(2023,12,15))" />
+            <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Checkout" DateFormat="dd/MM/yyyy" Date="@(new System.DateTime(2023,12,15))" />
             </MudItem>
             <MudItem xs="12" md="3" lg="2">
-                <MudSelect Label="Loại phòng" @bind-Value="_idRoomDetail">
-                    @foreach (var item in _lstRoomDetail)
-                    {
-                        <MudSelectItem Value="@item.Id.ToString()">@item.NameOfRoomType</MudSelectItem>
-                    }
-                </MudSelect>
+            <MudSelect Label="Loại phòng" @bind-Value="_idRoomDetail">
+            @foreach (var item in _lstRoomDetail)
+            {
+            <MudSelectItem Value="@item.Id.ToString()">@item.NameOfRoomType</MudSelectItem>
+            }
+            </MudSelect>
             </MudItem>
             <MudItem xs="12" md="3" lg="2">
-                <MudSelect Label="Số người tối đa" @bind-Value="_idRoomDetail">
-                    @foreach (var item in _lstRoomDetail)
-                    {
-                        <MudSelectItem Value="@item.Id.ToString()">@item.MaxPeopleStay</MudSelectItem>
-                    }
-                </MudSelect>
+            <MudSelect Label="Số người tối đa" @bind-Value="_idRoomDetail">
+            @foreach (var item in _lstRoomDetail)
+            {
+            <MudSelectItem Value="@item.Id.ToString()">@item.MaxPeopleStay</MudSelectItem>
+            }
+            </MudSelect>
             </MudItem>
             <MudItem xs="12" md="3" lg="2">
-                <MudSelect Label="Giá" @bind-Value="_idRoomDetail">
-                    @foreach (var item in _lstRoomDetail)
-                    {
-                        <MudSelectItem Value="@item.Id.ToString()">@item.Price</MudSelectItem>
-                    }
-                </MudSelect>
+            <MudSelect Label="Giá" @bind-Value="_idRoomDetail">
+            @foreach (var item in _lstRoomDetail)
+            {
+            <MudSelectItem Value="@item.Id.ToString()">@item.Price</MudSelectItem>
+            }
+            </MudSelect>
             </MudItem>
-        </MudGrid> *@
-        <MudTable Items="@_RoomTypelVM.Data" Style="position:relative;" Elevation="0">
-            <HeaderContent>
-                <MudTh>STT</MudTh>
-                <MudTh>Tên loại phòng</MudTh>
-                <MudTh>Số lượng tiện ích </MudTh>
-                <MudTh>Số lượng phòng</MudTh>
-                <MudTh>Hành động</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd>@(_lstRoomType.IndexOf(context) + 1)</MudTd>
-                <MudTd>@context.Name</MudTd>
-                <MudTd>@context.NumberOfAmenityRoomDetail <MudChip Icon="@Icons.Material.Filled.ListAlt" OnClick="@(() => OpenAmenity(context.Id))"></MudChip></MudTd>
-                <MudTd>@context.AmountOfRoomType</MudTd>
-                <MudTd>
-                        <MudChip Color="Color.Primary" OnClick="@(() => OpenDetail(context.Id))" Disabled="@_isDisableControls">Đặt phòng</MudChip>
-                </MudTd>
-                </RowTemplate>
-            </MudTable>
-        <CustomPagination Class="my-1" HasNext="@_RoomTypelVM.HasNext" OnPageChange="@(async e => await OnPaginationButtonClickTab1(e))" CurrentPageNumber="@_RoomTypelVM.PageNumber"></CustomPagination>
-        <MudDivider />
-    }
-</MudPaper>
+            </MudGrid> *@
+                <MudTable Items="@_RoomTypeVM.Data" Style="position:relative;" Elevation="0">
+                    <HeaderContent>
+                        <MudTh>STT</MudTh>
+                        <MudTh>Tên loại phòng</MudTh>
+                        <MudTh>Số lượng tiện ích </MudTh>
+                        <MudTh>Số lượng phòng</MudTh>
+                        <MudTh>Hành động</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>@(_lstRoomType.IndexOf(context) + 1)</MudTd>
+                        <MudTd>@context.Name</MudTd>
+                            <MudTd>@context.NumberOfAmenityRoomDetail <MudChip Icon="@Icons.Material.Filled.ListAlt" OnClick="@(() => OpenAmenity(context.Id))"></MudChip></MudTd>
+                        <MudTd>@context.AmountOfRoomType</MudTd>
+                            <MudTd>
+                                <MudChip Color="Color.Primary" OnClick="@(() => OpenDetail(context.Id))" Disabled="@_isDisableControls">Đặt phòng</MudChip>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                <CustomPagination Class="my-1" HasNext="@_RoomTypeVM.HasNext" OnPageChange="@(async e => await OnPaginationButtonClick(e))" CurrentPageNumber="@_RoomTypeVM.PageNumber"></CustomPagination>
+                <MudDivider />
+            }
+        </MudPaper>
+    </BodyContent>
+</CustomListDisplayP2>
 @code {
     [Inject]
     public IRoomTypeRepo _roomTypeRepo { get; set; }
@@ -75,7 +82,7 @@
     private Guid _idRoomType = Guid.Empty;
     private Guid _idRoomDetail = Guid.Empty;
     #region
-    private PaginationResponse<RoomTypeDTO> _RoomTypelVM;
+    private PaginationResponse<RoomTypeDTO> _RoomTypeVM;
     private List<RoomTypeDTO> _lstRoomType;
     private ViewRoomTypeWithPaginationRequest _roomTypeRequest = new();
     private PaginationResponse<RoomDetailDTO> _roomDetailslVM;
@@ -84,6 +91,7 @@
     #endregion
     #region
     private bool _isLoadingAll = true;
+    private bool _isLoadingList = true;
     private bool closeAdd = true;
     private bool closeDetail = true;
     private bool _isDisableControls = false;
@@ -95,14 +103,10 @@
     #region RoomType
     private async Task LoadData()
     {
-        _RoomTypelVM = await _roomTypeRepo.GetRoomType(_roomTypeRequest);
-        _lstRoomType = _RoomTypelVM.Data!.ToList();
+        _RoomTypeVM = await _roomTypeRepo.GetRoomType(_roomTypeRequest);
+        _lstRoomType = _RoomTypeVM.Data!.ToList();
+        _isLoadingList = false;
         _isLoadingAll = false;
-    }
-    private async Task OnSearchTab(string? searchString)
-    {
-        _isLoadingAll = true;
-        await LoadData();
     }
     private async Task OpenDetail(Guid _idRoomType)
     {
@@ -126,12 +130,21 @@
             await LoadData();
         }
     }
-    
-    private async Task OnPaginationButtonClickTab1(int pageNumber)
+
+    private async Task OnPaginationButtonClick(int pageNumber)
     {
         if (_isDisableControls) return;
+        _isLoadingList = true;
         _roomTypeRequest.PageNumber = pageNumber;
         await LoadData();
+    }
+    private async Task OnSearch(string? searchString)
+    {
+        _isLoadingList = true;
+        _roomTypeRequest.PageNumber = 1;
+        _roomTypeRequest.SearchString = searchString;
+        await LoadData();
+
     }
     #endregion
 }

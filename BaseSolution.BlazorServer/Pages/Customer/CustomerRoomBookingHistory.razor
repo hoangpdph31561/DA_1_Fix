@@ -3,7 +3,7 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request
 @using BaseSolution.BlazorServer.Respository.Interfaces
 
-<CustomListDisplay IsLoading="@(_isLoadingAll)" OnSearch="@OnSearch">
+<CustomListDisplay Label="Lịch sử đặt phòng" IsLoading="@(_isLoadingAll)" OnSearch="@OnSearch">
     <HeaderContent>
 
     </HeaderContent>
@@ -20,6 +20,7 @@
                     <MudTable Items="@_roomBookingVM.Data">
                         <HeaderContent>
                             <MudTh>STT</MudTh>
+                            <MudTh>Tên khách</MudTh>
                             <MudTh>Thông tin phòng</MudTh>
                             <MudTh>Checkin</MudTh>
                             <MudTh>Checkout</MudTh>
@@ -28,6 +29,7 @@
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd>@(_lstRoomBooking.IndexOf(context) + 1)</MudTd>
+                            <MudTd>@context.NameCustomer</MudTd>
                             <MudTd>@context.NameBuilding - @context.NameFloor - @context.NameRoom</MudTd>
                                 <MudTd>@context.CheckInBooking</MudTd>
                                 <MudTh>@context.CheckOutBooking</MudTh>

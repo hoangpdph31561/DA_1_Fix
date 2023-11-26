@@ -48,19 +48,20 @@
     [Inject]
     public ISendMailService sendMailService { get; set; }
     public CustomerCreateRequest createRequest = new CustomerCreateRequest();
+    public CustomerUpdateRequest updateRequest = new CustomerUpdateRequest();
 
     private async Task SendEmail()
     {
         if (!isCodeSent)
         {
-            var existingCustomer = await customerRepo.SignUpOrSignIn(createRequest);
+
             if (string.IsNullOrWhiteSpace(createRequest.Email))
             {
                 await _dialogService.ShowMessageBox("Lỗi", "Vui lòng nhập địa chỉ email!");
                 return;
             }
-            string emailAddress = createRequest.Email;
-            await sendMailService.SendMail(emailAddress);
+            var existingCustomer = await customerRepo.SignUpOrSignIn(createRequest);
+
             isCodeSent = true;
             isFormLocked = true;
         }
@@ -89,10 +90,13 @@
                 {
                     isFormLocked = true;
 
-                    var result = await customerRepo.CreateCustomer(createRequest);
-                    if (result == true)
+                    var result = await customerRepo.GetIdentificationNumber(createRequest.IdentificationNumber);
+                  
+
+                    if (result != null)
                     {
                         _snackbar.Add("Thêm thành công", Severity.Success);
+                        
                     }
                     else
                     {

@@ -15,9 +15,16 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
                      .ForMember(des => des.NameBuilding, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.RoomDetail.Floor.Building.Name).FirstOrDefault()))
                      .ForMember(des => des.NameFloor, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.RoomDetail.Floor.Name).FirstOrDefault()))
                      .ForMember(des => des.NameRoom, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.RoomDetail.Name).FirstOrDefault()))
+                     .ForMember(des => des.CountServices, otp => otp.MapFrom(src => src.Customer.ServiceOrders.Select(x => x.CustomerId).Count()))
+                     .ForMember(des => des.ServicePrice, otp => otp.MapFrom(src => src.Customer.ServiceOrders.SelectMany(x => x.ServiceOrderDetails.Select(x => x.Price)).FirstOrDefault()))
+                     .ForMember(des => des.RoomPrice, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.Price).FirstOrDefault()))
+                     .ForMember(des => des.PrePaid, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.PrePaid).FirstOrDefault()))
+                     .ForMember(des => des.CheckInBooking, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.CheckInBooking).FirstOrDefault()))
+                     .ForMember(des => des.CheckOutBooking, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.CheckOutBooking).FirstOrDefault()))
                      .ForMember(des => des.TotalService, otp => otp.MapFrom(src => src.Customer.ServiceOrders.Count()))
                      .ForMember(des => des.NameService, otp => otp.MapFrom(src => src.Customer.ServiceOrders.SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Name).FirstOrDefault()))
                      .ForMember(des => des.RoomPrice, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.RoomDetail.Price).FirstOrDefault()));
+
 
             CreateMap<RoombookingCreateRequest, RoomBookingEntity>()
                 .ForPath(des => des.RoomBookingDetails,opt => opt.MapFrom(src => new List<RoomBookingDetailEntity>

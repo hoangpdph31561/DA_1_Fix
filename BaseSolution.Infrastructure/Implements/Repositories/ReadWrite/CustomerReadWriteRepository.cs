@@ -85,7 +85,9 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 Customer!.Name = string.IsNullOrWhiteSpace(entity.Name) ? Customer.Name : entity.Name;
                 Customer.PhoneNumber = entity.PhoneNumber;
                 Customer.Email = entity.Email;
-                Customer.IdentificationNumber = entity.IdentificationNumber;
+                Customer.Status = entity.Status;
+                Customer.ApprovedCode = entity.ApprovedCode;
+                Customer.ApprovedCodeExpiredTime = entity.ApprovedCodeExpiredTime;
                 Customer.CustomerType = entity.CustomerType;
                 Customer.ModifiedBy = entity.ModifiedBy;
                 Customer.ModifiedTime = DateTimeOffset.UtcNow;

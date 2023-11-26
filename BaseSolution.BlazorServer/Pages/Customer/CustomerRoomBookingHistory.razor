@@ -1,8 +1,6 @@
-﻿@page "/customer/customerRoomBooking"
+﻿@page "/customer/customerRoomBookingHistory"
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request
-@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
-@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request
 @using BaseSolution.BlazorServer.Respository.Interfaces
 
 <CustomListDisplay IsLoading="@(_isLoadingAll)" OnSearch="@OnSearch">
@@ -22,25 +20,23 @@
                     <MudTable Items="@_roomBookingVM.Data">
                         <HeaderContent>
                             <MudTh>STT</MudTh>
-                            <MudTh>Thời gian đặt</MudTh>
-                            <MudTh>Loại phòng</MudTh>
-                            <MudTh>Kiểu đặt phòng</MudTh>
+                            <MudTh>Thông tin phòng</MudTh>
+                            <MudTh>Checkin</MudTh>
+                            <MudTh>Checkout</MudTh>
                             <MudTh>Thanh toán trước</MudTh>
-                            <MudTh>Giá phòng</MudTh>
-                            <MudTh>Trạng thái</MudTh>
+                            <MudTh>Giá</MudTh>
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd>@(_lstRoomBooking.IndexOf(context) + 1)</MudTd>
-                            <MudTd>@context.CreatedTime</MudTd>
-                                <MudTd>@context.NameRoomType</MudTd>
-                                <MudTh>@context.BookingType</MudTh>
+                            <MudTd>@context.NameBuilding - @context.NameFloor - @context.NameRoom</MudTd>
+                                <MudTd>@context.CheckInBooking</MudTd>
+                                <MudTh>@context.CheckOutBooking</MudTh>
                                 <MudTh>@context.PrePaid</MudTh>
                                 <MudTh>@context.RoomPrice</MudTh>
-                                <MudTh>@context.Status</MudTh>
                             </RowTemplate>
                         </MudTable>
                         <MudDivider />
-                        <CustomPagination Class="my-1" HasNext="@_roomBookingVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClickTab(e))" CurrentPageNumber="_roomBookingVM.PageNumber"></CustomPagination>
+                        <CustomPagination Class="my-1" HasNext="@_roomBookingVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="_roomBookingVM.PageNumber"></CustomPagination>
                     </MudCard>
             }
         </MudPaper>
@@ -48,52 +44,44 @@
 </CustomListDisplay>
 
 
-
-
 @code {
     [Inject]
-    public IRoomBookingRepo _roomBookingRepo { get; set; }
+    public IRoomBookingRespo roomBookingRespo { get; set; }
     [Inject]
     public IDialogService _dialogService { get; set; }
-    [Inject]
     public ISnackbar _snackbar { get; set; }
-    private Guid _idRoomDetail = Guid.Empty;
-    #region 
     private PaginationResponse<RoomBookingDto> _roomBookingVM;
-    private List<RoomBookingDto> _lstRoomBooking;
-    private ViewRoombookingPaginationRequest _roomBookingRequest = new();
-    #endregion
-    #region
-
     private bool _isLoadingAll = true;
-    private bool closeAdd = true;
-    private bool closeDetail = true;
+    private bool _isLoadingList = true;
     private bool _isDisableControls = false;
-    #endregion
+    private ViewRoombookingPaginationRequest roomBookingRequest = new();
+    private List<RoomBookingDto> _lstRoomBooking;
+
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
     }
     private async Task LoadData()
     {
-        _roomBookingVM = await _roomBookingRepo.GetListRoomBookingByOther(_roomBookingRequest);
+        _roomBookingVM = await roomBookingRespo.GetAllRoomBooking(roomBookingRequest);
         _lstRoomBooking = _roomBookingVM.Data!.ToList();
+        _isLoadingList = false;
         _isLoadingAll = false;
     }
-    #region RoomBooking
-    private async Task OnPaginationButtonClickTab(int pageNumber)
+    private async Task OnPaginationButtonClick(int pageNumber)
     {
         if (_isDisableControls) return;
-        _isLoadingAll = true;
-        _roomBookingRequest.PageNumber = pageNumber;
+        _isLoadingList = true;
+        roomBookingRequest.PageNumber = pageNumber;
         await LoadData();
     }
+
     private async Task OnSearch(string? searchString)
     {
-        _isLoadingAll = true;
+        _isLoadingList = true;
+        roomBookingRequest.PageNumber = 1;
+        roomBookingRequest.SearchString = searchString;
         await LoadData();
+
     }
-    #endregion
-    
-   
 }

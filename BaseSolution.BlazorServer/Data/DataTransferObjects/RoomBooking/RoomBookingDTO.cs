@@ -19,10 +19,14 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking
         public string NameFloor { get; set; } 
         public string NameRoom { get; set; }
         public int TotalService { get; set; }
+        public int CountServices { get; set; } // tổng số lượng của 1 dịch vụ 
+        public decimal ServicePrice { get; set; } // giá của dịch vụ 
+        public float ServiceAmount { get; set; } // ServiceAmount = TotalService x ServicePrice
         public string NameService { get; set; }
         public decimal RoomPrice { get; set; }
         public float TotalAmount { get; set; }
-
+        public DateTimeOffset CheckInBooking { get; set; }
+        public DateTimeOffset CheckOutBooking { get; set; }
 
     }
 }

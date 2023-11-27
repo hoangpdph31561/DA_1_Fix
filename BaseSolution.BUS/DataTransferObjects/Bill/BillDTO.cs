@@ -10,7 +10,8 @@ namespace BaseSolution.Application.DataTransferObjects.Bill
     public class BillDTO
     {
         public Guid Id { get; set; } // mã hóa đơn
-        public Guid CustomerId { get; set; } 
+        public Guid CustomerId { get; set; }
+        public string CustomerName { get; set; }
         public DateTimeOffset CreatedTime { get; set; }
         public string BillType { get; set; }
         public EntityStatus Status { get; set; }

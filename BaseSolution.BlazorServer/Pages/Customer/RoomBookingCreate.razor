@@ -16,18 +16,12 @@
         }
         else
         {
-            <MudForm Model="@roomBookingCreateRequest" @ref="_form">
+            <MudForm Model="@_roomBookingCreateRequest" @ref="_form">
                 <MudPaper Elevation="0">
-                    <MudSelect T="string" Label="Khách hàng" Class="mb-2"
-                               AnchorOrigin="Origin.BottomCenter" @bind-Value="@customerId" For="@(() => customerId)">
-                        @foreach (var item in lstCustomer)
-                        {
-                            <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
-                        }
-                    </MudSelect>
-                   
-                    <MudTextField @bind-Value="@roomBookingCreateRequest.BookingType" For="@(() => roomBookingCreateRequest.BookingType)" Label="Loại đặt phòng"></MudTextField>
-                    <MudTextField @bind-Value="@roomBookingCreateRequest.CodeBooking" For="@(() => roomBookingCreateRequest.CodeBooking)" Label="Mã đặt phòng"></MudTextField>
+                    <MudTextField T="string" Label="Mã định danh" @bind-Value="createRequest.IdentificationNumber" Required="true"/>
+                    <MudTextField T="string" Label="Nhập code" Required="true" @bind-Value="createRequest.ApprovedCode"></MudTextField>
+                    <MudTextField @bind-Value="@_roomBookingCreateRequest.BookingType" For="@(() => _roomBookingCreateRequest.BookingType)" Label="Loại đặt phòng"></MudTextField>
+                    <MudTextField @bind-Value="@_roomBookingCreateRequest.CodeBooking" For="@(() => _roomBookingCreateRequest.CodeBooking)" Label="Mã đặt phòng"></MudTextField>
                 </MudPaper>
             </MudForm>
         }
@@ -35,7 +29,7 @@
     <DialogActions>
         <MudButton OnClick="OnClickCancel">Hủy</MudButton>
         <MudButton OnClick="Reset">Khôi phục</MudButton>
-        <MudButton OnClick="CreateNewRoomBooking">Lưu</MudButton>
+        <MudButton OnClick="CreateNewRoomBooking">Đặt phòng</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -54,16 +48,17 @@
     [Inject]
     public ISnackbar _snackbar { get; set; }
 
-    private ViewRoomDetailWithPaginationRequest roomDetailRequest = new();
+    private ViewRoomDetailWithPaginationRequest _roomDetailRequest = new();
 
     private ViewCustomerWithPaginationRequest customer = new();
 
-    private PaginationResponse<RoomDetailDTO> roomDetailVM;
-    private PaginationResponse<CustomerDTO> CustomerVM;
+    private PaginationResponse<RoomDetailDTO> _roomDetailVM;
+    private PaginationResponse<CustomerDTO> _CustomerVM;
 
     List<RoomDetailDTO> lstRoomDetails = new();
     List<CustomerDTO> lstCustomer = new();
-    private RoombookingCreateRequest roomBookingCreateRequest = new();
+    private RoombookingCreateRequest _roomBookingCreateRequest = new();
+    public CustomerCreateRequest createRequest = new();
 
     private string roomDetailId;
     private string customerId;
@@ -78,11 +73,11 @@
     }
     private async Task LoadData()
     {
-        roomDetailVM = await roomDetailRespo.GetAllRoomDetailsByStatus(roomDetailRequest);
-        lstRoomDetails = roomDetailVM.Data!.ToList();
+        _roomDetailVM = await roomDetailRespo.GetAllRoomDetailsByStatus(_roomDetailRequest);
+        lstRoomDetails = _roomDetailVM.Data!.ToList();
 
-        CustomerVM = await cumtomerRespo.GetCustomer(customer);
-        lstCustomer = CustomerVM.Data!.ToList();
+        _CustomerVM = await cumtomerRespo.GetCustomer(customer);
+        lstCustomer = _CustomerVM.Data!.ToList();
 
         _isLoadingList = false;
     }
@@ -92,7 +87,7 @@
     }
     private void Reset()
     {
-        roomBookingCreateRequest = new();
+        _roomBookingCreateRequest = new();
     }
     private async Task CreateNewRoomBooking()
     {
@@ -107,9 +102,9 @@
         );
         if (confirm == true)
         {
-            roomBookingCreateRequest.RoomDetailId = Guid.Parse(roomDetailId);
-            roomBookingCreateRequest.CustomerId = Guid.Parse(customerId);
-            var result = await roomBookingRespo.CreateNewRoomBooking(roomBookingCreateRequest);
+            _roomBookingCreateRequest.RoomDetailId = Guid.Parse(roomDetailId);
+            _roomBookingCreateRequest.CustomerId = Guid.Parse(customerId);
+            var result = await roomBookingRespo.CreateNewRoomBooking(_roomBookingCreateRequest);
             if (result == true)
             {
                 MudDialog.Close(DialogResult.Ok(true));

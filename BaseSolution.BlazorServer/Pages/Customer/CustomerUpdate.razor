@@ -3,7 +3,7 @@
 @using BaseSolution.BlazorServer.Respository.Interfaces
 
  @page "/customer/customerUpdate"
-<CustomListDisplayP2 Label="@("Thông tin cá nhân")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="OnSearch">
+<CustomListDisplayP2 Label="@("Danh sách khách hàng")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="OnSearch">
     <HeaderContent>
 
     </HeaderContent>
@@ -76,6 +76,7 @@
     }
     private async Task OnSearch(string? searchString)
     {
+        if (_isDisableControls) return;
         _isLoadingList = true;
         customerRequest.PageNumber = 1;
         customerRequest.Name = searchString;

@@ -47,6 +47,28 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             }
         }
 
+        public async Task<RequestResult<UserDTO>> GetUserByUserNameAsync(string userName, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var user = await _dbContext.Users.AsNoTracking().Where(x => x.UserName == userName).ProjectTo<UserDTO>(_mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
+                return RequestResult<UserDTO>.Succeed(user);
+
+            }
+            catch (Exception e)
+            {
+
+                return RequestResult<UserDTO>.Fail(_localizationService["User is not found"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "user"
+                    }
+                });
+            }
+        }
+
         public async Task<RequestResult<PaginationResponse<UserDTO>>> GetUserWithPaginationByAdminAsync(ViewUserWithPaginationRequest request, CancellationToken cancellationToken)
         {
             try

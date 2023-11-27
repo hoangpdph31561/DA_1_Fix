@@ -19,6 +19,7 @@
                 <MudTable Items="@billPagination.Data" Style="position: relative;" Elevation="0">
                     <HeaderContent>
                         <MudTh>STT</MudTh>
+                        <MudTh>Tên khách</MudTh>
                         <MudTh>Ngày xuất</MudTh>
                         <MudTh>Loại hóa đơn</MudTh>
                         <MudTh>Tổng tiền</MudTh>
@@ -26,11 +27,12 @@
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd>@(lstBill.IndexOf(context) + 1)</MudTd>
-                        <MudTd>@context.CreatedTime</MudTd>
-                        <MudTd>@context.BillType</MudTd>
-                        <MudTd>@context.TotalAmount </MudTd>
-                        <MudTh><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTh>
-                    </RowTemplate>
+                        <MudTd>@context.CustomerName</MudTd>
+                            <MudTd>@context.CreatedTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
+                            <MudTd>@context.BillType</MudTd>
+                            <MudTd>@context.TotalAmount </MudTd>
+                            <MudTh><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTh>
+                        </RowTemplate>
                     </MudTable>
                 <CustomPagination Class="my-1" HasNext="@billPagination.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="@billPagination.PageNumber"></CustomPagination>
             }

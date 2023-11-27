@@ -91,7 +91,14 @@
     }
     public async Task OpenDetail(Guid idRoomDetail)
     {
-
+        var parameters = new DialogParameters<RoomDetail>();
+        parameters.Add(x => x.idRoomDetail, idRoomDetail);
+        var dialog = await _dialogService.ShowAsync<RoomDetail>("Chi tiết phòng", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
     }
     private void OnClickCancel()
     {

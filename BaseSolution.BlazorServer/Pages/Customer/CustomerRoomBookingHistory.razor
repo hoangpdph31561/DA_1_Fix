@@ -31,8 +31,8 @@
                             <MudTd>@(_lstRoomBooking.IndexOf(context) + 1)</MudTd>
                             <MudTd>@context.NameCustomer</MudTd>
                             <MudTd>@context.NameBuilding - @context.NameFloor - @context.NameRoom</MudTd>
-                                <MudTd>@context.CheckInBooking</MudTd>
-                                <MudTh>@context.CheckOutBooking</MudTh>
+                                <MudTd>@context.CheckInBooking.ToString("HH:mm dd/MM/yyyy")</MudTd>
+                                <MudTh>@context.CheckOutBooking.ToString("HH:mm dd/MM/yyyy")</MudTh>
                                 <MudTh>@context.PrePaid</MudTh>
                                 <MudTh>@context.RoomPrice</MudTh>
                             </RowTemplate>

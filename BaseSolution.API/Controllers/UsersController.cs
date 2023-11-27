@@ -4,9 +4,11 @@ using BaseSolution.Application.DataTransferObjects.User.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
+using BaseSolution.Infrastructure.Implements.Repositories.ReadOnly;
 using BaseSolution.Infrastructure.Implements.Repositories.ReadWrite;
 using BaseSolution.Infrastructure.ViewModels.Amenity;
 using BaseSolution.Infrastructure.ViewModels.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BaseSolution.API.Controllers
@@ -33,6 +35,20 @@ namespace BaseSolution.API.Controllers
             UserListWithPaginationViewModel vm = new(_userReadOnlyRespository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
             return Ok(vm);
+        }
+        [AllowAnonymous]
+        [HttpGet("confirmAccount")]
+        public async Task<IActionResult> ConfirmAccount(string username, string password, CancellationToken cancellationToken)
+        {
+            var getUser = await _userReadOnlyRespository.GetUserByUserNameAsync(username, cancellationToken);
+            if (getUser.Data?.UserName != username || getUser.Data?.Password != password)
+            {
+                return BadRequest("Sai tài khoản người dùng hoặc sai mật khẩu!");
+            }
+            else
+            {
+                return Ok("Đăng nhập thành công!");
+            }
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(Guid id, CancellationToken cancellationToken)

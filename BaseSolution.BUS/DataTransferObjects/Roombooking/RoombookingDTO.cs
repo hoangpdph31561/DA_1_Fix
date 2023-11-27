@@ -21,7 +21,6 @@ namespace BaseSolution.Application.DataTransferObjects.Roombooking
         public float ServiceAmount { get; set; } // ServiceAmount = TotalService x ServicePrice
         public decimal RoomPrice { get; set; }
         public int TotalService { get; set; }
-        public decimal ServicePrice { get; set; }
         public string NameService { get; set; }
         public float TotalAmount { get; set; }
         public decimal PrePaid { get; set; } 

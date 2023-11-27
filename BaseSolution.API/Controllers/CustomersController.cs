@@ -58,7 +58,11 @@ namespace BaseSolution.API.Controllers
             CustomerViewModel vm = new(_CustomerReadOnlyRepository, _localizationService);
 
             await vm.HandleAsync(id, cancellationToken);
-
+            if (vm.Success)
+            {
+                CustomerDto result = (CustomerDto)vm.Data;
+                return Ok(result);
+            }
             return Ok(vm);
         }
         [HttpGet("{identification}/details")]

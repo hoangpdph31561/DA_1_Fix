@@ -20,7 +20,7 @@
                 <MudForm Model="roomDetailUpdateRequest" @ref="_form">
                     <MudGrid>
                         <MudItem xs="4">
-                            <MudImage Src="@imageURL" Fluid="true" Class="rounded-lg w-100" Style="border: 1px grey solid;"></MudImage>
+                            <MudImage Height="130" Width="160" Src="@imageURL" Class="rounded-lg" Style="border: 1px grey solid; " ObjectFit="ObjectFit.Fill"></MudImage>
                             <MudFileUpload T="IBrowserFile" Class="align-content-center" FilesChanged="UploadImage">
                                 <ButtonTemplate>
                                     <MudButton HtmlTag="label"
@@ -114,7 +114,7 @@
                     </MudGrid>
                     <MudGrid>
                         <MudItem xs="12">
-                            <MudTextField @bind-Value="roomDetailUpdateRequest.Description" T="string" For="@(() => roomDetailUpdateRequest.Description)" Label="Mô tả phòng" Lines="3"></MudTextField>
+                            <MudTextField Variant="Variant.Outlined" @bind-Value="roomDetailUpdateRequest.Description" T="string" For="@(() => roomDetailUpdateRequest.Description)" Label="Mô tả phòng" Lines="3"></MudTextField>
                         </MudItem>
                     </MudGrid>
                 </MudForm>

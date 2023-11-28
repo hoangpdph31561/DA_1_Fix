@@ -92,7 +92,7 @@
     protected async override Task OnInitializedAsync()
     {
         serviceTypeVM = await serviceTypeRespo.GetAllServiceTypes(serviceTypeViewRequest);
-        lstServiceType = serviceTypeVM.Data!.ToList();
+        lstServiceType = serviceTypeVM.Data!.Where(x => x.Status == EntityStatus.Active).ToList();
         if (lstServiceType != null)
         {
             if (lstServiceType.Any())

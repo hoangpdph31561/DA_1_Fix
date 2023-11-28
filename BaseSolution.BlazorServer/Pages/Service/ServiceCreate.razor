@@ -72,7 +72,7 @@
     private async Task LoadData()
     {
         serviceTypeVM = await serviceTypeRespo.GetAllServiceTypes(new Data.DataTransferObjects.ServiceType.Request.ViewServiceTypeWithPaginationRequest { PageSize = int.MaxValue - 1 });
-        lstServiceType = serviceTypeVM.Data!.ToList();
+        lstServiceType = serviceTypeVM.Data!.Where(x => x.Status == EntityStatus.Active).ToList();
         _isLoadingList = false;
     }
     private void OnClickCancel()

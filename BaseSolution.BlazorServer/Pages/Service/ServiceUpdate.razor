@@ -102,7 +102,7 @@
     {
         service = await serviceRespo.GetServiceById(idService);
         serviceTypeVM = await serviceTypeRespo.GetAllServiceTypes(new Data.DataTransferObjects.ServiceType.Request.ViewServiceTypeWithPaginationRequest { PageSize = int.MaxValue - 1 });
-        lstServiceType = serviceTypeVM.Data!.ToList();
+        lstServiceType = serviceTypeVM.Data!.Where(x => x.Status == EntityStatus.Active).ToList();
         serviceUpdateRequest.Id = service.Id;
         serviceUpdateRequest.Status = service.Status;
         serviceUpdateRequest.Unit = service.Unit;

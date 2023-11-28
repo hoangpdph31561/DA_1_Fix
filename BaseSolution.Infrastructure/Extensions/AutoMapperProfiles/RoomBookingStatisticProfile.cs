@@ -15,10 +15,8 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
         {
             CreateMap<RoomBookingEntity, RoomBookingStatisticDto>()
                      .ForMember(dest => dest.Month, opt => opt.MapFrom(src => src.RoomBookingDetails.Select(x => x.CheckInReality.Month).FirstOrDefault()))
-                     .ForMember(dest => dest.NameRoom, opt => opt.MapFrom(src => src.RoomBookingDetails.Select(x => x.RoomDetail.Name).FirstOrDefault()))
-                     .ForMember(dest => dest.BookingCount, opt => opt.MapFrom(src => src.RoomBookingDetails
-                                                                     .GroupBy(x => new { x.RoomDetail.Name, x.CheckInReality.Month })
-                                                                     .Select(g => g.Count()).First()));
+                     .ForMember(dest => dest.NameRoom, opt => opt.MapFrom(src => src.RoomBookingDetails.Select(x => x.RoomDetail.Name).FirstOrDefault()));
+                    
 
 
         }

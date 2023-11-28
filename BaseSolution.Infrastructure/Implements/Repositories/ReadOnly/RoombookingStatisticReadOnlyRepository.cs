@@ -30,8 +30,26 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             {
                 var query = _dbContext.RoomBookings.AsNoTracking().Where(x => x.Deleted == false && x.Status != EntityStatus.Deleted)
               .ProjectTo<RoomBookingStatisticDto>(_mapper.ConfigurationProvider);
+
+                List<RoomBookingStatisticDto> lstRests = await query.ToListAsync();
+                List<RoomBookingStatisticDto> lstTepRests = null;
+
+                if (lstRests != null)
+                {
+                    lstTepRests = lstRests.GroupBy(c => new
+                    {
+                        c.NameRoom,
+                        c.Month
+                    })
+              .Select(gcs => new RoomBookingStatisticDto()
+              {
+                  NameRoom = gcs.Key.NameRoom,
+                  Month = gcs.Key.Month,
+                  BookingCount = gcs.Count(),
+              }).OrderBy(x => x.Month).ToList();
+                }
               
-                return RequestResult<List<RoomBookingStatisticDto>>.Succeed(await query.ToListAsync());
+                return RequestResult<List<RoomBookingStatisticDto>>.Succeed(lstTepRests);
             }
             catch (Exception e)
             {

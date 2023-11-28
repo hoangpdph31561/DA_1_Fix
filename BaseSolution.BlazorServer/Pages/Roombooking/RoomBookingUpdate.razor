@@ -14,23 +14,6 @@
             <MudForm Model="roombookingUpdate" @ref="@_form" @bind-IsValid="@_formIsValid">
                 <MudPaper Width="100%" Elevation="0">
                     <MudGrid>
-                          <MudItem xs="12" sm="6">
-                    <MudSelect T="Guid" Label="Khách hàng" AnchorOrigin="Origin.BottomCenter" @bind-Value="roombookingUpdate.CustomerId" For="@(() => roombookingUpdate.CustomerId)">
-                            @foreach (var item in lstCustomer)
-                            {
-                                <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
-                            }
-                        </MudSelect>
-                    </MudItem>
-                          <MudItem xs="12" sm="6">
-                    <MudSelect T="Guid" Label="Phòng" AnchorOrigin="Origin.BottomCenter" @bind-Value="roombookingUpdate.RoomDetailId" For="@(() => roombookingUpdate.RoomDetailId)">
-                            @foreach (var item in lstRoomDetails)
-                            {
-                                <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
-                            }
-                        </MudSelect>
-                    </MudItem>
-                          <MudItem xs="12" sm="6">
                     <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="roombookingUpdate.Status" For="@(() => roombookingUpdate.Status)">
                         <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
                         <MudSelectItem Value="EntityStatus.InActive">Không hoạt động</MudSelectItem>
@@ -40,8 +23,6 @@
                         <MudSelectItem Value="EntityStatus.PendingForApproval">Chờ chấp thuận</MudSelectItem>
                         <MudSelectItem Value="EntityStatus.Locked">Khóa</MudSelectItem>
                     </MudSelect>
-                    </MudItem>
-
                     </MudGrid>
                 </MudPaper>
             </MudForm>
@@ -98,19 +79,8 @@
     private async Task LoadData()
     {
         roombooking = await roomBookingRespo.GetRoomBookingById(idRoomBooking);
-
-        roomDetailVM = await roomDetailRespo.GetAllRoomDetails(roomDetailRequest);
-        lstRoomDetails = roomDetailVM.Data!.ToList();
-
-
-        CustomerVM = await cumtomerRespo.GetCustomer(customer);
-        lstCustomer = CustomerVM.Data!.ToList();
-
-
-
         roombookingUpdate.Id = roombooking.Id;
-        roombookingUpdate.RoomDetailId = roombooking.RoomDetailId;
-        roombookingUpdate.CustomerId = roombooking.CustomerId;
+        roombookingUpdate.Status = roombooking.Status;
     }
     private void OnClickCancel()
     {
@@ -122,7 +92,7 @@
     }
     private bool CheckChangeData()
     {
-        return roombooking!.RoomDetailId != roombookingUpdate.RoomDetailId || roombooking.CustomerId != roombookingUpdate.CustomerId || roombooking.Status != roombookingUpdate.Status;
+        return  roombooking.Status != roombookingUpdate.Status;
     }
     private async Task UpdateService()
     {

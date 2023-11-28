@@ -109,6 +109,36 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 });
             }
         }
+
+        public async Task<RequestResult<int>> UpdateStatusCustomerAsync(Guid id, CancellationToken cancellationToken)
+        {
+            try
+            {
+                // Get existed Customer
+                var Customer = await GetCustomerByIdAsync(id, cancellationToken);
+
+                // Update value to existed Customer
+                Customer!.Status = EntityStatus.Active;
+                Customer.ModifiedTime = DateTimeOffset.UtcNow;
+
+                _dbContext.Customers.Update(Customer);
+                await _dbContext.SaveChangesAsync(cancellationToken);
+
+                return RequestResult<int>.Succeed(1);
+            }
+            catch (Exception e)
+            {
+                return RequestResult<int>.Fail(_localizationService["Unable to update Customer"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToUpdate + "Customer"
+                    }
+                });
+            }
+        }
+
         private async Task<CustomerEntity?> GetCustomerByIdAsync(Guid idCustomer, CancellationToken cancellationToken)
         {
             var Customer = await _dbContext.Customers.FirstOrDefaultAsync(c => c.Id == idCustomer && !c.Deleted, cancellationToken);

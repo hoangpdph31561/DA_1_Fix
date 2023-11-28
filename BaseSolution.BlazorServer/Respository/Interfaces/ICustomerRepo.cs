@@ -14,5 +14,6 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
         Task<bool> SignUpOrSignIn(CustomerCreateRequest customerCreateRequest);
         Task<bool> VerifyCode(string code, string idCard);  
         Task<CustomerDTO> GetCustomerById(Guid id);
+        Task<bool> UpdateStatusCustomer(Guid id);
     }
 }

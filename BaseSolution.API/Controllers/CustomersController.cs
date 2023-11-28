@@ -63,7 +63,7 @@ namespace BaseSolution.API.Controllers
                 CustomerDto result = (CustomerDto)vm.Data;
                 return Ok(result);
             }
-            return Ok(vm);
+            return BadRequest(vm);
         }
         [HttpGet("{identification}/details")]
         public async Task<IActionResult> GetIdentificationNumber(string identification, CancellationToken cancellationToken)
@@ -222,9 +222,19 @@ namespace BaseSolution.API.Controllers
             }
             return BadRequest(vm);
         }
+        [AllowAnonymous]
+        [HttpPut("UpdateStatusCustomer/{id}")]
+        public async Task<IActionResult> UpdateStatus(Guid id, CancellationToken cancellationToken)
+        {
+            CustomerUpdateStatusViewModel vm = new(_CustomerReadWriteRepository, _localizationService, _mapper);
+
+            await vm.HandleAsync(id, cancellationToken);
+
+            return Ok(vm.Data);
+        }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(CustomerDeleteRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> Delete([FromQuery] CustomerDeleteRequest request, CancellationToken cancellationToken)
         {
             CustomerDeleteViewModel vm = new(_CustomerReadWriteRepository, _localizationService, _mapper);
 

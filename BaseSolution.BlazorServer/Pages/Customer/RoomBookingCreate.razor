@@ -19,10 +19,15 @@
         {
             <MudForm Model="@_roomBookingCreateRequest" @ref="_form">
                 <MudPaper Elevation="0">
+                    <MudSelect T="string" Label="Khách hàng" Class="mb-2"
+                               AnchorOrigin="Origin.BottomCenter" @bind-Value="@customerId" For="@(() => customerId)">
+                        @foreach (var item in lstCustomer)
+                        {
+                            <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
+                        }
+                    </MudSelect>
                     <MudTextField T="string" Label="Mã định danh" @bind-Value="createRequest.IdentificationNumber" Required="true" />
                     <MudTextField T="string" Label="Nhập code" Required="true" @bind-Value="createRequest.ApprovedCode"></MudTextField>
-
-                    <MudTextField @bind-Value="@_roomBookingCreateRequest.CodeBooking" For="@(() => _roomBookingCreateRequest.CodeBooking)" Label="Mã đặt phòng"></MudTextField>
                 </MudPaper>
             </MudForm>
         }

@@ -18,7 +18,7 @@
                               Validation='new EmailAddressAttribute() { ErrorMessage = "The email address is invalid" }' @bind-Value="createRequest.Email" />
                 <MudTextField T="string" Label="Số điện thoại" @bind-Value="createRequest.PhoneNumber" Disabled="isFormLocked" />
                 <MudSpacer></MudSpacer>
-                <MudButton  style="position: relative; top: 10px; left: 560px;"
+                <MudButton  style="top: 10px; left: 560px;"
                 Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)"  OnClick="@SendEmail">Gửi mã</MudButton>
             </MudForm>
         </MudPaper>
@@ -79,6 +79,7 @@
             }
             else
             {
+
                 var confirm = await _dialogService.ShowMessageBox(
                "Thông báo",
                "Xác nhận đăng nhập?",
@@ -91,12 +92,12 @@
                     isFormLocked = true;
 
                     var result = await customerRepo.GetIdentificationNumber(createRequest.IdentificationNumber);
-                  
+                    
 
                     if (result != null)
                     {
                         _snackbar.Add("Thêm thành công", Severity.Success);
-                        
+                        var activeCustomer = await customerRepo.UpdateStatusCustomer(result.Id);
                     }
                     else
                     {

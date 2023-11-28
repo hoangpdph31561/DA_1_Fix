@@ -2,20 +2,21 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
 @using BaseSolution.BlazorServer.Respository.Interfaces
 
- @page "/customer/customerUpdate"
+ @page "/customer/customerList"
 <CustomListDisplayP2 Label="@("Danh sách khách hàng")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="OnSearch">
     <HeaderContent>
-
+        <MudChip Icon="@Icons.Material.Filled.Add" OnClick="@(async() => await OpenAdd())" Color="Color.Primary">Thêm</MudChip>
     </HeaderContent>
     <BodyContent>
         <MudPaper Elevation="0" Class="custom-list-display-border">
             @if (_isLoadingList)
             {
                 <MudProgressLinear Color="Color.Primary" Indeterminate="true"></MudProgressLinear>
+
             }
             else
             {
-                <MudCard Class="p-3" Elevation="2">
+                <MudCard Class="p-3" Elevation="0">
                     <MudTable Items="@customerVM.Data">
                         <HeaderContent>
                             <MudTh>STT</MudTh>
@@ -87,6 +88,16 @@
         customerRequest.PageNumber = 1;
         customerRequest.Name = searchString;
         await LoadData();
+    }
+    private async Task OpenAdd()
+    {
+        var dialog = await _dialogService.ShowAsync<AdminCreateCustomer>("Thêm khách hàng");
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+            StateHasChanged();
+        }
     }
     private async Task OpenDetail(Guid idCustomer)
     {

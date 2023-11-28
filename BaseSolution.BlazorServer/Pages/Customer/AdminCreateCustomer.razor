@@ -1,0 +1,74 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
+@using Respository.Interfaces
+
+<MudDialog>
+    <DialogContent>
+        <MudPaper Elevation="0">
+            <MudForm Model="_customerCreate" @bind-IsValid="success" @ref="_form">
+                <MudTextField Class="mb-2" @bind-Value="_customerCreate.Name" For="@(() => _customerCreate.Name)" Label="Tên khách"></MudTextField>
+                <MudTextField Class="mb-2" @bind-Value="_customerCreate.IdentificationNumber" For="@(() => _customerCreate.IdentificationNumber)" Label="Mã định danh khách"></MudTextField>
+                <MudTextField Class="mb-2" @bind-Value="_customerCreate.Email" For="@(() => _customerCreate.Email)" Label="Email"></MudTextField>
+                <MudTextField Class="mb-2" @bind-Value="_customerCreate.PhoneNumber" For="@(() => _customerCreate.PhoneNumber)" Label="Số điện thoại"></MudTextField>
+            </MudForm>
+        </MudPaper>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@OnClickCancel">Hủy</MudButton>
+        <MudButton @onclick="Reset">Làm mới</MudButton>
+        <MudButton @onclick="CreateNewCustomer" Disabled="@(!success)">Lưu</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    [Inject]
+    public ICustomerRepo customerRepo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    private CustomerCreateRequest _customerCreate = new();
+    private bool success;
+    MudForm _form;
+    private void OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+    private async Task CreateNewCustomer()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+        var confirm = await _dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận khách hàng?",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            _customerCreate.Status = EntityStatus.Active;
+            var result = await customerRepo.CreateCustomer(_customerCreate);
+            if (result == true)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                _snackbar.Add("Thêm thành công", Severity.Success);
+            }
+            else
+            {
+                OnClickCancel();
+                _snackbar.Add
+                (
+                    "Thêm thất bại",
+                     Severity.Error
+                );
+            }
+            Reset();
+        }
+    }
+    private void Reset()
+    {
+        _customerCreate = new CustomerCreateRequest();
+    }
+}

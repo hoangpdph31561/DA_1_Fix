@@ -59,5 +59,16 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             var result = await _httpClient.PutAsJsonAsync("/api/Customers", request);
             return result.IsSuccessStatusCode;
         }
+
+        public async Task<bool> DeleteCustomer(CustomerDeleteRequest request)
+        {
+            string url = $"api/Customers?Id={request.Id}";
+            if (request.DeletedBy != null)
+            {
+                url += $"&DeletedBy={request.DeletedBy}";
+            }
+            var result = await _httpClient.DeleteAsync(url);
+            return result.IsSuccessStatusCode;
+        }
     }
 }

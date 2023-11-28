@@ -203,8 +203,11 @@ namespace BaseSolution.API.Controllers
             CustomerCreateViewModel vm = new(_CustomerReadOnlyRepository, _CustomerReadWriteRepository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);
-
-            return Ok(vm);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
         }
 
         [HttpPut]
@@ -213,8 +216,11 @@ namespace BaseSolution.API.Controllers
             CustomerUpdateViewModel vm = new(_CustomerReadWriteRepository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);
-
-            return Ok(vm);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
         }
 
         [HttpDelete]
@@ -223,8 +229,11 @@ namespace BaseSolution.API.Controllers
             CustomerDeleteViewModel vm = new(_CustomerReadWriteRepository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);
-
-            return Ok(vm);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using BaseSolution.Application.DataTransferObjects.Customer;
 using BaseSolution.Application.DataTransferObjects.Customer.Request;
-using BaseSolution.Application.DataTransferObjects.Customer;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Services;
 using BaseSolution.Application.ValueObjects.Common;
@@ -11,13 +10,8 @@ using BaseSolution.Domain.Entities;
 using BaseSolution.Infrastructure.Database.AppDbContext;
 using BaseSolution.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AutoMapper.QueryableExtensions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using BaseSolution.Domain.Enums;
 
 namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
 {
@@ -83,12 +77,12 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                IQueryable<CustomerEntity> queryable = _dbContext.Customers.AsNoTracking().AsQueryable().Where(x => x.Deleted!);
-                if (!string.IsNullOrWhiteSpace(request.Name))
+                IQueryable<CustomerEntity> queryable = _dbContext.Customers.AsNoTracking().AsQueryable().Where(x => x.Status != EntityStatus.Deleted);
+                if (!String.IsNullOrWhiteSpace(request.Name))
                 {
-                    queryable = queryable.Where(x => x.Name.Contains(request.Name!));
+                    queryable = queryable.Where(x => x.Name.ToLower().Contains(request.Name.ToLower()));
                 }
-                var result = await _dbContext.Customers.AsNoTracking()
+                var result = await queryable.AsNoTracking()
                     .PaginateAsync<CustomerEntity, CustomerDto>(request, _mapper, cancellationToken);
 
                 return RequestResult<PaginationResponse<CustomerDto>>.Succeed(new PaginationResponse<CustomerDto>()

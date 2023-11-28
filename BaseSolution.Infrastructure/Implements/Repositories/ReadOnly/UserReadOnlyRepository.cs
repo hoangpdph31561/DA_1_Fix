@@ -73,8 +73,12 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                IQueryable<UserEntity> queryable = _dbContext.Users.AsNoTracking().AsQueryable();
-                var result = await _dbContext.Users.AsNoTracking().PaginateAsync<UserEntity, UserDTO>(request, _mapper, cancellationToken);
+                IQueryable<UserEntity> queryable = _dbContext.Users.AsNoTracking().AsQueryable().Where(x => !x.Deleted);
+                if (!String.IsNullOrWhiteSpace(request.Name))
+                {
+                    queryable = queryable.Where(x => x.Name.ToLower().Contains(request.Name.ToLower()));
+                }
+                var result = await queryable.AsNoTracking().PaginateAsync<UserEntity, UserDTO>(request, _mapper, cancellationToken);
                 return RequestResult<PaginationResponse<UserDTO>>.Succeed(new PaginationResponse<UserDTO>
                 {
                     PageNumber = request.PageNumber,

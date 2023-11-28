@@ -35,7 +35,7 @@
                                 </MudTd>
                                 <MudTh>
                                     @context.NumberOfRoomDetails
-                                    <MudIconButton Icon="@Icons.Material.Filled.MeetingRoom"></MudIconButton>
+                                <MudIconButton Icon="@Icons.Material.Filled.MeetingRoom" OnClick="@(async() => await OpenRoomDetail(context.Id))"></MudIconButton>
                                 </MudTh>
                                 <MudTh>@context.MinPriceOfRoom - @context.MaxPriceOfRoom</MudTh>
                                 <MudTd><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTd>
@@ -124,6 +124,17 @@
         var parameters = new DialogParameters<RoomTypeUpdate>();
         parameters.Add(x => x.id, idRoomType);
         var dialog = await _dialogService.ShowAsync<RoomTypeUpdate>("Chi tiết loại phòng", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
+    }
+    private async Task OpenRoomDetail(Guid idRoomType)
+    {
+        var parameters = new DialogParameters<RoomTypeViewRoomDetail>();
+        parameters.Add(x => x.idRoomType, idRoomType);
+        var dialog = await _dialogService.ShowAsync<RoomTypeViewRoomDetail>("Chi tiết phòng", parameters);
         var result = await dialog.Result;
         if (!result.Canceled)
         {

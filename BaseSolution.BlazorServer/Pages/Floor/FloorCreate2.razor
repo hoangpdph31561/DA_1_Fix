@@ -26,9 +26,9 @@
                     </MudGrid>
                     <MudGrid>
                         <MudItem xs="12" sm="12">
-                            <MudTextField @bind-Value="@floorCreateRequest.NumberOfRoom" For="@(() => floorCreateRequest.NumberOfRoom)" Label="Số phòng cho thuê">
+                            <MudNumericField T="int"  @bind-Value="@floorCreateRequest.NumberOfRoom" For="@(() => floorCreateRequest.NumberOfRoom)" Label="Số phòng cho thuê" Min="0">
 
-                            </MudTextField>
+                            </MudNumericField>
                         </MudItem>
 
                     </MudGrid>
@@ -94,21 +94,34 @@
         );
         if (confirm == true)
         {
-            floorCreateRequest.BuildingId = Guid.Parse(_selectedBuidingId);
-            var result = await floorRespo.CreateNewFloor(floorCreateRequest);
-            if (result == true)
+            if(string.IsNullOrWhiteSpace(_selectedBuidingId))
             {
-                MudDialog.Close(DialogResult.Ok(true));
-                _snackbar.Add("Thêm thành công", Severity.Success);
+                _snackbar.Add
+               (
+                   "Chưa chọn tầng",
+                    Severity.Error
+               );
+                Reset();
             }
             else
             {
-                _snackbar.Add
-                (
-                    "Thêm thất bại",
-                     Severity.Error
-                );
+                floorCreateRequest.BuildingId = Guid.Parse(_selectedBuidingId);
+                var result = await floorRespo.CreateNewFloor(floorCreateRequest);
+                if (result == true)
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    _snackbar.Add("Thêm thành công", Severity.Success);
+                }
+                else
+                {
+                    _snackbar.Add
+                    (
+                        "Thêm thất bại",
+                         Severity.Error
+                    );
+                }
             }
+           
             Reset();
         }
     }

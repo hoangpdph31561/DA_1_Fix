@@ -1,0 +1,93 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request
+@using BaseSolution.BlazorServer.Pages.RoomDetail
+@using BaseSolution.BlazorServer.Respository.Interfaces
+<MudDialog>
+    <DialogContent>
+        @if(isLoadingList)
+        {
+            <LoadingIndicator/>
+        }
+        else
+        {
+            @if(lstRoomDetail == null)
+            {
+                <MudText>Không có phòng nào thuộc loại phòng này</MudText>
+            }
+            else
+            {
+                <MudCard Elevation="0" Class="pa-3">
+                    <MudTable Items="roomDetailVM.Data" Style="position: relative;" Elevation="0">
+                        <HeaderContent>
+                            <MudTh>STT</MudTh>
+                            <MudTh>Tên phòng</MudTh>
+                            <MudTh>Trạng thái</MudTh>
+                            <MudTh>Hành động</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd>@(lstRoomDetail.IndexOf(context) + 1)</MudTd>
+                            <MudTd>@context.BuildingName - @context.FloorName - @context.Name</MudTd>
+                            <MudTd><BadgeRoomStatus Status="@context.Status"></BadgeRoomStatus></MudTd>
+                                <MudTd><MudChip Icon="@Icons.Material.Filled.Info" Color="Color.Info" OnClick="@( async() => await OpenDetail(context.Id))">Chi tiết</MudChip></MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </MudCard>
+            }
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="OnClickCancel">Đóng</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #region Khai báo
+    [Parameter]
+    public Guid idRoomType { get; set; }
+    [Inject]
+    public IRoomDetailRespo roomDetailRespo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    MudForm _form;
+    private PaginationResponse<RoomDetailDTO> roomDetailVM;
+    private List<RoomDetailDTO> lstRoomDetail;
+    private ViewRoomDetailWithPaginationRequest roomDetailRequest = new()
+    {
+        PageSize = int.MaxValue - 1,
+    };
+    private bool isLoadingList = true;
+    private string SearchString;
+    #endregion
+    #region Code xử lý
+    private async Task LoadData()
+    {
+        roomDetailRequest.RoomTypeId = idRoomType;
+        roomDetailVM = await roomDetailRespo.GetAllRoomDetails(roomDetailRequest);
+        lstRoomDetail = roomDetailVM.Data!.OrderBy(x => x.BuildingName).ThenBy(x => x.FloorName).ToList();
+        isLoadingList = false;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private void OnClickCancel()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+    private async Task OpenDetail(Guid idRoomDetail)
+    {
+        var parameters = new DialogParameters<RoomDetailUpdate>();
+        parameters.Add(x => x.idRoomDetail, idRoomDetail);
+        var dialog = await _dialogService.ShowAsync<RoomDetailUpdate>("Chi tiết phòng", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
+    }
+    #endregion
+}

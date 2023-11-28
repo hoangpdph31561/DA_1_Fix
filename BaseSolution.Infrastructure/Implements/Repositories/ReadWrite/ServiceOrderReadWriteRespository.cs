@@ -29,6 +29,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
             try
             {
                 entity.CreatedTime = DateTimeOffset.UtcNow;
+                entity.CustomerId = entity.CustomerId;
 
                 await _appReadWriteDbContext.ServiceOrders.AddAsync(entity);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);

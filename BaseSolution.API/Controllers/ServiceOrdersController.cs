@@ -31,7 +31,12 @@ namespace BaseSolution.API.Controllers
         {
             ServiceOrderViewModel vm = new(_serviceOrderReadOnly, _localizationService);
             await vm.HandleAsync(id, cancellationToken);
-            return Ok(vm);
+            if(vm.Success)
+            {
+                ServiceOrderDTO result = (ServiceOrderDTO)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
         }
         [HttpGet("serviceOrdersByAdmin")]
         public async Task<IActionResult> GetServiceOrdersByAdmin([FromQuery]ViewServiceOrderWithPaginationRequest request, CancellationToken cancellationToken)

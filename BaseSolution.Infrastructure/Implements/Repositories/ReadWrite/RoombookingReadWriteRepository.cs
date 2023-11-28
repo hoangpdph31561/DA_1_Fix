@@ -25,8 +25,9 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
             try
             {
                 entity.Id = Guid.NewGuid();
-                
-                entity.Status = entity.Status == EntityStatus.Active ? EntityStatus.Active : EntityStatus.InActive;
+
+                entity.Status = entity.Status;
+                entity.CustomerId = entity.CustomerId;
                 entity.CreatedBy = entity.CreatedBy;
                 entity.CreatedTime = DateTimeOffset.Now;
                 await _appReadWriteDbContext.RoomBookings.AddAsync(entity);
@@ -85,11 +86,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
             {
                 var roomBooking = await GetRoomBookingByIdAsync(entity.Id, cancellationToken);
 
-                roomBooking!.BookingType = entity.BookingType;
-                roomBooking.CustomerId = entity.CustomerId;
-                roomBooking.UserId = entity.UserId;
-                roomBooking!.Status = entity.Status;
-                roomBooking.ModifiedBy = entity.ModifiedBy;
+                roomBooking.Status = entity.Status;
                 roomBooking.ModifiedTime = DateTimeOffset.Now;
                 _appReadWriteDbContext.RoomBookings.Update(roomBooking);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);

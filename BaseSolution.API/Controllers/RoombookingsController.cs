@@ -60,7 +60,12 @@ public class RoombookingsController : ControllerBase
         {
             RoombookingViewModel vm = new(_roombookingrReadOnlyRespository, _localizationService);
             await vm.HandleAsync(id, cancellationToken);
-            return Ok(vm);
+            if(vm.Success)
+            {
+                RoombookingDTO result = (RoombookingDTO)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
         }
         catch (Exception)
         {

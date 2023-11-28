@@ -23,7 +23,6 @@
                             }
                         </MudSelect>
                     </MudItem>
-                    <MudItem xs="12" sm="6">
                         <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="serviceOrderUpdate.Status" For="@(() => serviceOrderUpdate.Status)">
                             <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
                             <MudSelectItem Value="EntityStatus.InActive">Không hoạt động</MudSelectItem>
@@ -33,7 +32,6 @@
                             <MudSelectItem Value="EntityStatus.PendingForApproval">Chờ chấp thuận</MudSelectItem>
                             <MudSelectItem Value="EntityStatus.Locked">Khóa</MudSelectItem>
                         </MudSelect>
-                    </MudItem>
 
                 </MudGrid>
             </MudPaper>

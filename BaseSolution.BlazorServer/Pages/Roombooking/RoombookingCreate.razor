@@ -35,7 +35,10 @@
                         }
                     </MudSelect>
 
-                    <MudTextField @bind-Value="@roomBookingCreateRequest.BookingType" For="@(() => roomBookingCreateRequest.BookingType)" Label="Loại đặt phòng"></MudTextField>
+                    <MudSelect T="BookingType" AnchorOrigin="Origin.BottomCenter" Label="Loại đặt phòng" @bind-Value="roomBookingCreateRequest.BookingType" For="@(() => roomBookingCreateRequest.BookingType)">
+                        <MudSelectItem Value="BookingType.Online">Online</MudSelectItem>
+                        <MudSelectItem Value="BookingType.Offline">Offline</MudSelectItem>
+                    </MudSelect>           
                     <MudTextField @bind-Value="@roomBookingCreateRequest.CodeBooking" For="@(() => roomBookingCreateRequest.CodeBooking)" Label="Mã đặt phòng"></MudTextField>
                 </MudPaper>
             </MudForm>
@@ -118,6 +121,7 @@
         {
             roomBookingCreateRequest.RoomDetailId = Guid.Parse(roomDetailId);
             roomBookingCreateRequest.CustomerId = Guid.Parse(customerId);
+
             var result = await roomBookingRespo.CreateNewRoomBooking(roomBookingCreateRequest);
             if (result == true)
             {

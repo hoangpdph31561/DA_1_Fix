@@ -31,6 +31,12 @@ namespace BaseSolution.API.Controllers
         {
             BillViewModel vm = new(_billReadOnlyRespository, _localizationService);
             await vm.HandleAsync(id, cancellationToken);
+            if (vm.Success)
+            {
+              BillDTO result = (BillDTO)vm.Data;
+
+                return Ok(result);
+            }
             return Ok(vm);
         }
         [HttpGet("getBillsByAdmin")]

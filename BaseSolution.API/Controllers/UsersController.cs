@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using BaseSolution.Application.DataTransferObjects.Amenity.Request;
+using BaseSolution.Application.DataTransferObjects.User;
 using BaseSolution.Application.DataTransferObjects.User.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
+using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Infrastructure.Implements.Repositories.ReadOnly;
 using BaseSolution.Infrastructure.Implements.Repositories.ReadWrite;
 using BaseSolution.Infrastructure.ViewModels.Amenity;
@@ -30,11 +32,30 @@ namespace BaseSolution.API.Controllers
             _localizationService = localizationService;
         }
         [HttpGet]
-        public async Task<IActionResult> GetLisUserByAdmin([FromQuery] ViewUserWithPaginationRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetListUserByAdmin([FromQuery] ViewUserWithPaginationRequest request, CancellationToken cancellationToken)
         {
             UserListWithPaginationViewModel vm = new(_userReadOnlyRespository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-            return Ok(vm);
+            if (vm.Success)
+            {
+                PaginationResponse<UserDTO> result = new();
+                result = (PaginationResponse<UserDTO>)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
+        }
+        [HttpGet("name")]
+        public async Task<IActionResult> GetUserByUserName(string userName, CancellationToken cancellationToken)
+        {
+            UserNameViewModel vm = new(_userReadOnlyRespository, _localizationService);
+            await vm.HandleAsync(userName, cancellationToken);
+            if (vm.Success)
+            {
+                UserDTO result = new();
+                result = (UserDTO)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
         }
         [AllowAnonymous]
         [HttpGet("confirmAccount")]
@@ -55,14 +76,24 @@ namespace BaseSolution.API.Controllers
         {
             UserViewModel vm = new(_userReadOnlyRespository, _localizationService);
             await vm.HandleAsync(id, cancellationToken);
-            return Ok(vm);
+            if (vm.Success)
+            {
+                UserDTO result = (UserDTO)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
         }
         [HttpPost]
         public async Task<IActionResult> CreateNewUser(UserCreateRequest request, CancellationToken cancellationToken)
         {
             UserCreateViewModel vm = new(_userReadOnlyRespository, _userReadWriteRespository, _mapper, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-            return Ok(vm);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
+
+            return BadRequest(vm);
         }
 
         [HttpPut]
@@ -70,7 +101,12 @@ namespace BaseSolution.API.Controllers
         {
             UserUpdateViewModel vm = new(_userReadWriteRespository, _mapper, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-            return Ok(vm);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
+
+            return BadRequest(vm);
         }
         [HttpDelete]
         public async Task<IActionResult> DeleteUser(UserDeleteRequest request, CancellationToken cancellationToken)
@@ -79,7 +115,12 @@ namespace BaseSolution.API.Controllers
 
             await vm.HandleAsync(request, cancellationToken);
 
-            return Ok(vm);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
+
+            return BadRequest(vm);
         }
 
     }

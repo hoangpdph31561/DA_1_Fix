@@ -1,9 +1,9 @@
-﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer
-@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
+﻿ @using BaseSolution.BlazorServer.Data.DataTransferObjects.User
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.User.Request
 @using BaseSolution.BlazorServer.Respository.Interfaces
 
- @page "/customer/customerUpdate"
-<CustomListDisplayP2 Label="@("Danh sách khách hàng")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="OnSearch">
+ @page "/user/list-to-manager"
+<CustomListDisplayP2 Label="@("Danh sách nguời dùng")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="OnSearch">
     <HeaderContent>
 
     </HeaderContent>
@@ -16,20 +16,20 @@
             else
             {
                 <MudCard Class="p-3" Elevation="2">
-                    <MudTable Items="@customerVM.Data">
+                    <MudTable Items="@_userVM.Data">
                         <HeaderContent>
-                            <MudTh>STT</MudTh>
                             <MudTh>Tên</MudTh>
-                            <MudTh>Mã định danh</MudTh>
                             <MudTh>Email</MudTh>
+                            <MudTh>Tài khoản</MudTh>
+                            <MudTh>Mật khẩu</MudTh>
                             <MudTh>Số điện thoại</MudTh>
                             <MudTh>Hành động</MudTh>
                         </HeaderContent>
                         <RowTemplate>
-                            <MudTd>@(_lstCustomers.IndexOf(context) + 1)</MudTd>
                             <MudTd>@context.Name</MudTd>
-                                <MudTd>@context.IdentificationNumber</MudTd>
                                 <MudTd>@context.Email</MudTd>
+                                <MudTd>@context.UserName</MudTd>
+                                <MudTd>@context.Password</MudTd>
                                 <MudTh>@context.PhoneNumber</MudTh>
                                 <MudTd>
                                     <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@( async() => await OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
@@ -38,7 +38,7 @@
                             </RowTemplate>
                         </MudTable>
                         <MudDivider />
-                        <CustomPagination Class="my-1" HasNext="@customerVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="customerVM.PageNumber"></CustomPagination>
+                        <CustomPagination Class="my-1" HasNext="@_userVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="_userVM.PageNumber"></CustomPagination>
                     </MudCard>
             }
         </MudPaper>
@@ -48,28 +48,26 @@
 
 
     [Inject]
-    public ICustomerRepo customerRepo { get; set; }
+    public IUserRepo userRepo { get; set; }
     [Inject]
     public IDialogService _dialogService { get; set; }
     [Inject]
     public ISnackbar _snackbar { get; set; }
-    private PaginationResponse<CustomerDTO> customerVM;
-    private List<CustomerDTO> _lstCustomers;
+    private PaginationResponse<UserHotelDTO> _userVM;
     private bool _isLoadingAll = true;
     private bool _isLoadingList = true;
     private bool _isDisableControls = false;
     private bool closeDetail = true;
-    private ViewCustomerWithPaginationRequest customerRequest = new();
-    private CustomerDeleteRequest _customerDeleteRequest = new();
+    private ViewUsersHotelWithPaginationRequest _userRequest = new();
+    private UserDeleteRequest _userDeleteRequest = new();
 
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
     }
-    private async Task LoadData()   
+    private async Task LoadData()
     {
-        customerVM = await customerRepo.GetCustomer(customerRequest);
-        _lstCustomers = customerVM.Data!.ToList();
+        _userVM = await userRepo.GetUserAsync(_userRequest);
         _isLoadingList = false;
         _isLoadingAll = false;
     }
@@ -77,42 +75,41 @@
     {
         if (_isDisableControls) return;
         _isLoadingList = true;
-        customerRequest.PageNumber = pageNumber;
+        _userRequest.PageNumber = pageNumber;
         await LoadData();
     }
     private async Task OnSearch(string? searchString)
     {
         if (_isDisableControls) return;
         _isLoadingList = true;
-        customerRequest.PageNumber = 1;
-        customerRequest.Name = searchString;
+        _userRequest.PageNumber = 1;
+        // _userRequest.Name = searchString;
         await LoadData();
     }
-    private async Task OpenDetail(Guid idCustomer)
+    private async Task OpenDetail(Guid idUser)
     {
-        var parameters = new DialogParameters<CustomerUpdateDetail>();
-        parameters.Add(x => x.idCustomer, idCustomer);
-        var dialog = await _dialogService.ShowAsync<CustomerUpdateDetail>("Thông tin khách hàng chi tiết", parameters);
+        var parameters = new DialogParameters<UserUpdate>();
+        parameters.Add(x => x.idUser, idUser);
+        var dialog = await _dialogService.ShowAsync<UserUpdate>("Thông tin cá nhân chi tiết", parameters);
         var result = await dialog.Result;
         if (!result.Canceled)
         {
             await LoadData();
         }
     }
-    private async Task OnDelete(Guid id)
+    public async Task OnDelete(Guid deleteId)
     {
-
         var confirm = await _dialogService.ShowMessageBox
         (
             "Thông báo",
-            "Xác nhận khách hàng?",
+            "Xác nhận xóa người dùng?",
             "Xác nhận",
             cancelText: "Hủy"
         );
         if (confirm == true)
         {
-            _customerDeleteRequest.Id = id;
-            var removeConfirm = await customerRepo.DeleteCustomer(_customerDeleteRequest);
+            _userDeleteRequest.Id = deleteId;
+            var removeConfirm = await userRepo.DeleteUserAsync(_userDeleteRequest);
             if (removeConfirm)
             {
                 _snackbar.Add("Xóa thành công", Severity.Success);
@@ -123,6 +120,5 @@
             }
             await LoadData();
         }
-
     }
 }

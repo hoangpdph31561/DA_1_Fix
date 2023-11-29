@@ -59,7 +59,7 @@
     private bool _isDisableControls = false;
     private bool closeDetail = true;
     private ViewUsersHotelWithPaginationRequest _userRequest = new();
-    private UserDeleteRequest _userDeleteRequest = new();
+    private UserHotelDeleteRequest _userDeleteRequest = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -67,7 +67,7 @@
     }
     private async Task LoadData()
     {
-        _userVM = await userRepo.GetUserAsync(_userRequest);
+        _userVM = await userRepo.GetAllUser(_userRequest);
         _isLoadingList = false;
         _isLoadingAll = false;
     }
@@ -109,7 +109,7 @@
         if (confirm == true)
         {
             _userDeleteRequest.Id = deleteId;
-            var removeConfirm = await userRepo.DeleteUserAsync(_userDeleteRequest);
+            var removeConfirm = await userRepo.DeleteUser(_userDeleteRequest);
             if (removeConfirm)
             {
                 _snackbar.Add("Xóa thành công", Severity.Success);

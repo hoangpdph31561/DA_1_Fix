@@ -13,7 +13,7 @@
         <MudChip Icon="@Icons.Material.Filled.Add" @onclick="async() => await OpenAdd()" Color="Color.Primary">Thêm</MudChip>
     </HeaderContent>
     <AdditionalSearchBarColumn>
-        <MudSelect Variant="Variant.Outlined" Class="custom-list-display-border-input" Style="background-color: white;" AnchorOrigin="Origin.BottomCenter" Label="Chuyên ngành" Value="@_idRole" ValueChanged="@(async (string e) => await OnSelect(e))">
+        <MudSelect Variant="Variant.Outlined" Class="custom-list-display-border-input" Style="background-color: white;" AnchorOrigin="Origin.BottomCenter" Label="Chức vụ" Value="@_idRole" ValueChanged="@(async (string e) => await OnSelect(e))">
             @foreach (var i in lstRole)
             {
                 <MudSelectItem Value="@i.Id.ToString()">@i.RoleCode</MudSelectItem>

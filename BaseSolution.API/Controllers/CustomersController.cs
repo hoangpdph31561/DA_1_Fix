@@ -107,6 +107,20 @@ namespace BaseSolution.API.Controllers
             return Ok();
         }
         [AllowAnonymous]
+        [HttpPost("verifyCustomerBooking/{identification}/{code}")]
+        public async Task<IActionResult> VerifyCustomerBooking(string identification, string code, CancellationToken cancellationToken)
+        {
+            var details = await _CustomerReadOnlyRepository.GetCustomerByIdentificationAsync(identification, cancellationToken);
+            if (details.Data?.ApprovedCode == code)
+            {
+                return Ok("Xác nhận mã thành công");
+            }
+            else
+            {
+                return BadRequest("Xác nhận mã thất bại");
+            }
+        }
+        [AllowAnonymous]
         [HttpPost("verifyCode/{code}/{idCard}")]
         public async Task<IActionResult> VerifyCode(string code, string idCard, CancellationToken cancellationToken)
         {

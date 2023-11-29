@@ -28,6 +28,12 @@
                     </MudSelect>
                     <MudTextField T="string" Label="Mã định danh" @bind-Value="createRequest.IdentificationNumber" Required="true" />
                     <MudTextField T="string" Label="Nhập code" Required="true" @bind-Value="createRequest.ApprovedCode"></MudTextField>
+                    <MudItem>
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Checkin" DateFormat="dd/MM/yyyy" Date="@(new System.DateTime(2023,12,07))" />
+                    </MudItem>
+                    <MudItem>
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Checkout" DateFormat="dd/MM/yyyy" Date="@(new System.DateTime(2023,12,10))" />
+                    </MudItem>
                 </MudPaper>
             </MudForm>
         }
@@ -41,6 +47,8 @@
 
 @code {
     #region Khai báo
+    [Parameter]
+    public Guid idRoomDetail { get; set; }
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
     [Inject]
@@ -66,7 +74,6 @@
     private RoombookingCreateRequest _roomBookingCreateRequest = new();
     public CustomerCreateRequest createRequest = new();
 
-    private string roomDetailId;
     private string customerId;
 
     private bool _isLoadingList = true;
@@ -94,6 +101,9 @@
     private void Reset()
     {
         _roomBookingCreateRequest = new();
+        createRequest = new();
+        idRoomDetail = Guid.Empty;
+        customerId = null;
     }
     private async Task CreateNewRoomBooking()
     {
@@ -108,26 +118,35 @@
         );
         if (confirm == true)
         {
-            var code = UtilityExtentions.GenerateRandomString(6);
-            _roomBookingCreateRequest.RoomDetailId = Guid.Parse(roomDetailId);
-            _roomBookingCreateRequest.CustomerId = Guid.Parse(customerId);
-            _roomBookingCreateRequest.BookingType = BookingType.Online;
-            _roomBookingCreateRequest.CodeBooking = code;
-            var result = await roomBookingRespo.CreateNewRoomBooking(_roomBookingCreateRequest);
-            if (result == true)
+            var verifyCustomer = await customerRespo.VerifyCustomerBooking(createRequest.IdentificationNumber, createRequest.ApprovedCode);
+            if (verifyCustomer == true)
             {
-                MudDialog.Close(DialogResult.Ok(true));
-                _snackbar.Add("Thêm thành công", Severity.Success);
+                var code = UtilityExtentions.GenerateRandomString(6);
+                _roomBookingCreateRequest.RoomDetailId = idRoomDetail;
+                _roomBookingCreateRequest.CustomerId = Guid.Parse(customerId);
+                _roomBookingCreateRequest.BookingType = BookingType.Online;
+                _roomBookingCreateRequest.CodeBooking = code;
+                var result = await roomBookingRespo.CreateNewRoomBooking(_roomBookingCreateRequest);
+
+                if (result == true)
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    _snackbar.Add("Thêm thành công", Severity.Success);
+                }
+                else
+                {
+                    _snackbar.Add
+                    (
+                        "Thêm thất bại",
+                         Severity.Error
+                    );
+                }
+                Reset();
             }
             else
             {
-                _snackbar.Add
-                (
-                    "Thêm thất bại",
-                     Severity.Error
-                );
+                await  _dialogService.ShowMessageBox("Thông báo", "Xác nhận mã thất bại", "Xác nhận", cancelText: "Hủy");
             }
-            Reset();
         }
     }
     #endregion

@@ -1,7 +1,9 @@
-﻿using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
+﻿using BaseSolution.Application.Interfaces.Login;
+using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
 using BaseSolution.Infrastructure.Database.AppDbContext;
+using BaseSolution.Infrastructure.Implements.Login;
 using BaseSolution.Infrastructure.Implements.Repositories.ReadOnly;
 using BaseSolution.Infrastructure.Implements.Repositories.ReadWrite;
 using BaseSolution.Infrastructure.Implements.Services;
@@ -74,6 +76,7 @@ namespace BaseSolution.Infrastructure.Extensions
             services.AddTransient<IUserReadOnlyRepository, UserReadOnlyRepository>();
             services.AddTransient<IUserReadWriteRepository, UserReadWriteRepository>();
             services.AddTransient<IRoombookingStatisticReadOnlyRepository, RoombookingStatisticReadOnlyRepository>();
+            services.AddTransient<ILoginService, LoginService>();
 
             return services;
         }

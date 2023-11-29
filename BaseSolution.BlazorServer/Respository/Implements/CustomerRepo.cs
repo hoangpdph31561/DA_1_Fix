@@ -2,6 +2,8 @@
 using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request;
 using BaseSolution.BlazorServer.Data.ValueObjects.Pagination;
 using BaseSolution.BlazorServer.Respository.Interfaces;
+using System.Text.Json;
+using System.Text;
 
 namespace BaseSolution.BlazorServer.Respository.Implements
 {
@@ -68,6 +70,12 @@ namespace BaseSolution.BlazorServer.Respository.Implements
                 url += $"&DeletedBy={request.DeletedBy}";
             }
             var result = await _httpClient.DeleteAsync(url);
+            return result.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> UpdateStatusCustomer(Guid id)
+        {
+            var result = await _httpClient.PutAsJsonAsync($"/api/Customers/UpdateStatusCustomer/{id}", string.Empty);
             return result.IsSuccessStatusCode;
         }
     }

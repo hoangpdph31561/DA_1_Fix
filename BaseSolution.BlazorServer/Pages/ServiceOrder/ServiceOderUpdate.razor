@@ -23,7 +23,7 @@
                             }
                         </MudSelect>
                     </MudItem>
-                        <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="serviceOrderUpdate.Status" For="@(() => serviceOrderUpdate.Status)">
+                    <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" Label="Trạng thái" @bind-Value="serviceOrderUpdate.Status" For="@(() => serviceOrderUpdate.Status)">
                             <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
                             <MudSelectItem Value="EntityStatus.InActive">Không hoạt động</MudSelectItem>
                             <MudSelectItem Value="EntityStatus.Pending">Chờ</MudSelectItem>

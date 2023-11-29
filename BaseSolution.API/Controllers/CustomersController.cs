@@ -63,7 +63,7 @@ namespace BaseSolution.API.Controllers
                 CustomerDto result = (CustomerDto)vm.Data;
                 return Ok(result);
             }
-            return Ok(vm);
+            return BadRequest(vm);
         }
         [HttpGet("{identification}/details")]
         public async Task<IActionResult> GetIdentificationNumber(string identification, CancellationToken cancellationToken)
@@ -203,8 +203,11 @@ namespace BaseSolution.API.Controllers
             CustomerCreateViewModel vm = new(_CustomerReadOnlyRepository, _CustomerReadWriteRepository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);
-
-            return Ok(vm);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
         }
 
         [HttpPut]
@@ -213,18 +216,34 @@ namespace BaseSolution.API.Controllers
             CustomerUpdateViewModel vm = new(_CustomerReadWriteRepository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
+        }
+        [AllowAnonymous]
+        [HttpPut("UpdateStatusCustomer/{id}")]
+        public async Task<IActionResult> UpdateStatus(Guid id, CancellationToken cancellationToken)
+        {
+            CustomerUpdateStatusViewModel vm = new(_CustomerReadWriteRepository, _localizationService, _mapper);
 
-            return Ok(vm);
+            await vm.HandleAsync(id, cancellationToken);
+
+            return Ok(vm.Data);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(CustomerDeleteRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> Delete([FromQuery] CustomerDeleteRequest request, CancellationToken cancellationToken)
         {
             CustomerDeleteViewModel vm = new(_CustomerReadWriteRepository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);
-
-            return Ok(vm);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
         }
     }
 }

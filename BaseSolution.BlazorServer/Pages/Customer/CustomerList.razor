@@ -2,22 +2,24 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
 @using BaseSolution.BlazorServer.Respository.Interfaces
 
- @page "/customer/customerUpdate"
+ @page "/customer/customerList"
 <CustomListDisplayP2 Label="@("Danh sách khách hàng")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="OnSearch">
     <HeaderContent>
-
+        <MudChip Icon="@Icons.Material.Filled.Add" OnClick="@(async() => await OpenAdd())" Color="Color.Primary">Thêm</MudChip>
     </HeaderContent>
     <BodyContent>
         <MudPaper Elevation="0" Class="custom-list-display-border">
             @if (_isLoadingList)
             {
                 <MudProgressLinear Color="Color.Primary" Indeterminate="true"></MudProgressLinear>
+
             }
             else
             {
-                <MudCard Class="p-3" Elevation="2">
+                <MudCard Class="p-3" Elevation="0">
                     <MudTable Items="@customerVM.Data">
                         <HeaderContent>
+                            <MudTh>STT</MudTh>
                             <MudTh>Tên</MudTh>
                             <MudTh>Mã định danh</MudTh>
                             <MudTh>Email</MudTh>
@@ -25,12 +27,14 @@
                             <MudTh>Hành động</MudTh>
                         </HeaderContent>
                         <RowTemplate>
+                            <MudTd>@(_lstCustomers.IndexOf(context) + 1)</MudTd>
                             <MudTd>@context.Name</MudTd>
                                 <MudTd>@context.IdentificationNumber</MudTd>
                                 <MudTd>@context.Email</MudTd>
                                 <MudTh>@context.PhoneNumber</MudTh>
                                 <MudTd>
                                     <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@( async() => await OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
+                                    <MudChip Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@( async() => await OnDelete(context.Id))" Disabled="@_isDisableControls">Xóa</MudChip>
                                 </MudTd>
                             </RowTemplate>
                         </MudTable>
@@ -51,11 +55,13 @@
     [Inject]
     public ISnackbar _snackbar { get; set; }
     private PaginationResponse<CustomerDTO> customerVM;
+    private List<CustomerDTO> _lstCustomers;
     private bool _isLoadingAll = true;
     private bool _isLoadingList = true;
     private bool _isDisableControls = false;
     private bool closeDetail = true;
     private ViewCustomerWithPaginationRequest customerRequest = new();
+    private CustomerDeleteRequest _customerDeleteRequest = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,6 +70,7 @@
     private async Task LoadData()   
     {
         customerVM = await customerRepo.GetCustomer(customerRequest);
+        _lstCustomers = customerVM.Data!.ToList();
         _isLoadingList = false;
         _isLoadingAll = false;
     }
@@ -82,15 +89,51 @@
         customerRequest.Name = searchString;
         await LoadData();
     }
+    private async Task OpenAdd()
+    {
+        var dialog = await _dialogService.ShowAsync<AdminCreateCustomer>("Thêm khách hàng");
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+            StateHasChanged();
+        }
+    }
     private async Task OpenDetail(Guid idCustomer)
     {
         var parameters = new DialogParameters<CustomerUpdateDetail>();
         parameters.Add(x => x.idCustomer, idCustomer);
-        var dialog = await _dialogService.ShowAsync<CustomerUpdateDetail>("Thông tin cá nhân chi tiết", parameters);
+        var dialog = await _dialogService.ShowAsync<CustomerUpdateDetail>("Thông tin khách hàng chi tiết", parameters);
         var result = await dialog.Result;
         if (!result.Canceled)
         {
             await LoadData();
         }
+    }
+    private async Task OnDelete(Guid id)
+    {
+
+        var confirm = await _dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận khách hàng?",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            _customerDeleteRequest.Id = id;
+            var removeConfirm = await customerRepo.DeleteCustomer(_customerDeleteRequest);
+            if (removeConfirm)
+            {
+                _snackbar.Add("Xóa thành công", Severity.Success);
+            }
+            else
+            {
+                _snackbar.Add("Xóa thất bại", Severity.Error);
+            }
+            await LoadData();
+        }
+
     }
 }

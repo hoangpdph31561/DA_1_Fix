@@ -20,6 +20,7 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             return result.IsSuccessStatusCode;
         }
 
+
         public async Task<bool> CreateNewUser(UserHotelCreateRequest request)
         {
             var result = await _httpClient.PostAsJsonAsync("/api/Users", request);
@@ -33,7 +34,6 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             var result = await _httpClient.DeleteAsync(url);
             return result.IsSuccessStatusCode;
         }
-
         public async Task<PaginationResponse<UserHotelDTO>> GetAllUser(ViewUsersHotelWithPaginationRequest request)
         {
             try

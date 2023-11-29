@@ -27,7 +27,7 @@
                     </MudGrid>
                     <MudGrid>
                         <MudItem xs="12" sm="6">
-                            <MudTextField @bind-Value="floorUpdateRequest.NumberOfRoom" For="@(() => floorUpdateRequest.NumberOfRoom)" Label="Số phòng cho thuê"></MudTextField>
+                            <MudNumericField T="int" @bind-Value="floorUpdateRequest.NumberOfRoom" For="@(() => floorUpdateRequest.NumberOfRoom)" Label="Số phòng cho thuê" Min="@floorInfo.NumberOfRoomRent"></MudNumericField>
                         </MudItem>
                         <MudItem xs="12" sm="6">
                             <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="floorUpdateRequest.Status" For="@(() => floorUpdateRequest.Status)">
@@ -90,7 +90,7 @@
     {
         floorInfo = await floorRespo.GetFloorById(idFloor);
         buildingPage = await buildingRespo.GetAllBuilding(new Data.DataTransferObjects.Building.Request.ViewBuildingWithPaginationRequest { PageSize = int.MaxValue - 1 });
-        lstBuilding = buildingPage.Data!.ToList();
+        lstBuilding = buildingPage.Data!.Where(x => x.Status == EntityStatus.Active).ToList();
         floorUpdateRequest.Id = floorInfo.Id;
         floorUpdateRequest.Status = floorInfo.Status;
         floorUpdateRequest.NumberOfRoom = floorInfo.NumberOfRoom;

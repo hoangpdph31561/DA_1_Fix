@@ -83,7 +83,8 @@
     protected async override Task OnInitializedAsync()
     {
         buildingPagination = await buildingRespo.GetAllBuilding(new Data.DataTransferObjects.Building.Request.ViewBuildingWithPaginationRequest { PageSize = int.MaxValue - 1 });
-        lstBuilding = buildingPagination.Data!.ToList();
+        lstBuilding = buildingPagination.Data!.Where(x => x.Status == EntityStatus.Active).ToList();
+       
         if (lstBuilding != null)
         {
             if (lstBuilding.Any())

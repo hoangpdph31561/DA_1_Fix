@@ -20,7 +20,7 @@
                         }
                     </MudSelect>
                     <MudTextField @bind-Value="@serviceCreateRequest.Name" For="@(() => serviceCreateRequest.Name)" Label="Tên dịch vụ"></MudTextField>
-                    <MudAutocomplete T="string" Label="Đơn vị tính" @bind-Value="serviceCreateRequest.Unit" SearchFunc="SearchAutoComplete" AdornmentIcon="@Icons.Material.Filled.Search"></MudAutocomplete>
+                    <MudAutocomplete T="string" Label="Đơn vị tính" @bind-Value="serviceCreateRequest.Unit" SearchFunc="SearchAutoComplete" AdornmentIcon="@Icons.Material.Filled.Search" For="@(() => serviceCreateRequest.Unit)"></MudAutocomplete>
                     <MudNumericField @bind-Value="@serviceCreateRequest.Price" For="@(() => serviceCreateRequest.Price)" Label="Giá" Variant="Variant.Text" Min="1000" Step="1000"></MudNumericField>
                     <MudTextField @bind-Value="@serviceCreateRequest.Description" For="@(() => serviceCreateRequest.Description)" Label="Mô tả"></MudTextField>
                 </MudPaper>
@@ -72,7 +72,7 @@
     private async Task LoadData()
     {
         serviceTypeVM = await serviceTypeRespo.GetAllServiceTypes(new Data.DataTransferObjects.ServiceType.Request.ViewServiceTypeWithPaginationRequest { PageSize = int.MaxValue - 1 });
-        lstServiceType = serviceTypeVM.Data!.ToList();
+        lstServiceType = serviceTypeVM.Data!.Where(x => x.Status == EntityStatus.Active).ToList();
         _isLoadingList = false;
     }
     private void OnClickCancel()
@@ -96,21 +96,34 @@
         );
         if (confirm == true)
         {
-            serviceCreateRequest.ServiceTypeId = Guid.Parse(_selectedServiceTypeId);
-            var result = await serviceRespo.CreateNewService(serviceCreateRequest);
-            if (result == true)
-            {
-                MudDialog.Close(DialogResult.Ok(true));
-                _snackbar.Add("Thêm thành công", Severity.Success);
-            }
-            else
+            if(String.IsNullOrWhiteSpace(_selectedServiceTypeId))
             {
                 _snackbar.Add
                 (
-                    "Thêm thất bại",
+                    "Chưa chọn loại dịch vụ",
                      Severity.Error
                 );
+                Reset();
             }
+            else
+            {
+                serviceCreateRequest.ServiceTypeId = Guid.Parse(_selectedServiceTypeId);
+                var result = await serviceRespo.CreateNewService(serviceCreateRequest);
+                if (result == true)
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    _snackbar.Add("Thêm thành công", Severity.Success);
+                }
+                else
+                {
+                    _snackbar.Add
+                    (
+                        "Thêm thất bại",
+                         Severity.Error
+                    );
+                }
+            }
+            
             Reset();
         }
     }

@@ -7,7 +7,6 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
     public interface IUserRepo
     {
         Task<bool> ConfirmAccountAsync(string username, string password);
-
         Task<PaginationResponse<UserHotelDTO>> GetAllUser(ViewUsersHotelWithPaginationRequest request);
         Task<bool> CreateNewUser(UserHotelCreateRequest request);
         Task<bool> UpdateUser(UserHotelUpdateRequest request);

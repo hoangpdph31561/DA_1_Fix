@@ -162,12 +162,12 @@ else
             {
                 PageSize = int.MaxValue - 1,
             });
-        lstBuilding = buildingVM.Data!.ToList();
+        lstBuilding = buildingVM.Data!.Where(x => x.Status == EntityStatus.Active).ToList();
         roomTypeVM = await roomTypeRespo.GetAllRoomTypes(new Data.DataTransferObjects.RoomType.Request.ViewRoomTypeWithPaginationRequest
             {
                 PageSize = int.MaxValue - 1,
             });
-        lstRoomType = roomTypeVM.Data!.ToList();
+        lstRoomType = roomTypeVM.Data!.Where(x => x.Status == EntityStatus.Active).ToList();
         await LoadData();
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -182,7 +182,7 @@ else
                     PageSize = int.MaxValue - 1,
                     BuildingId = idBuildingCurrent
                 });
-            lstFloor = floorVM.Data!.ToList();
+            lstFloor = floorVM.Data!.Where(x => x.Status == EntityStatus.Active).ToList();
             await LoadData();
             StateHasChanged();
 

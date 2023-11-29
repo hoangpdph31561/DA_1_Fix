@@ -8,7 +8,7 @@
         <MudPaper Class="pa-4">
             <MudForm Model="_userDTO" @ref="form">
                 <MudTextField T="string" Label="Tài khoản" @bind-Value="_userDTO.UserName" Required="true" />
-                <MudTextField T="string" Label="Mật khẩu" @bind-Value="_userDTO.Password" Required="true" InputType="InputType.Password" />
+                <MudTextField T="string" Label="Mật khẩu" @bind-Value="_userDTO.Password" Required="true"  />
                 <MudSpacer></MudSpacer>
                 <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="@Login">Đăng nhập</MudButton>
             </MudForm>
@@ -17,7 +17,7 @@
 </MudGrid>
 @code {
     MudForm form;
-    private UserHotelDTO _userDTO;
+    private UserHotelDTO _userDTO = new();
     [Inject]
     public IDialogService _dialogService { get; set; }
     [Inject]
@@ -53,4 +53,4 @@
         }
     }
 }
-}
+

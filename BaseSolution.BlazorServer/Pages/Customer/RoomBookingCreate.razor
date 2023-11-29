@@ -6,6 +6,7 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Service.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceType;
+@using BaseSolution.BlazorServer.Extensions
 @using BaseSolution.BlazorServer.Pages.Customer;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
 <MudDialog>
@@ -18,10 +19,15 @@
         {
             <MudForm Model="@_roomBookingCreateRequest" @ref="_form">
                 <MudPaper Elevation="0">
-                    <MudTextField T="string" Label="Mã định danh" @bind-Value="createRequest.IdentificationNumber" Required="true"/>
+                    <MudSelect T="string" Label="Khách hàng" Class="mb-2"
+                               AnchorOrigin="Origin.BottomCenter" @bind-Value="@customerId" For="@(() => customerId)">
+                        @foreach (var item in lstCustomer)
+                        {
+                            <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudTextField T="string" Label="Mã định danh" @bind-Value="createRequest.IdentificationNumber" Required="true" />
                     <MudTextField T="string" Label="Nhập code" Required="true" @bind-Value="createRequest.ApprovedCode"></MudTextField>
-                    <MudTextField @bind-Value="@_roomBookingCreateRequest.BookingType" For="@(() => _roomBookingCreateRequest.BookingType)" Label="Loại đặt phòng"></MudTextField>
-                    <MudTextField @bind-Value="@_roomBookingCreateRequest.CodeBooking" For="@(() => _roomBookingCreateRequest.CodeBooking)" Label="Mã đặt phòng"></MudTextField>
                 </MudPaper>
             </MudForm>
         }
@@ -42,7 +48,7 @@
     [Inject]
     public IRoomBookingRespo roomBookingRespo { get; set; }
     [Inject]
-    public ICustomerRepo cumtomerRespo { get; set; }
+    public ICustomerRepo customerRespo { get; set; }
     [Inject]
     public IDialogService _dialogService { get; set; }
     [Inject]
@@ -53,7 +59,7 @@
     private ViewCustomerWithPaginationRequest customer = new();
 
     private PaginationResponse<RoomDetailDTO> _roomDetailVM;
-    private PaginationResponse<CustomerDTO> _CustomerVM;
+    private PaginationResponse<CustomerDTO> _customerVM;
 
     List<RoomDetailDTO> lstRoomDetails = new();
     List<CustomerDTO> lstCustomer = new();
@@ -76,8 +82,8 @@
         _roomDetailVM = await roomDetailRespo.GetAllRoomDetailsByStatus(_roomDetailRequest);
         lstRoomDetails = _roomDetailVM.Data!.ToList();
 
-        _CustomerVM = await cumtomerRespo.GetCustomer(customer);
-        lstCustomer = _CustomerVM.Data!.ToList();
+        _customerVM = await customerRespo.GetCustomer(customer);
+        lstCustomer = _customerVM.Data!.ToList();
 
         _isLoadingList = false;
     }
@@ -102,8 +108,11 @@
         );
         if (confirm == true)
         {
+            var code = UtilityExtentions.GenerateRandomString(6);
             _roomBookingCreateRequest.RoomDetailId = Guid.Parse(roomDetailId);
             _roomBookingCreateRequest.CustomerId = Guid.Parse(customerId);
+            _roomBookingCreateRequest.BookingType = BookingType.Online;
+            _roomBookingCreateRequest.CodeBooking = code;
             var result = await roomBookingRespo.CreateNewRoomBooking(_roomBookingCreateRequest);
             if (result == true)
             {

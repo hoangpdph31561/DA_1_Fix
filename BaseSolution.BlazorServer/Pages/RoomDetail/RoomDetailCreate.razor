@@ -18,7 +18,7 @@
                 <MudForm Model="createRoomDetailRequest" @ref="_form">
                     <MudGrid>
                         <MudItem xs="4">
-                            <MudImage Src="@imageURL" Fluid="true" Class="rounded-lg w-100" Style="border: 1px grey solid;"></MudImage>
+                            <MudImage Src="@imageURL" Height="130" Width="160" ObjectFit="ObjectFit.Fill" Class="rounded-lg w-100" Style="border: 1px grey solid;"></MudImage>
                             <MudFileUpload T="IBrowserFile" Class="align-content-center" FilesChanged="UploadImage">
                                 <ButtonTemplate>
                                     <MudButton HtmlTag="label"

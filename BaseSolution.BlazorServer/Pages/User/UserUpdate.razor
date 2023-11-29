@@ -1,3 +1,4 @@
+
 ﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Building;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Floor;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Floor.Request;
@@ -53,6 +54,7 @@
             <MudButton OnClick="OnClickCancel">Hủy</MudButton>
             <MudButton OnClick="Reset">Khôi phục</MudButton>
             <MudButton OnClick="UpdateFloor">Lưu</MudButton>
+
         }
     </DialogActions>
 </MudDialog>
@@ -103,6 +105,7 @@
     {
         MudDialog.Cancel();
     }
+
     private async Task Reset()
     {
         await LoadData();
@@ -125,11 +128,13 @@
         if (confirm == true)
         {
             var result = await userRespo.UpdateUser(userRequest);
+
             if (result)
             {
                 if (CheckChangeData())
                 {
                     MudDialog.Close(DialogResult.Ok(true));
+
                     _snackbar.Add("Sửa thành công", Severity.Success);
                 }
                 else

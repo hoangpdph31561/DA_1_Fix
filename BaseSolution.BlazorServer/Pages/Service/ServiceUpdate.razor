@@ -28,7 +28,7 @@
                     </MudGrid>
                     <MudGrid>
                         <MudItem xs="12" sm="6">
-                            <MudAutocomplete T="string" Label="Đơn vị tính" @bind-Value="serviceUpdateRequest.Unit" SearchFunc="SearchAutoComplete" AdornmentIcon="@Icons.Material.Filled.Search"></MudAutocomplete>
+                            <MudAutocomplete T="string" Label="Đơn vị tính" @bind-Value="serviceUpdateRequest.Unit" SearchFunc="SearchAutoComplete" AdornmentIcon="@Icons.Material.Filled.Search" For="@(() => serviceUpdateRequest.Unit)"></MudAutocomplete>
                         </MudItem>
                         <MudItem xs="12" sm="6">
                             <MudNumericField @bind-Value="@serviceUpdateRequest.Price" For="@(() => serviceUpdateRequest.Price)" Label="Giá" Variant="Variant.Text" Min="1000" Step="1000"></MudNumericField>
@@ -102,7 +102,7 @@
     {
         service = await serviceRespo.GetServiceById(idService);
         serviceTypeVM = await serviceTypeRespo.GetAllServiceTypes(new Data.DataTransferObjects.ServiceType.Request.ViewServiceTypeWithPaginationRequest { PageSize = int.MaxValue - 1 });
-        lstServiceType = serviceTypeVM.Data!.ToList();
+        lstServiceType = serviceTypeVM.Data!.Where(x => x.Status == EntityStatus.Active).ToList();
         serviceUpdateRequest.Id = service.Id;
         serviceUpdateRequest.Status = service.Status;
         serviceUpdateRequest.Unit = service.Unit;

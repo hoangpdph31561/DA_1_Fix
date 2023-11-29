@@ -1,0 +1,149 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Building;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Floor;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Floor.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Role;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Role.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.User;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.User.Request;
+@using BaseSolution.BlazorServer.Respository.Interfaces;
+<MudDialog>
+    <DialogContent>
+
+        <MudForm Model="userRequest" @ref="@_form" @bind-IsValid="@_formIsValid">
+                <MudPaper Width="100%" Elevation="0">
+                    <MudGrid>
+                        <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="userRequest.Email" For="@(() => userRequest.Email)" Label="Email"></MudTextField>
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                        <MudSelect T="Guid" Label="Chức vụ" AnchorOrigin="Origin.BottomCenter" @bind-Value="userRequest.UserRoleId" For="@(() => userRequest.UserRoleId)">
+                            @foreach (var item in lstRole)
+                            {
+                                <MudSelectItem Value="@item.Id">@item.RoleCode</MudSelectItem>
+                            }
+                            </MudSelect>
+                        </MudItem>
+                    </MudGrid>
+                    <MudGrid>
+                        <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="userRequest.PhoneNumber" For="@(() => userRequest.PhoneNumber)" Label="Số điện thoại"></MudTextField>
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                        <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="userRequest.Status" For="@(() => userRequest.Status)">
+                                <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
+                                <MudSelectItem Value="EntityStatus.InActive">Không hoạt động</MudSelectItem>
+                                <MudSelectItem Value="EntityStatus.Pending">Chờ</MudSelectItem>
+                                <MudSelectItem Value="EntityStatus.PendingForActivation">Chờ hoạt động</MudSelectItem>
+                                <MudSelectItem Value="EntityStatus.PendingForConfirmation">Chờ kích hoạt</MudSelectItem>
+                                <MudSelectItem Value="EntityStatus.PendingForApproval">Chờ chấp thuận</MudSelectItem>
+                                <MudSelectItem Value="EntityStatus.Locked">Khóa</MudSelectItem>
+                            </MudSelect>
+                        </MudItem>
+                    </MudGrid>
+                </MudPaper>
+            </MudForm>
+    </DialogContent>
+    <DialogActions>
+        @if (_userDto == null)
+        {
+            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+        }
+        else
+        {
+            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+            <MudButton OnClick="Reset">Khôi phục</MudButton>
+            <MudButton OnClick="UpdateFloor">Lưu</MudButton>
+        }
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #region Khai báo
+    [Parameter]
+    public Guid idUser { get; set; }
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    [Inject]
+    public IUserRepo userRespo { get; set; }
+    [Inject]
+    public IRoleRespo roleRespo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    private PaginationResponse<UserHotelDTO> userVM;
+    private PaginationResponse<RoleDto> roleVM;
+
+    private List<RoleDto>? lstRole = new();
+    private ViewRoleWithPaginationRequest roleRequest = new();
+    private UserHotelUpdateRequest userRequest = new();
+    private UserHotelDTO _userDto;
+    private bool _formIsValid;
+    MudForm _form;
+    #endregion
+    #region Code xử lý
+    protected async override Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        _userDto = await userRespo.GetUserById(idUser);
+
+        roleVM = await roleRespo.GetAllRole(roleRequest);
+        lstRole = roleVM.Data!.ToList();
+        // update dữ liệu 
+        userRequest.Id = _userDto.Id;
+        userRequest.Status = _userDto.Status;
+        userRequest.Email = _userDto.Email;
+        userRequest.PhoneNumber = _userDto.PhoneNumber;
+        userRequest.UserRoleId = _userDto.UserRoleId;
+    }
+    private void OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+    private async Task Reset()
+    {
+        await LoadData();
+    }
+    private bool CheckChangeData()
+    {
+        return _userDto.Email != userRequest.Email || _userDto.Status != userRequest.Status || _userDto.PhoneNumber != userRequest.PhoneNumber || _userDto.UserRoleId != userRequest.UserRoleId;
+    }
+    private async Task UpdateFloor()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+        var confirm = await _dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận sửa thông tin người dùng ? ",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            var result = await userRespo.UpdateUser(userRequest);
+            if (result)
+            {
+                if (CheckChangeData())
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    _snackbar.Add("Sửa thành công", Severity.Success);
+                }
+                else
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    _snackbar.Add("Không có thay đổi dữ liệu để cập nhật", Severity.Warning);
+                }
+            }
+            else
+            {
+                _snackbar.Add("Sửa thất bại", Severity.Error);
+            }
+            await Reset();
+        }
+    }
+    #endregion
+}

@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using BaseSolution.Application.DataTransferObjects.Role;
 using BaseSolution.Application.DataTransferObjects.Role.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
+using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Infrastructure.Implements.Repositories.ReadWrite;
 using BaseSolution.Infrastructure.ViewModels.Role;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +31,12 @@ namespace BaseSolution.API.Controllers
         {
             RoleListWithPaginationViewModel vm = new(_roleReadOnlyRepository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-            return Ok(vm);
+            if(vm.Success)
+            {
+                PaginationResponse<RoleDTO> result = (PaginationResponse<RoleDTO>)vm.Data!;
+                return Ok(result);
+            }
+            return BadRequest(vm);
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRoleById(Guid id, CancellationToken cancellationToken)

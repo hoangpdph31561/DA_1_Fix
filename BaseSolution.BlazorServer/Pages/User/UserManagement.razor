@@ -1,0 +1,176 @@
+﻿@page "/roleService"
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Role;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Role.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.User;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.User.Request;
+@using BaseSolution.BlazorServer.Respository.Interfaces;
+
+
+
+<PageTitle>Quản lý chức vụ</PageTitle>
+<CustomListDisplayP2 Label="@("Danh sách User ")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
+    <HeaderContent>
+        <MudChip Icon="@Icons.Material.Filled.Add" @onclick="async() => await OpenAdd()" Color="Color.Primary">Thêm</MudChip>
+    </HeaderContent>
+    <AdditionalSearchBarColumn>
+        <MudSelect Variant="Variant.Outlined" Class="custom-list-display-border-input" Style="background-color: white;" AnchorOrigin="Origin.BottomCenter" Label="Chuyên ngành" Value="@_idRole" ValueChanged="@(async (string e) => await OnSelect(e))">
+            @foreach (var i in lstRole)
+            {
+                <MudSelectItem Value="@i.Id.ToString()">@i.RoleCode</MudSelectItem>
+            }
+        </MudSelect>
+    </AdditionalSearchBarColumn>
+    <BodyContent>
+         <MudPaper Elevation="0" Class="custom-list-display-border">
+             @if (lstUser == null)
+            {
+                <MudText>Không có data</MudText>
+            }
+            @if (_isLoadingList)
+            {
+                <MudProgressLinear Color="Color.Primary" Indeterminate="true"></MudProgressLinear>
+            }
+            else
+            {
+                <MudCard Class="p-3" Elevation="2">
+                    <MudTable Items="@userVM.Data">
+                        <HeaderContent>
+                            <MudTh>STT</MudTh>
+                            <MudTh>Tên</MudTh>
+                            <MudTh>Email</MudTh>
+                            <MudTh>Số điện thoại</MudTh>
+                            <MudTh>Chức vụ</MudTh>
+                            <MudTh>Trạng thái</MudTh>
+                            <MudTh>Hành động</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd>@(lstUser.IndexOf(context) + 1)</MudTd>
+                                <MudTd>@context.Name</MudTd>
+                                <MudTh>@context.Email</MudTh>
+                                <MudTh>@context.PhoneNumber</MudTh>
+                                <MudTh>@context.RoleCode</MudTh>
+                                <MudTd><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTd>
+                                <MudTd>
+                                    <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@(() => OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
+                                    <MudChip Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@( async() => await OnDelete(context.Id))" Disabled="@_isDisableControls">Xóa</MudChip>
+
+                                </MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                        <MudDivider />
+                        <CustomPagination Class="my-1" HasNext="@userVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="userVM.PageNumber"></CustomPagination>
+                    </MudCard>
+            }
+        </MudPaper>
+    </BodyContent>
+</CustomListDisplayP2>
+@code {
+    [Inject]
+    public IUserRepo userRespo { get; set; }
+    [Inject]
+    public IRoleRespo roleRespo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    private PaginationResponse<UserHotelDTO> userVM;
+    private PaginationResponse<RoleDto> roleVM;
+    private bool _isLoadingAll = true;
+    private bool _isLoadingList = true;
+    private bool _isDisableControls = false;
+    private ViewUsersHotelWithPaginationRequest userRequest = new();
+    private ViewRoleWithPaginationRequest roleRequest = new();
+    private UserHotelDeleteRequest requestDelete = new();
+
+    private List<UserHotelDTO> lstUser;
+    private List<RoleDto> lstRole;
+
+    public string SearchString { get; set; }
+    public string _idRole { get; set; } 
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        userVM = await userRespo.GetAllUser(userRequest);
+        lstUser = userVM.Data!.ToList();
+        roleVM = await roleRespo.GetAllRole(roleRequest);
+        lstRole = roleVM.Data!.ToList();
+
+        _isLoadingList = false;
+        _isLoadingAll = false;
+    }
+    private async Task OnPaginationButtonClick(int pageNumber)
+    {
+        if (_isDisableControls) return;
+        _isLoadingList = true;
+        userRequest.PageNumber = pageNumber;
+        await LoadData();
+    }
+
+    private async Task OnSearch(string? searchString)
+    {
+        _isLoadingList = true;
+        userRequest.PageNumber = 1;
+        userRequest.Name = searchString;
+        await LoadData();
+    }
+
+    private async Task OnSelect(string idRole)
+    {
+        _idRole = idRole;
+        _isLoadingList = true;
+        userRequest.PageNumber = 1;
+        userRequest.UserRoleId = new Guid(idRole);
+        await LoadData();
+    }
+
+    private async Task OpenAdd()
+    {
+        var dialog = await _dialogService.ShowAsync<UserCreate>("Thêm người dùng ");
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+            StateHasChanged();
+        }
+    }
+
+    private async Task OpenDetail(Guid idUser)
+    {
+        var parameters = new DialogParameters<UserUpdate>();
+        parameters.Add(x => x.idUser, idUser);
+        var dialog = await _dialogService.ShowAsync<UserUpdate>("Chi tiết người dùng", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
+    }
+    public async Task OnDelete(Guid deleteId)
+    {
+        var confirm = await _dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận xóa người dùng này?",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            requestDelete.Id = deleteId;
+            var removeConfirm = await userRespo.DeleteUser(requestDelete);
+            if (removeConfirm)
+            {
+                _snackbar.Add("Xóa thành công", Severity.Success);
+            }
+            else
+            {
+                _snackbar.Add("Xóa thất bại", Severity.Error);
+            }
+            await LoadData();
+        }
+    }
+
+}

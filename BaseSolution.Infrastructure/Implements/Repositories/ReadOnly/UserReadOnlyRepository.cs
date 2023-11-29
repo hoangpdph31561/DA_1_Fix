@@ -8,10 +8,10 @@ using BaseSolution.Application.ValueObjects.Common;
 using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Application.ValueObjects.Response;
 using BaseSolution.Domain.Entities;
+using BaseSolution.Domain.Enums;
 using BaseSolution.Infrastructure.Database.AppDbContext;
 using BaseSolution.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
-
 namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
 {
     public class UserReadOnlyRepository : IUserReadOnlyRepository
@@ -73,8 +73,16 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                IQueryable<UserEntity> queryable = _dbContext.Users.AsNoTracking().AsQueryable();
-                var result = await _dbContext.Users.AsNoTracking().PaginateAsync<UserEntity, UserDTO>(request, _mapper, cancellationToken);
+                var user =  _dbContext.Users.AsNoTracking().Where(x => x.Status != EntityStatus.Deleted).ProjectTo<UserDTO>(_mapper.ConfigurationProvider);
+                if (!string.IsNullOrWhiteSpace(request.Name))
+                {
+                    user = user.Where(x => x.Name.Contains(request.Name));
+                }
+                if(request.UserRoleId != null) 
+                {
+                    user = user.Where(x => x.UserRoleId == request.UserRoleId);
+                }
+                var result = await user.PaginateAsync(request, cancellationToken);
                 return RequestResult<PaginationResponse<UserDTO>>.Succeed(new PaginationResponse<UserDTO>
                 {
                     PageNumber = request.PageNumber,

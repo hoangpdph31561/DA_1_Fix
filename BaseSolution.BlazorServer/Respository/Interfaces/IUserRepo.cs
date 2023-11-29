@@ -7,10 +7,10 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
     public interface IUserRepo
     {
         Task<bool> ConfirmAccountAsync(string username, string password);
-        Task<PaginationResponse<UserHotelDTO>> GetUserAsync(ViewUsersHotelWithPaginationRequest request);
-        Task<bool> CreateUserAsync(UserCreateRequest request);
-        Task<bool> UpdateUserAsync(UserUpdateRequest request);
-        Task<bool> DeleteUserAsync(UserDeleteRequest request);
+        Task<PaginationResponse<UserHotelDTO>> GetAllUser(ViewUsersHotelWithPaginationRequest request);
+        Task<bool> CreateNewUser(UserHotelCreateRequest request);
+        Task<bool> UpdateUser(UserHotelUpdateRequest request);
+        Task<bool> DeleteUser(UserHotelDeleteRequest request);
         Task<UserHotelDTO> GetUserById(Guid id);
     }
 }

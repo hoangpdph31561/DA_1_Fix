@@ -1,0 +1,127 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Building;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Floor.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Role;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Role.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.User;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.User.Request;
+@using BaseSolution.BlazorServer.Respository.Interfaces;
+<MudDialog>
+    <DialogContent>
+        @if (_isLoadingList)
+        {
+            <LoadingIndicator></LoadingIndicator>
+        }
+        else
+        {
+            <MudForm Model="@userRequest" @ref="_form">
+                <MudPaper Elevation="0">
+                    <MudGrid>
+                        <MudItem xs="12" sm="6">
+                            <MudTextField Class="mb-2" @bind-Value="@userRequest.UserName" For="@(() => userRequest.UserName)" Label="Tài khoản"></MudTextField>
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudTextField Class="mb-2" @bind-Value="@userRequest.Name" For="@(() => userRequest.Name)" Label="Tên người dùng"></MudTextField>
+                        </MudItem>
+                         <MudItem xs="12" sm="6">
+                            <MudTextField Class="mb-2" @bind-Value="@userRequest.Email" For="@(() => userRequest.Email)" Label="Email"></MudTextField>
+                        </MudItem>
+                          <MudItem xs="12" sm="6">
+                            <MudTextField Class="mb-2" @bind-Value="@userRequest.PhoneNumber" For="@(() => userRequest.PhoneNumber)" Label="Số điện thoại"></MudTextField>
+                        </MudItem>
+
+                        <MudItem xs="12" sm="6">
+                            <MudSelect T="string" Label="Chức vụ" AnchorOrigin="Origin.BottomCenter" @bind-Value="@_selectedRoleId" For="@(() => _selectedRoleId)" Class="mb-2">
+                                @foreach (var item in lstRole)
+                                {
+                                    <MudSelectItem Value="@item.Id.ToString()">@item.RoleCode</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                    </MudGrid>
+                </MudPaper>
+            </MudForm>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+        <MudButton OnClick="Reset">Khôi phục</MudButton>
+        <MudButton OnClick="CreateNewFloor">Lưu</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #region Khai báo
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    [Inject]
+    public IUserRepo userRespo { get; set; }
+    [Inject]
+    public IRoleRespo roleRespo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    private PaginationResponse<UserHotelDTO> userVM;
+    private PaginationResponse<RoleDto> roleVM;
+    private bool _isLoadingAll = true;
+    private bool _isLoadingList = true;
+    private bool _isDisableControls = false;
+    private List<UserHotelDTO> lstUser;
+    private List<RoleDto> lstRole;
+    private ViewRoleWithPaginationRequest roleRequest = new();
+    private UserHotelCreateRequest userRequest = new();
+    private string _selectedRoleId;
+    MudForm _form;
+    #endregion
+    #region Code xử lý
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        roleVM = await roleRespo.GetAllRole(roleRequest);
+        lstRole = roleVM.Data!.ToList();
+        _isLoadingList = false;
+    }
+    private void OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+    private void Reset()
+    {
+        userRequest = new();
+    }
+    private async Task CreateNewFloor()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+        var confirm = await _dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận thêm người dùng?",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            userRequest.UserRoleId = Guid.Parse(_selectedRoleId);
+            var result = await userRespo.CreateNewUser(userRequest);
+            if (result == true)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                _snackbar.Add("Thêm thành công", Severity.Success);
+            }
+            else
+            {
+                _snackbar.Add
+                (
+                    "Thêm thất bại",
+                     Severity.Error
+                );
+            }
+            Reset();
+        }
+    }
+    #endregion
+}

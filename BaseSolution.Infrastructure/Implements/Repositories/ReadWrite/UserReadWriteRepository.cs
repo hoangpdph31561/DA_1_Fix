@@ -6,6 +6,7 @@ using BaseSolution.Application.ValueObjects.Response;
 using BaseSolution.Domain.Entities;
 using BaseSolution.Domain.Enums;
 using BaseSolution.Infrastructure.Database.AppDbContext;
+using BaseSolution.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
@@ -26,10 +27,10 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
             {
                 entity.Id = Guid.NewGuid();
                 entity.UserName = entity.UserName;
-                entity.Password = entity.Password;
+                entity.Password = UtilityExtensions.GenerateRandomString(6);
                 entity.Email = entity.Email;
                 entity.PhoneNumber = entity.PhoneNumber;
-                entity.Status = entity.Status == EntityStatus.Active ? EntityStatus.Active : EntityStatus.InActive;
+                entity.Status = entity.Status;
                 entity.CreatedBy = entity.CreatedBy;
                 entity.CreatedTime = DateTimeOffset.Now;
                 await _appReadWriteDbContext.Users.AddAsync(entity);
@@ -75,20 +76,16 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 });
             }
         }
-
         public async Task<RequestResult<int>> UpdateUserAsync(UserEntity entity, CancellationToken cancellationToken)
         {
             try
             {
                 var user = await GetUserByIdAsync(entity.Id, cancellationToken);
 
-                user!.Name = entity.Name;
-                user!.UserRole = entity.UserRole;
-                user.Status = entity.Status == EntityStatus.Active ? EntityStatus.Active : EntityStatus.InActive;
+                user!.UserRoleId = entity.UserRoleId;
+                user.Status = entity.Status;
                 user.PhoneNumber = entity.PhoneNumber;
                 user.Email = entity.Email;
-                user.Password = entity.Password;
-                user.ModifiedBy = entity.ModifiedBy;
                 user.ModifiedTime = DateTimeOffset.Now;
                 _appReadWriteDbContext.Users.Update(user);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);

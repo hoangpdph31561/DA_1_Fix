@@ -36,23 +36,11 @@ namespace BaseSolution.API.Controllers
         {
             UserListWithPaginationViewModel vm = new(_userReadOnlyRespository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
-            if (vm.Success)
+
+            if(vm.Success)
             {
-                PaginationResponse<UserDTO> result = new();
-                result = (PaginationResponse<UserDTO>)vm.Data;
-                return Ok(result);
-            }
-            return BadRequest(vm);
-        }
-        [HttpGet("name")]
-        public async Task<IActionResult> GetUserByUserName(string userName, CancellationToken cancellationToken)
-        {
-            UserNameViewModel vm = new(_userReadOnlyRespository, _localizationService);
-            await vm.HandleAsync(userName, cancellationToken);
-            if (vm.Success)
-            {
-                UserDTO result = new();
-                result = (UserDTO)vm.Data;
+                PaginationResponse<UserDTO> result = (PaginationResponse<UserDTO>)vm.Data!;
+
                 return Ok(result);
             }
             return BadRequest(vm);
@@ -76,9 +64,12 @@ namespace BaseSolution.API.Controllers
         {
             UserViewModel vm = new(_userReadOnlyRespository, _localizationService);
             await vm.HandleAsync(id, cancellationToken);
-            if (vm.Success)
+
+            if(vm.Success)
             {
-                UserDTO result = (UserDTO)vm.Data;
+                UserDTO result = (UserDTO)vm.Data!;
+
+
                 return Ok(result);
             }
             return BadRequest(vm);
@@ -109,7 +100,7 @@ namespace BaseSolution.API.Controllers
             return BadRequest(vm);
         }
         [HttpDelete]
-        public async Task<IActionResult> DeleteUser(UserDeleteRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> DeleteUser([FromQuery]UserDeleteRequest request, CancellationToken cancellationToken)
         {
             UserDeleteViewModel vm = new(_userReadWriteRespository, _localizationService, _mapper);
 

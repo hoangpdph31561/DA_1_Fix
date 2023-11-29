@@ -56,7 +56,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
             {
                 var role = await GetUserRoleByIdAsync(request.Id, cancellationToken);
                 role!.Deleted = true;
-                role.DeletedBy = request.DeletedBy;
+              //  role.DeletedBy = request.DeletedBy;
                 role.DeletedTime = DateTimeOffset.Now;
                 role.Status = EntityStatus.Deleted;
                 _appReadWriteDbContext.UserRoles.Update(role);

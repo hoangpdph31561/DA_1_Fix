@@ -13,6 +13,7 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.Service.Request
         public decimal Price { get; set; }
         [Required(ErrorMessage = "Trường này không được để trống")]
         public string Unit { get; set; } = string.Empty;
+        public bool IsRoomBookingNeed { get; set; }
         public Guid ServiceTypeId { get; set; }
         public Guid? CreatedBy { get; set; }
     }

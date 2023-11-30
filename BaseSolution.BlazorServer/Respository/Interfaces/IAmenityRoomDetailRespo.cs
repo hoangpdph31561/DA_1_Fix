@@ -4,8 +4,9 @@ using BaseSolution.BlazorServer.Data.ValueObjects.Pagination;
 
 namespace BaseSolution.BlazorServer.Respository.Interfaces
 {
-    public interface IAmenityRoomDetailRepo
+    public interface IAmenityRoomDetailRespo
     {
         Task<PaginationResponse<AmenityRoomDetailDTO>> GetAllAmentityRoomDetail(ViewAmenityRoomDetailWithPaginationRequest request);
+        Task<bool> CreateUpdateDeleteAmenityRoomDetail(List<AmenityRoomDetailCreateUpdateDelete> request);
     }
 }

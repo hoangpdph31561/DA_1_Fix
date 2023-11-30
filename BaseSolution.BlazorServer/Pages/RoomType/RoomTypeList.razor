@@ -1,6 +1,7 @@
 ﻿@page "/roomtype"
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType.Request
+@using BaseSolution.BlazorServer.Pages.AmenityRoomTypeDetail
 @using BaseSolution.BlazorServer.Respository.Interfaces
 <PageTitle>Quản lý loại phòng khách sạn</PageTitle>
 <CustomListDisplayP2 Label="@("Danh sách loại phòng của khách sạn")" IsLoading="lstRoomType == null && _isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
@@ -31,7 +32,7 @@
                             <MudTd>@context.Name</MudTd>
                                 <MudTd>
                                     @context.NumberOfAmenities
-                                    <MudIconButton Icon="@Icons.Material.Filled.Checklist"></MudIconButton>
+                                <MudIconButton Icon="@Icons.Material.Filled.Checklist" OnClick="@(async() => await OpenAmenityRoomDetail(context.Id))"></MudIconButton>
                                 </MudTd>
                                 <MudTh>
                                     @context.NumberOfRoomDetails
@@ -149,6 +150,17 @@
         {
             await LoadData();
             StateHasChanged();
+        }
+    }
+    private async Task OpenAmenityRoomDetail(Guid idRoomType)
+    {
+        var parameters = new DialogParameters<AmenityRoomTypeDetailView>();
+        parameters.Add(x => x.idRoomType, idRoomType);
+        var dialog = await _dialogService.ShowAsync<AmenityRoomTypeDetailView>("Chi tiết các tiện ích phòng", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
         }
     }
     #endregion

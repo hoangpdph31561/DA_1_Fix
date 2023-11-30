@@ -100,5 +100,87 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 });
             }
         }
+
+        public async Task<RequestResult<int>> CreateUpdateDeleteAmenityRoomDetailAsync(List<AmenityCreateUpdateDeleteRequest> request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                Guid roomTypeId = request[0].RoomTypeId;
+                var lstEsists = await _appReadWriteDbContext.AmenityRoomDetails.Where(x => x.RoomTypeId == roomTypeId && !x.Deleted).ToListAsync(cancellationToken);
+                List<AmenityCreateUpdateDeleteRequest> lstCreate = new();
+                List<AmenityCreateUpdateDeleteRequest> lstUpdate = new();
+                List<AmenityCreateUpdateDeleteRequest> lstDelete = new();
+                foreach (var item in request)
+                {
+                    if(!lstEsists.Exists(x => x.AmenityId == item.AmenityId))
+                    {
+                        lstCreate.Add(item);
+                    }
+                    if(lstEsists.Exists(x => x.AmenityId == item.AmenityId  && x.Amount != item.Amount))
+                    {
+                        lstUpdate.Add(item);
+                    }
+                }
+                foreach (var item in lstEsists)
+                {
+                    if(!request.Exists(x => x.AmenityId == item.AmenityId))
+                    {
+                        lstDelete.Add(new AmenityCreateUpdateDeleteRequest
+                        {
+                            AmenityId = item.AmenityId,
+                            Amount = item.Amount,
+                        });
+                    }
+                }
+                if(lstCreate.Any())
+                {
+                    foreach (var item in lstCreate)
+                    {
+                        AmenityRoomDetailEntity entity = new()
+                        {
+                            AmenityId = item.AmenityId,
+                            RoomTypeId = roomTypeId,
+                            Amount = item.Amount,
+                            CreatedTime = DateTimeOffset.UtcNow,
+                        };
+                        await _appReadWriteDbContext.AmenityRoomDetails.AddAsync(entity);
+                    }
+                }
+                if (lstUpdate.Any())
+                {
+                    foreach (var item in lstUpdate)
+                    {
+                        var update = await _appReadWriteDbContext.AmenityRoomDetails.FirstOrDefaultAsync(x => x.RoomTypeId == roomTypeId && x.AmenityId == item.AmenityId && !x.Deleted);
+                        update!.Amount = item.Amount;
+                        update.ModifiedTime = DateTimeOffset.UtcNow;
+                        _appReadWriteDbContext.AmenityRoomDetails.Update(update);
+                    }
+                }
+                if (lstDelete.Any())
+                {
+                    foreach (var item in lstDelete)
+                    {
+                        var delete = await _appReadWriteDbContext.AmenityRoomDetails.FirstOrDefaultAsync(x => x.RoomTypeId == roomTypeId && x.AmenityId == item.AmenityId && !x.Deleted);
+                        delete!.Status = EntityStatus.Deleted;
+                        delete.Deleted = true;
+                        delete.DeletedTime = DateTimeOffset.UtcNow;
+                        _appReadWriteDbContext.AmenityRoomDetails.Update(delete);
+                    }
+                }
+                await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
+                return RequestResult<int>.Succeed(1);
+            }
+            catch (Exception e)
+            {
+                return RequestResult<int>.Fail(_localizationService["Unable to update AmenityRoomDetail"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToUpdate + "AmenityRoomDetail"
+                    }
+                });
+            }
+        }
     }
 }

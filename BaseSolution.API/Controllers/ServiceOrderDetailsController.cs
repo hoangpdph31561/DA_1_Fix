@@ -1,8 +1,12 @@
 ﻿using AutoMapper;
+using BaseSolution.Application.DataTransferObjects.RoomBookingDetail.Request;
+using BaseSolution.Application.DataTransferObjects.ServiceOrder;
+using BaseSolution.Application.DataTransferObjects.ServiceOrderDetail;
 using BaseSolution.Application.DataTransferObjects.ServiceOrderDetail.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
+using BaseSolution.Infrastructure.ViewModels.RoomBookingDetail;
 using BaseSolution.Infrastructure.ViewModels.ServiceOrderDetail;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -44,6 +48,19 @@ namespace BaseSolution.API.Controllers
             ServiceOrderDetailListWithPaginationViewModelByOther vm = new(_serviceOrderDetailReadOnly, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
             return Ok(vm);
+        }
+
+         [HttpGet("getServiceOrderDetailByIdServiceOrder")]
+        public async Task<IActionResult> GetServiceOrderDetailByIdServiceOrder([FromQuery] ViewServiceOrderDetailByIdServiceOderRequest request, CancellationToken cancellationToken)
+        {
+            ServiceOrderDetailViewModelByServiceOrderId vm = new(_serviceOrderDetailReadOnly, _localizationService);
+            await vm.HandleAsync(request, cancellationToken);
+            if(vm.Success)
+            {
+                List<ServiceOrderDetailDTO> result = (List<ServiceOrderDetailDTO>)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
         }
         [HttpPost]
         public async Task<IActionResult> CreateNewServiceOrderDetail(ServiceOrderDetailCreateRequest request, CancellationToken cancellationToken)

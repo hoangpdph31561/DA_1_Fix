@@ -1,0 +1,42 @@
+﻿@page "/statistic/billstatistic"
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Statistic;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Statistic.Request;
+@using BaseSolution.BlazorServer.Respository.Interfaces;
+
+<MudText Color="Color.Dark" Typo="Typo.subtitle1">Thống kê doanh thu theo tháng</MudText>
+<MudPaper Elevation="12">
+    <div id="billStatisticchart"></div>
+</MudPaper>
+
+@code {
+    [Inject]
+    private IStatistic statisticRepo { get; set; }
+    [Inject]
+    IJSRuntime jsRuntime { get; set; }
+    private List<BillStatisticDto>? _lstBillStatisticDto { get; set; }
+    BillStatisticRequest billStatisticRequest = new();
+
+    private string labels = "Doanh thu";
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+
+    }
+    private async Task LoadData()
+    {
+        _lstBillStatisticDto = await statisticRepo.GetBillStatisticsAsync(billStatisticRequest);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (_lstBillStatisticDto != null)
+            {
+                var s1 = _lstBillStatisticDto.Select(gs => gs.Month).ToList();
+                var s2 = _lstBillStatisticDto.Select(gs => gs.TotalAmountForMonth).ToList();
+                await jsRuntime.InvokeVoidAsync("createBillStatistic", labels, s1, s2);
+            }
+        }
+    }
+}

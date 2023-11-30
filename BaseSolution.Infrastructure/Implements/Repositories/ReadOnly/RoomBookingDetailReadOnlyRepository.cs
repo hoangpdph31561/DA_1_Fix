@@ -54,11 +54,6 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             {
                 var query =  _dbContext.RoomBookingDetails.AsNoTracking().ProjectTo<RoomBookingDetailDTO>(_mapper.ConfigurationProvider);
                 
-                if(!string.IsNullOrWhiteSpace(request.SearchString))
-                {
-                    query = query.Where(x => x.NameCustomer.Contains(request.SearchString!));
-                }
-                
                var result = await query.PaginateAsync(request, cancellationToken);
                 return RequestResult<PaginationResponse<RoomBookingDetailDTO>>.Succeed(new PaginationResponse<RoomBookingDetailDTO>
                 {
@@ -82,17 +77,12 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             }
         }
 
+
         public async Task<RequestResult<PaginationResponse<RoomBookingDetailDTO>>> GetRoomBookingDetailWithPaginationByOtherAsync(ViewRoomBookingDetailWithPaginationRequest request, CancellationToken cancellationToken)
         {
             try
             {
                 var query = _dbContext.RoomBookingDetails.AsNoTracking().Where(x => x.Status != EntityStatus.Deleted).ProjectTo<RoomBookingDetailDTO>(_mapper.ConfigurationProvider);
-
-                if (!string.IsNullOrWhiteSpace(request.SearchString))
-                {
-                    query = query.Where(x => x.NameCustomer.Contains(request.SearchString!));
-                }
-
                 var result = await query.PaginateAsync(request, cancellationToken);
                 return RequestResult<PaginationResponse<RoomBookingDetailDTO>>.Succeed(new PaginationResponse<RoomBookingDetailDTO>
                 {
@@ -106,6 +96,29 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             {
 
                 return RequestResult<PaginationResponse<RoomBookingDetailDTO>>.Fail(_localizationService["List of RoomBookingDetail are not found"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error= e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "list of RoomBookingDetail"
+                    }
+                });
+            }
+        }
+
+        public async Task<RequestResult<RoomBookingDetailDTO>> GetRoomBookingDetailWithPaginationByIdRoomBookingAsync(Guid idRoomBooking, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = await _dbContext.RoomBookingDetails.AsNoTracking().Where(x => x.Status != EntityStatus.Deleted && idRoomBooking == x.RoomBookingId)
+                    .ProjectTo<RoomBookingDetailDTO>(_mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
+
+                return RequestResult<RoomBookingDetailDTO>.Succeed(query);
+            }
+            catch (Exception e)
+            {
+
+                return RequestResult<RoomBookingDetailDTO>.Fail(_localizationService["List of RoomBookingDetail are not found"], new[]
                 {
                     new ErrorItem
                     {

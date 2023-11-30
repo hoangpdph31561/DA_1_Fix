@@ -21,11 +21,9 @@
 <MudPaper Elevation="4">
     <div id="data-label-bar-chart"></div>
 </MudPaper>
-
 @code {
     [Inject]
     public IJSRuntime JSRuntime { get; set; } = null!;
-
     private string ChartName { get; set; } = "Example";
     private List<string> Category { get; set; } = new (){ "Data1", "Data2", "Data3", "Data4", "Data5" };
     private List<int> ChartData { get; set; } = new List<int> { 10, 20, 60, 40, 50 };

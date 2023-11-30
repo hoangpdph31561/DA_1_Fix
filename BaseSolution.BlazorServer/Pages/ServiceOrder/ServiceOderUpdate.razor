@@ -15,14 +15,6 @@
         <MudForm Model="serviceOrderUpdate" @ref="@_form" @bind-IsValid="@_formIsValid">
             <MudPaper Width="100%" Elevation="0">
                 <MudGrid>
-                    <MudItem xs="12" sm="6">
-                        <MudSelect T="Guid" Label="Khách hàng" AnchorOrigin="Origin.BottomCenter" @bind-Value="serviceOrderUpdate.CustomerId" For="@(() => serviceOrderUpdate.CustomerId)">
-                            @foreach (var item in lstCustomer)
-                            {
-                                <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
-                            }
-                        </MudSelect>
-                    </MudItem>
                     <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" Label="Trạng thái" @bind-Value="serviceOrderUpdate.Status" For="@(() => serviceOrderUpdate.Status)">
                             <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
                             <MudSelectItem Value="EntityStatus.InActive">Không hoạt động</MudSelectItem>

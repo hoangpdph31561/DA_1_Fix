@@ -2,6 +2,8 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBookingDetail.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBookingDetail;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Service;
@@ -11,64 +13,59 @@
 @using BaseSolution.BlazorServer.Respository.Interfaces;
 <MudDialog>
     <DialogContent>
-            <MudForm Model="roombookingUpdate" @ref="@_form" @bind-IsValid="@_formIsValid">
-                <MudPaper Width="100%" Elevation="0">
-                    <MudGrid>
-                    <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="roombookingUpdate.Status" For="@(() => roombookingUpdate.Status)">
-                        <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
-                        <MudSelectItem Value="EntityStatus.InActive">Không hoạt động</MudSelectItem>
-                        <MudSelectItem Value="EntityStatus.Pending">Chờ</MudSelectItem>
-                        <MudSelectItem Value="EntityStatus.PendingForActivation">Chờ hoạt động</MudSelectItem>
-                        <MudSelectItem Value="EntityStatus.PendingForConfirmation">Chờ kích hoạt</MudSelectItem>
-                        <MudSelectItem Value="EntityStatus.PendingForApproval">Chờ chấp thuận</MudSelectItem>
-                        <MudSelectItem Value="EntityStatus.Locked">Khóa</MudSelectItem>
-                    </MudSelect>
-                    </MudGrid>
-                </MudPaper>
-            </MudForm>
-        
-    </DialogContent>
-    <DialogActions>
-        @if (roombooking == null)
-        {
-            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
-        }
-        else
-        {
-            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
-            <MudButton OnClick="Reset">Khôi phục</MudButton>
-            <MudButton OnClick="UpdateService">Lưu</MudButton>
-        }
-    </DialogActions>
-</MudDialog>
+        <MudForm Model="_roomBookingDetail" @ref="@_form" @bind-IsValid="@_formIsValid">
+            <MudPaper Width="100%" Elevation="0">
+                <MudGrid>
+                    <MudItem xs="12" sm="6">
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="checkIn" Label="Giờ vào" DateFormat="dd/MM/yyyy hh:mm" />
+                     </MudItem>
 
+                    <MudItem xs="12" sm="6">
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="checkOut" Label="Giờ ra" DateFormat="dd/MM/yyyy hh:mm" />
+                     </MudItem>
+
+                    <MudItem xs="12" sm="6">
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog"  @bind-Date="checkIn"  Label="Giờ vào thực tế" Disabled="true" DateFormat="dd/MM/yyyy hh:mm" />
+                      </MudItem>
+
+                    <MudItem xs="12" sm="6">
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="checkOut" Label="Giờ ra thực tế" Disabled="true" DateFormat="dd/MM/yyyy hh:mm" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudChip @onclick="async() => await UpdateService()" Color="Color.Primary">Cập nhập</MudChip>
+                        <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+
+                    </MudItem>
+
+                </MudGrid>
+
+            </MudPaper>
+        </MudForm>
+    </DialogContent>
+</MudDialog>
 @code {
     #region Khai báo
     [Parameter]
     public Guid idRoomBooking { get; set; }
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
-    [Inject]
-    public IRoomDetailRespo roomDetailRespo { get; set; }
-    [Inject]
-    public IRoomBookingRespo roomBookingRespo { get; set; }
-    [Inject]
-    public ICustomerRepo cumtomerRespo { get; set; }
+
     [Inject]
     public IDialogService _dialogService { get; set; }
     [Inject]
     public ISnackbar _snackbar { get; set; }
     MudForm _form;
     private bool _formIsValid;
-    private RoomBookingDto? roombooking;
-    private PaginationResponse<RoomDetailDTO> roomDetailVM;
-    List<RoomDetailDTO> lstRoomDetails = new();
 
-    private PaginationResponse<CustomerDTO> CustomerVM;
-    List<CustomerDTO> lstCustomer = new();
-    RoombookingUpdateRequest roombookingUpdate = new();
-    private ViewRoomDetailWithPaginationRequest roomDetailRequest = new();
-    private ViewCustomerWithPaginationRequest customer = new();
+    [Inject]
+    IRoomBookingDetailRepo roomBookingDetailRepo { get; set; }
+
+
+    RoombookingDetailDTO _roomBookingDetail = new();
+
+
+    DateTime? checkIn;
+    DateTime? checkOut;
     #endregion
 
     #region Code xử lý
@@ -78,9 +75,17 @@
     }
     private async Task LoadData()
     {
-        roombooking = await roomBookingRespo.GetRoomBookingById(idRoomBooking);
-        roombookingUpdate.Id = roombooking.Id;
-        roombookingUpdate.Status = roombooking.Status;
+        try
+        {
+            _roomBookingDetail = await roomBookingDetailRepo.GetRoomBookingDetailByRoomBookingId(idRoomBooking);
+            checkIn = _roomBookingDetail.CheckInBooking.DateTime;
+            checkOut = _roomBookingDetail.CheckOutBooking.DateTime;
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
     }
     private void OnClickCancel()
     {
@@ -90,14 +95,15 @@
     {
         await LoadData();
     }
-    private bool CheckChangeData()
-    {
-        return  roombooking.Status != roombookingUpdate.Status;
-    }
     private async Task UpdateService()
     {
-        await _form.Validate();
-        if (!_form.IsValid) return;
+        var RoomBookingDetailUpdateRequest = new RoomBookingDetailUpdateRequest
+            {
+                Id = _roomBookingDetail.Id,
+                CheckInBooking = (DateTimeOffset)checkIn,
+                CheckOutBooking = (DateTimeOffset)checkOut,
+                
+            };
         var confirm = await _dialogService.ShowMessageBox
         (
             "Thông báo",
@@ -107,35 +113,16 @@
         );
         if (confirm == true)
         {
-            var result = await roomBookingRespo.UpdateRoomBooking(roombookingUpdate);
-            if (result)
-            {
-                if (CheckChangeData())
-                {
-                    MudDialog.Close(DialogResult.Ok(true));
-                    _snackbar.Add("Sửa thành công", Severity.Success);
-                }
-                else
-                {
-                    MudDialog.Close(DialogResult.Ok(true));
-                    _snackbar.Add("Không có thay đổi dữ liệu để cập nhật", Severity.Warning);
-                }
-            }
-            else
-            {
-                _snackbar.Add("Sửa thất bại", Severity.Error);
-            }
+            await roomBookingDetailRepo.UpdateRoomBookingDetail(RoomBookingDetailUpdateRequest);
+            MudDialog.Close(DialogResult.Ok(true));
+            _snackbar.Add("Sửa thành công", Severity.Success);
             await Reset();
         }
-    }
-    private async Task OpenAdd()
-    {
-        var dialog = await _dialogService.ShowAsync<CustomerCreate>("Thêm khách hàng đặt ");
-        var result = await dialog.Result;
-        if (!result.Canceled)
+        else
         {
-            StateHasChanged();
+            _snackbar.Add("Yêu cầu được hủy bỏ", Severity.Error);
         }
     }
+
     #endregion
 }

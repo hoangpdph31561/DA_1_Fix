@@ -18,7 +18,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         private readonly IMapper _mapper;
         private readonly ILocalizationService _localizationService;
 
-        public RoombookingStatisticReadOnlyRepository(AppReadOnlyDbContext dbContext , ILocalizationService localizationService , IMapper mapper)
+        public RoombookingStatisticReadOnlyRepository(AppReadOnlyDbContext dbContext, ILocalizationService localizationService, IMapper mapper)
         {
             _dbContext = dbContext;
             _mapper = mapper;
@@ -48,8 +48,9 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                   BookingCount = gcs.Count(),
               }).OrderBy(x => x.Month).ToList();
                 }
-              
-                return RequestResult<List<RoomBookingStatisticDto>>.Succeed(lstTepRests);
+                var roomWithMaxBookings = lstTepRests.GroupBy(x => x.Month)
+                                                 .Select(g => g.First(x => x.BookingCount == g.Max(y => y.BookingCount))).ToList();
+                return RequestResult<List<RoomBookingStatisticDto>>.Succeed(roomWithMaxBookings);
             }
             catch (Exception e)
             {
@@ -63,7 +64,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                     }
                 });
             }
-          
+
         }
     }
 }

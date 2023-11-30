@@ -16,6 +16,37 @@
     var chart = new ApexCharts(document.querySelector("#basic-bar-chart"), options);
     chart.render();
 }
+function createBillStatistic(name, categories, chartData)
+{
+    var options = {
+        series: [{
+            name: name,
+            data: chartData
+        }],
+        chart: {
+            height: 350,
+            type: 'line',
+            zoom: {
+                enabled: false
+            }
+        },
+        stroke: {
+            curve: 'straight'
+        },
+        grid: {
+            row: {
+                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                opacity: 0.5
+            },
+        },
+        xaxis: {
+            categories: categories,
+        }
+    };
+    var chart = new ApexCharts(document.querySelector("#billStatisticchart"), options);
+    chart.render();
+}
+
 
 function createDataLabelBarChart(name, categories, chartData) {
     var options = {

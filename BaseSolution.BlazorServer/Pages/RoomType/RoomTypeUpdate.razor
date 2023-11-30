@@ -1,4 +1,5 @@
-﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType.Request
 @using BaseSolution.BlazorServer.Respository.Interfaces
 <MudDialog>
@@ -52,10 +53,14 @@
     public IDialogService dialogService { get; set; }
     [Inject]
     public ISnackbar snackbar { get; set; }
+    [Inject]
+    public IRoomDetailRespo roomDetailRespo { get; set; }
     MudForm _form;
     private bool _formIsValid;
     private RoomTypeUpdateRequest updateRoomTypeRequest = new();
     private RoomTypeDTO? roomType;
+    private PaginationResponse<RoomDetailDTO> roomDetailVM;
+    private List<RoomDetailDTO> lstRoomDetail;
     #endregion
     #region Code xử lý
     protected override async Task OnInitializedAsync()
@@ -91,25 +96,40 @@
         );
         if (confirm == true)
         {
-            var result = await roomTypeRespo.UpdateRoomType(updateRoomTypeRequest);
-            if (result)
+            roomDetailVM = await roomDetailRespo.GetAllRoomDetails(new Data.DataTransferObjects.RoomDetail.Request.ViewRoomDetailWithPaginationRequest
+                {
+                    PageSize = int.MaxValue - 1,
+                    RoomTypeId = id
+                });
+            lstRoomDetail = roomDetailVM.Data!.ToList();
+            if (lstRoomDetail.Any(x => x.Status == RoomStatus.Occupied))
             {
-                if (CheckChangeData())
-                {
-                    MudDialog.Close(DialogResult.Ok(true));
-                    snackbar.Add("Sửa thành công", Severity.Success);
-                }
-                else
-                {
-                    OnClickCancel();
-                    snackbar.Add("Không có thay đổi dữ liệu để cập nhật", Severity.Warning);
-                }
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Có phòng đang được thuê tại loại phòng này, không sửa được", Severity.Error);
             }
             else
             {
-                snackbar.Add("Sửa thất bại", Severity.Error);
+                var result = await roomTypeRespo.UpdateRoomType(updateRoomTypeRequest);
+                if (result)
+                {
+                    if (CheckChangeData())
+                    {
+                        MudDialog.Close(DialogResult.Ok(true));
+                        snackbar.Add("Sửa thành công", Severity.Success);
+                    }
+                    else
+                    {
+                        OnClickCancel();
+                        snackbar.Add("Không có thay đổi dữ liệu để cập nhật", Severity.Warning);
+                    }
+                }
+                else
+                {
+                    snackbar.Add("Sửa thất bại", Severity.Error);
+                }
+                await Reset();
             }
-            await Reset();
+            
         }
     }
     private async Task Reset()

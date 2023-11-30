@@ -27,6 +27,12 @@ namespace BaseSolution.Application.DataTransferObjects.RoomDetail
         public Guid BuildingId { get; set; }
         //Tên tòa nhà
         public string BuildingName { get; set; } = string.Empty;
+        //Status floor
+        public EntityStatus FloorStatus { get; set; }
+        //Status Building
+        public EntityStatus BuildingStatus { get; set; }
+        //Status roomType
+        public EntityStatus RoomTypeStatus { get; set; }
 
     }
 }

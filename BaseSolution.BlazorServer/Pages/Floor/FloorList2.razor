@@ -2,6 +2,7 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Building;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Floor;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Floor.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
 @using BaseSolution.BlazorServer.Respository.Interfaces;
 <CustomListDisplayP2 Label="Danh sách tầng trong khách sạn" IsLoading="lstBuilding == null" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>
@@ -60,6 +61,8 @@
     public IDialogService dialogService { get; set; }
     [Inject]
     public ISnackbar snackbar { get; set; }
+    [Inject]
+    public IRoomDetailRespo roomDetailRespo { get; set; }
     private ViewFloorWithPaginationRequest floorRequest = new();
     private List<BuildingDTO> lstBuilding;
     private PaginationResponse<FloorDTO> floorPagination;
@@ -71,6 +74,8 @@
     private bool _isLoadingAll = true;
     private bool _isLoadingList = true;
     private bool _isDisableControls = false;
+    private PaginationResponse<RoomDetailDTO> roomDetailVM;
+    private List<RoomDetailDTO> lstRoomDetail;
     #endregion
     #region Code xử lý
     private async Task LoadData()
@@ -84,7 +89,7 @@
     {
         buildingPagination = await buildingRespo.GetAllBuilding(new Data.DataTransferObjects.Building.Request.ViewBuildingWithPaginationRequest { PageSize = int.MaxValue - 1 });
         lstBuilding = buildingPagination.Data!.Where(x => x.Status == EntityStatus.Active).ToList();
-       
+
         if (lstBuilding != null)
         {
             if (lstBuilding.Any())
@@ -151,17 +156,31 @@
         );
         if (confirm == true)
         {
-            floorDeleteRequest.Id = id;
-            var removeConfirm = await floorRespo.DeleteFloor(floorDeleteRequest);
-            if (removeConfirm)
+            roomDetailVM = await roomDetailRespo.GetAllRoomDetails(new Data.DataTransferObjects.RoomDetail.Request.ViewRoomDetailWithPaginationRequest
+                {
+                    PageSize = int.MaxValue - 1,
+                    FloorId = id
+                });
+            lstRoomDetail = roomDetailVM.Data!.ToList();
+            if (lstRoomDetail.Any(x => x.Status == RoomStatus.Occupied))
             {
-                snackbar.Add("Xóa thành công", Severity.Success);
+                snackbar.Add("Có phòng đang được thuê tại tầng này, không xóa được", Severity.Error);
             }
             else
             {
-                snackbar.Add("Xóa thất bại", Severity.Error);
+                floorDeleteRequest.Id = id;
+                var removeConfirm = await floorRespo.DeleteFloor(floorDeleteRequest);
+                if (removeConfirm)
+                {
+                    snackbar.Add("Xóa thành công", Severity.Success);
+                }
+                else
+                {
+                    snackbar.Add("Xóa thất bại", Severity.Error);
+                }
+                await LoadData();
             }
-            await LoadData();
+            
         }
 
     }

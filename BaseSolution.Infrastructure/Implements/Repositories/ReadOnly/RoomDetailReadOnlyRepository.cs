@@ -103,7 +103,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 {
                     queryable = queryable.Where(x => x.Name.ToLower().Trim().Contains(request.SearchString.ToLower().Trim()));
                 }
-                var result = await queryable.PaginateAsync(request, cancellationToken);
+                var result = await queryable.Where(x => x.RoomTypeStatus == EntityStatus.Active && x.FloorStatus == EntityStatus.Active && x.BuildingStatus == EntityStatus.Active).PaginateAsync(request, cancellationToken);
                 return RequestResult<PaginationResponse<RoomDetailDto>>.Succeed(new PaginationResponse<RoomDetailDto>()
                 {
                     PageNumber = request.PageNumber,

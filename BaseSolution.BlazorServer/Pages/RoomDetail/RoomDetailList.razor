@@ -98,7 +98,6 @@ else
                                 <MudTd>@context.Price</MudTd>
                                 <MudTd><BadgeRoomStatus Status="@context.Status"></BadgeRoomStatus></MudTd>
                                 <MudTd>
-                                        <MudChip Icon="@Icons.Material.Filled.Info" Color="Color.Info">Chi tiết</MudChip>
                                         <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@( async() => await OpenDetail(context.Id))">Sửa</MudChip>
                                         <MudChip Icon="@Icons.Material.Filled.Delete" OnClick="@( async() => await OnDelete(context.Id))" Color="Color.Error">Xóa</MudChip>
                                 </MudTd>
@@ -244,6 +243,7 @@ else
         );
         if (confirm == true)
         {
+
             deleteRoomDetailRequest.Id = id;
             RoomDetailDTO roomDetailInfo = await roomDetailRespo.GetRoomDetailById(id);
             if(roomDetailInfo.Status == RoomStatus.Occupied)
@@ -266,21 +266,30 @@ else
     }
     private async Task OnPaginationButtonClick(int pageNumber)
     {
-        
+
         isLoadingList = true;
         roomDetailRequest.PageNumber = pageNumber;
         await LoadData();
     }
     private async Task OpenDetail(Guid idRoomDetail)
     {
-        var parameters = new DialogParameters<RoomDetailUpdate>();
-        parameters.Add(x => x.idRoomDetail, idRoomDetail);
-        var dialog = await _dialogService.ShowAsync<RoomDetailUpdate>("Chi tiết phòng", parameters);
-        var result = await dialog.Result;
-        if (!result.Canceled)
+        RoomDetailDTO roomDetailInfo = await roomDetailRespo.GetRoomDetailById(idRoomDetail);
+        if(roomDetailInfo.Status == RoomStatus.Occupied)
         {
-            await LoadData();
+            _snackbar.Add("Không sửa phòng được do đang được thuê", Severity.Error);
         }
+        else
+        {
+            var parameters = new DialogParameters<RoomDetailUpdate>();
+            parameters.Add(x => x.idRoomDetail, idRoomDetail);
+            var dialog = await _dialogService.ShowAsync<RoomDetailUpdate>("Chi tiết phòng", parameters);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData();
+            }
+        }
+        
     }
     #endregion
 }

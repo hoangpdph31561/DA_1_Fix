@@ -30,6 +30,7 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+        <MudButton OnClick="Reset">Khôi phục</MudButton>
         <MudButton Color="Color.Primary" OnClick="@(async() => await UpdateFloor())">Lưu</MudButton>
         
     </DialogActions>
@@ -156,8 +157,8 @@
             var result = await amenityRoomDetailRespo.CreateUpdateDeleteAmenityRoomDetail(lstCreateUpdateDelete);
             if (result)
             {
-                    MudDialog.Close(DialogResult.Ok(true));
-                    snackbar.Add("Cập nhật thành công", Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Cập nhật thành công", Severity.Success);
             }
             else
             {
@@ -168,6 +169,12 @@
     private void OnClickCancel()
     {
         MudDialog.Cancel();
+    }
+    private async Task Reset()
+    {
+        lstAmenityRoomDetailSelected = new();
+        lstAmenityRoomDetailSelectedOriginal = new();
+        await LoadData();
     }
     #endregion
 }

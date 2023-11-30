@@ -31,7 +31,7 @@ namespace BaseSolution.Infrastructure.ViewModels.Roombooking
                 {
                     var result = await _roombookingReadOnlyRepository.GetRoombookingByIdAsync(createResult.Data, cancellationToken);
 
-                    Data = result.Data!;
+                    Data = createResult!;
                     Success = result.Success;
                     ErrorItems = result.Errors;
                     Message = result.Message;

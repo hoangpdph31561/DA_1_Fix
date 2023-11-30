@@ -2,6 +2,8 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBookingDetail
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBookingDetail.Request
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Service.Request;
@@ -29,10 +31,10 @@
                     <MudTextField T="string" Label="Mã định danh" @bind-Value="createRequest.IdentificationNumber" Required="true" />
                     <MudTextField T="string" Label="Nhập code" Required="true" @bind-Value="createRequest.ApprovedCode"></MudTextField>
                     <MudItem>
-                        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Checkin" DateFormat="dd/MM/yyyy" Date="@(new System.DateTime(2023,12,07))" />
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Checkin" DateFormat="dd/MM/yyyy" @bind-Value="_roomBookingDetailUpdateRequest.CheckInBooking" Date="@DateTime.Now" />
                     </MudItem>
                     <MudItem>
-                        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Checkout" DateFormat="dd/MM/yyyy" Date="@(new System.DateTime(2023,12,10))" />
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Checkout" DateFormat="dd/MM/yyyy" @bind-Value="_roomBookingDetailUpdateRequest.CheckOutBooking" Date="@DateTime.Now.AddDays(1)" />
                     </MudItem>
                 </MudPaper>
             </MudForm>
@@ -58,11 +60,13 @@
     [Inject]
     public ICustomerRepo customerRespo { get; set; }
     [Inject]
+    public IRoomBookingDetailRepo roomBookingDetailRepo { get; set; }
+    [Inject]
     public IDialogService _dialogService { get; set; }
     [Inject]
     public ISnackbar _snackbar { get; set; }
 
-    private ViewRoomDetailWithPaginationRequest _roomDetailRequest = new();
+    private ViewRoomDetailWithPaginationRequest _roomDetailPaginationRequest = new();
 
     private ViewCustomerWithPaginationRequest customer = new();
 
@@ -73,7 +77,8 @@
     List<CustomerDTO> lstCustomer = new();
     private RoombookingCreateRequest _roomBookingCreateRequest = new();
     public CustomerCreateRequest createRequest = new();
-
+    private RoomBookingDetailUpdateRequest _roomBookingDetailUpdateRequest = new();
+    private RoomDetailUpdateStatusRequest _roomDetailUpdateStatusRequest = new();
     private string customerId;
 
     private bool _isLoadingList = true;
@@ -86,7 +91,7 @@
     }
     private async Task LoadData()
     {
-        _roomDetailVM = await roomDetailRespo.GetAllRoomDetailsByStatus(_roomDetailRequest);
+        _roomDetailVM = await roomDetailRespo.GetAllRoomDetailsByStatus(_roomDetailPaginationRequest);
         lstRoomDetails = _roomDetailVM.Data!.ToList();
 
         _customerVM = await customerRespo.GetCustomer(customer);
@@ -126,12 +131,32 @@
                 _roomBookingCreateRequest.CustomerId = Guid.Parse(customerId);
                 _roomBookingCreateRequest.BookingType = BookingType.Online;
                 _roomBookingCreateRequest.CodeBooking = code;
-                var result = await roomBookingRespo.CreateNewRoomBooking(_roomBookingCreateRequest);
+                var result = await roomBookingRespo.CreateRoomBooking(_roomBookingCreateRequest);
 
-                if (result == true)
+                if (result.ToString() != null)
                 {
+                    var getPriceRoomDetail = await roomDetailRespo.GetRoomDetailById(idRoomDetail);
+                    var getId = await roomBookingDetailRepo.GetRoomBookingDetailByIdRoomBooking(result);
+                    var roomBookingDetailDTO = new RoomBookingDetailDTO
+                        {
+                            Id = getId.Id,
+                            RoomBookingId = getId.RoomBookingId,
+                            Price = getPriceRoomDetail.Price,
+                            CheckInBooking = _roomBookingDetailUpdateRequest.CheckInBooking,
+                            CheckOutBooking = _roomBookingDetailUpdateRequest.CheckOutBooking,
+                            PrePaid = getPriceRoomDetail.Price * (decimal)0.3,
+                            RoomDetailId = getId.RoomDetailId,
+                            BookingType = BookingType.Online
+                        };
+                    var updateRoomBookingDetail = await roomBookingDetailRepo.UpdateRoomBookingDetail(roomBookingDetailDTO);
+
+                    _roomDetailUpdateStatusRequest.Id = idRoomDetail;
+                    _roomDetailUpdateStatusRequest.Status = RoomStatus.Occupied;
+                    _roomDetailUpdateStatusRequest.ModifiedBy = Guid.Parse(customerId);
+                    var updateRoomDetailStatus = await roomDetailRespo.UpdateRoomDetailStatus(_roomDetailUpdateStatusRequest);
                     MudDialog.Close(DialogResult.Ok(true));
-                    _snackbar.Add("Thêm thành công", Severity.Success);
+                    _snackbar.Add("Thêm thành công", Severity.Success); 
+                   
                 }
                 else
                 {

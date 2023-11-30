@@ -18,10 +18,11 @@
     <PackageReference Include="MailKit" Version="4.3.0" />
     <PackageReference Include="MimeKit" Version="4.3.0" />
     <PackageReference Include="MudBlazor" Version="6.11.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Text.Json" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\DataTransferObjects\RoomBookingDetail\Request\" />
     <Folder Include="wwwroot\image\RoomDetail\" />
   </ItemGroup>
 

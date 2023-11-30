@@ -1,6 +1,5 @@
 ﻿using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail;
 using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request;
-using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType;
 using BaseSolution.BlazorServer.Data.ValueObjects.Pagination;
 
 namespace BaseSolution.BlazorServer.Respository.Interfaces
@@ -16,6 +15,6 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
         Task<bool> CreateNewRoomDetail(RoomDetailCreateRequest request);
         Task<bool> UpdateRoomDetail(RoomDetailUpdateRequest request);
         Task<bool> DeleteRoomDetail(RoomDetailDeleteRequest request);
-
+        Task<bool> UpdateRoomDetailStatus(RoomDetailUpdateStatusRequest request);
     }
 }

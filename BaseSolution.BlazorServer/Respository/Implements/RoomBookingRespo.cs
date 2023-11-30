@@ -21,6 +21,21 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             return result.IsSuccessStatusCode;
         }
 
+        public async Task<Guid> CreateRoomBooking(RoombookingCreateRequest request)
+        {
+            var result = await _httpClient.PostAsJsonAsync("/api/Roombookings", request);
+
+            if (result.IsSuccessStatusCode)
+            {
+                var convert = await result.Content.ReadFromJsonAsync<RoomBookingRespone>();
+                return convert.Data;
+            }
+            else
+            {
+                throw new Exception("Lỗi trong quá trình tạo mới phòng");
+            }
+        }
+
         public async Task<PaginationResponse<RoomBookingDto>> GetAllRoomBooking(ViewRoombookingPaginationRequest request)
         {
             try

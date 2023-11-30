@@ -7,7 +7,9 @@ using BaseSolution.Application.Interfaces.Services;
 using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Infrastructure.Implements.Repositories.ReadOnly;
 using BaseSolution.Infrastructure.Implements.Repositories.ReadWrite;
+using BaseSolution.Infrastructure.ViewModels.Customer;
 using BaseSolution.Infrastructure.ViewModels.RoomDetail;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -116,7 +118,19 @@ namespace BaseSolution.API.Controllers
             }
             return BadRequest(vm);
         }
+        [AllowAnonymous]
+        [HttpPut("UpdateStatusRoomDetail")] 
+        public async Task<IActionResult> UpdateStatus([FromBody] RoomDetailUpdateStatusRequest request, CancellationToken cancellationToken)
+        {
+            RoomDetailUpdateStatusViewModel vm = new(_RoomDetailReadWriteRepository, _localizationService, _mapper);
 
+            await vm.HandleAsync(request, cancellationToken);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
+        }
         [HttpDelete]
         public async Task<IActionResult> Delete([FromQuery]RoomDetailDeleteRequest request, CancellationToken cancellationToken)
         {

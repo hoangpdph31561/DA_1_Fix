@@ -10,6 +10,6 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
         Task<bool> CreateNewRoomBooking(RoombookingCreateRequest request);
         Task<bool> UpdateRoomBooking(RoombookingUpdateRequest request);
         Task<RoomBookingDto> GetRoomBookingById(Guid id);
-
+        Task<Guid> CreateRoomBooking(RoombookingCreateRequest request);
     }
 }

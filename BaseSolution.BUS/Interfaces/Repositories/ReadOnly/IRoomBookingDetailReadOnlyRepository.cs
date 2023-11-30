@@ -8,6 +8,7 @@ namespace BaseSolution.Application.Interfaces.Repositories.ReadOnly
     public interface IRoomBookingDetailReadOnlyRepository
     {
         Task<RequestResult<RoomBookingDetailDTO?>> GetRoomBookingDetailByIdAsync(Guid idRoomBookingDetail, CancellationToken cancellationToken);
+        Task<RequestResult<RoomBookingDetailDTO?>> GetRoomBookingDetailByIdRoomBookingAsync(Guid idRoomBooking, CancellationToken cancellationToken);
         Task<RequestResult<PaginationResponse<RoomBookingDetailDTO>>> GetRoomBookingDetailWithPaginationByAdminAsync(ViewRoomBookingDetailWithPaginationRequest request, CancellationToken cancellationToken);
         Task<RequestResult<PaginationResponse<RoomBookingDetailDTO>>> GetRoomBookingDetailWithPaginationByOtherAsync(ViewRoomBookingDetailWithPaginationRequest request, CancellationToken cancellationToken);
     }

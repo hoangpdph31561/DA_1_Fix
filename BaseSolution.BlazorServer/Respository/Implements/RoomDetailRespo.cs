@@ -114,5 +114,11 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             var result = await _httpClient.PutAsJsonAsync("/api/RoomDetails", request);
             return result.IsSuccessStatusCode;
         }
+
+        public async Task<bool> UpdateRoomDetailStatus(RoomDetailUpdateStatusRequest request)
+        {
+            var result = await _httpClient.PutAsJsonAsync($"/api/RoomDetails/UpdateStatusRoomDetail", request);
+            return result.IsSuccessStatusCode;
+        }
     }
 }

@@ -14,5 +14,6 @@ namespace BaseSolution.Application.Interfaces.Repositories.ReadWrite
         Task<RequestResult<Guid>> AddRoomDetailAsync(RoomDetailEntity entity, CancellationToken cancellationToken);
         Task<RequestResult<int>> UpdateRoomDetailAsync(RoomDetailEntity entity, CancellationToken cancellationToken);
         Task<RequestResult<int>> DeleteRoomDetailAsync(RoomDetailDeleteRequest request, CancellationToken cancellationToken);
+        Task<RequestResult<int>> UpdateStatusRoomDetailAsync(RoomDetailUpdateStatusRequest request, CancellationToken cancellationToken);
     }
 }

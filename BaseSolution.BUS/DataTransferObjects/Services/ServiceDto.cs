@@ -16,6 +16,7 @@ namespace BaseSolution.Application.DataTransferObjects.Services
         public string Unit { get; set; } = string.Empty;
         public Guid ServiceTypeId { get; set; }
         public EntityStatus Status { get; set; }
+        public bool IsRoomBookingNeed { get; set; }
         //Tên loại dịch vụ
         public string ServiceTypeName { get; set; } = string.Empty;
         //Số lượng đã đặt

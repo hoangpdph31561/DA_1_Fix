@@ -1,6 +1,9 @@
 ﻿using BaseSolution.BlazorServer.Data;
+using BaseSolution.BlazorServer.Pages.Manager;
 using BaseSolution.BlazorServer.Respository.Implements;
 using BaseSolution.BlazorServer.Respository.Interfaces;
+using Blazored.SessionStorage;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using MudBlazor.Services;
 
@@ -39,6 +42,10 @@ builder.Services.AddTransient<IUserRepo, UserRepo>();
 builder.Services.AddTransient<IRoleRespo, RoleRespo>();
 builder.Services.AddTransient<IRoomBookingDetailRepo, RoomBookingDetailRepo>();
 builder.Services.AddTransient<IStatistic, Statistic>();
+builder.Services.AddTransient<ILogin, LoginRepo>();
+builder.Services.AddBlazoredSessionStorage();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+
 #endregion
 
 var app = builder.Build();
@@ -50,6 +57,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
 
 app.UseHttpsRedirection();
 

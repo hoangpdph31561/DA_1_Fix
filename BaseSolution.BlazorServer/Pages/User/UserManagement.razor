@@ -5,7 +5,7 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.User.Request;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
 
-
+@attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Quản lý chức vụ</PageTitle>
 <CustomListDisplayP2 Label="@("Danh sách User ")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">

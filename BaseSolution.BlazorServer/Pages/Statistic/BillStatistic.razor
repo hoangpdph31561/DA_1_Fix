@@ -16,11 +16,7 @@
     BillStatisticRequest billStatisticRequest = new();
 
     private string labels = "Doanh thu";
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadData();
 
-    }
     private async Task LoadData()
     {
         _lstBillStatisticDto = await statisticRepo.GetBillStatisticsAsync(billStatisticRequest);
@@ -30,12 +26,19 @@
     {
         if (firstRender)
         {
-            if (_lstBillStatisticDto != null)
+            if (firstRender)
             {
-                var s1 = _lstBillStatisticDto.Select(gs => gs.Month).ToList();
-                var s2 = _lstBillStatisticDto.Select(gs => gs.TotalAmountForMonth).ToList();
-                await jsRuntime.InvokeVoidAsync("createBillStatistic", labels, s1, s2);
+                await LoadData().ContinueWith(async (result) => { await LoadChart(); }); // chạy lần luọt
             }
+        }
+    }
+    private async Task LoadChart()
+    {
+        if (_lstBillStatisticDto != null)
+        {
+            var s1 = _lstBillStatisticDto.Select(gs => gs.Month).ToList();
+            var s2 = _lstBillStatisticDto.Select(gs => gs.TotalAmountForMonth).ToList();
+            await jsRuntime.InvokeVoidAsync("createBillStatistic", labels, s1, s2);
         }
     }
 }

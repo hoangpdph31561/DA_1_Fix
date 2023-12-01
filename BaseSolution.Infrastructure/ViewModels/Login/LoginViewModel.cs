@@ -21,8 +21,8 @@ namespace BaseSolution.Infrastructure.ViewModels.Login
             try
             {
                 var result = await _loginService.Login(data);
-                Data = result.Data!;
-                Success = result.Success;
+                Data = result.Data;
+                Success  = true;
                 ErrorItems = result.Errors;
                 Message = result.Message;
                 return;

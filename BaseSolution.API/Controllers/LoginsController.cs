@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using BaseSolution.Application.DataTransferObjects.Account;
 using BaseSolution.Application.DataTransferObjects.Account.request;
 using BaseSolution.Application.Interfaces.Login;
 using BaseSolution.Application.Interfaces.Services;
 using BaseSolution.Infrastructure.Implements.Login;
 using BaseSolution.Infrastructure.Implements.Services;
+using BaseSolution.Infrastructure.ViewModels.Login;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,10 +26,16 @@ namespace BaseSolution.API.Controllers
             _mapper = mapper;
         }
         [HttpPost]
-        public async Task<IActionResult> Login([FromBody] LoginInputRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginInputRequest request,CancellationToken cancellationToken)
         {
-            var result = await _loginService.Login(request);
-            return Ok(result);
+            LoginViewModel vm = new(_loginService, _localizationService);
+            await vm.HandleAsync(request,cancellationToken);
+            if(vm.Success)
+            {
+                ViewLoginInput result = (ViewLoginInput)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
         }
     }
 }

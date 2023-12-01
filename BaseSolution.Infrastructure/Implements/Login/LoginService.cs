@@ -36,15 +36,24 @@ namespace BaseSolution.Infrastructure.Implements.Login
             {
                 var result = new ViewLoginInput(); // khai báo để còn return 
                 var user = _dbContext.Users.FirstOrDefault(x => x.UserName == request.UserName && x.Password == request.Password);
-                if (user != null)
+                if(user == null)
+                {
+                    return RequestResult<ViewLoginInput>.Fail(_localizationService["Login fail"]);
+                }
+                else
                 {
                     // lấy ra Role của User đó
                     result.UserName = user.UserName;
                     result.Password = user.Password;
-                    var role = _dbContext.UserRoles.FirstOrDefault(x => x.Id == user.UserRoleId);
-                    if (role != null)
+                    var role = _dbContext.Users.FirstOrDefault(x => x.UserRoleId == request.UserRoleId && x.UserName == user.UserName && x.Password == user.Password);
+                    if(role == null)
                     {
-                        result.UserRoleId = role.Id;
+                        return RequestResult<ViewLoginInput>.Fail(_localizationService["Login fail"]);
+                    }
+                    else 
+                    {
+                        result.UserRoleId = role.UserRoleId;
+                        result.RoleCode = _dbContext.UserRoles.Where(x => x.Id == result.UserRoleId).Select(x => x.RoleCode).FirstOrDefault();
                     }
                 }
                 return RequestResult<ViewLoginInput>.Succeed(result);

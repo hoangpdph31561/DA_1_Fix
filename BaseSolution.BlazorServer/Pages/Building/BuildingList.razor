@@ -4,7 +4,7 @@
 @using Data.DataTransferObjects.Building
 @using Data.DataTransferObjects.Building.Request
 
-
+@attribute [Authorize(Roles = "Admin")]
 <CustomListDisplayP2 Label="@("Danh sách tòa nhà của khách sạn")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>
         <MudChip Icon="@Icons.Material.Filled.Add" OnClick="@(async() => await OpenAdd())" Color="Color.Primary">Thêm</MudChip>

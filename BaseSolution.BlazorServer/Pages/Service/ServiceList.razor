@@ -4,10 +4,14 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceType.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceType;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
+ @attribute [Authorize(Roles = "Admin")]
+
 <PageTitle>Danh sách dịch vụ khách sạn</PageTitle>
 <CustomListDisplayP2 Label="Danh sách dịch vụ trong khách sạn" IsLoading="lstServiceType == null" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>
+         <AuthorizeView Roles="Admin"> 
         <MudChip Icon="@Icons.Material.Filled.Add" OnClick="@(async() => await OpenAdd())" Color="Color.Primary">Thêm</MudChip>
+        </AuthorizeView>
     </HeaderContent>
     <AdditionalSearchBarColumn>
         <MudSelect Variant="Variant.Outlined" Style="background-color: white;" AnchorOrigin="Origin.BottomCenter" Label="Tòa nhà" @bind-Value="_idServiceType">

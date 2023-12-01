@@ -10,7 +10,9 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
     {
         public LoginProfile()
         {
-            CreateMap<UserEntity,ViewLoginInput>();
+            CreateMap<UserEntity, ViewLoginInput>()
+                .ForMember(des => des.RoleCode, opt => opt.MapFrom(src => src.UserRole.Name));
+                ;
             CreateMap<LoginInputRequest, UserEntity>();
         }
     }

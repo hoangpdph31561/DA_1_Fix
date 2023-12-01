@@ -6,9 +6,7 @@ using BaseSolution.Application.DataTransferObjects.ServiceOrderDetail.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
-using BaseSolution.Infrastructure.ViewModels.RoomBookingDetail;
 using BaseSolution.Infrastructure.ViewModels.ServiceOrderDetail;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BaseSolution.API.Controllers

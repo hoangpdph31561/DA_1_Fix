@@ -2,7 +2,7 @@
 {
     public class RoomBookingStatisticDto
     {
-        public int Month { get; set; } // các tháng đặt phòng
+        public int Month { get; set; } 
         public string NameRoom { get; set; }
         public int BookingCount { get; set; }
     }

@@ -64,8 +64,6 @@
 
     private ServiceOrderDTO? serviceOrder;
 
-
-
     private PaginationResponse<CustomerDTO> CustomerVM;
     List<CustomerDTO> lstCustomer = new();
 
@@ -99,7 +97,7 @@
     }
     private bool CheckChangeData()
     {
-        return serviceOrder.CustomerId != serviceOrderUpdate.CustomerId || serviceOrder.Status != serviceOrderUpdate.Status;
+        return serviceOrder.Status != serviceOrderUpdate.Status;
     }
     private async Task UpdateService()
     {
@@ -108,7 +106,7 @@
         var confirm = await _dialogService.ShowMessageBox
         (
             "Thông báo",
-            "Xác nhận sửa thông tin phòng",
+            "Xác nhận sửa thông tin dịch vụ",
             "Xác nhận",
             cancelText: "Hủy"
         );

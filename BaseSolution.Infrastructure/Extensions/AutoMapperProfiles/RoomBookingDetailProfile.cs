@@ -10,7 +10,6 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
         public RoomBookingDetailProfile()
         {
             CreateMap<RoomBookingDetailEntity, RoomBookingDetailDTO>();
-
             CreateMap<RoomBookingDetailCreateRequest, RoomBookingDetailEntity>();
             CreateMap<RoomBookingDetailUpdateRequest, RoomBookingDetailEntity>();
             CreateMap<RoomBookingDetailDeleteRequest, RoomBookingDetailEntity>();

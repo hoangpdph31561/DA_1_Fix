@@ -76,8 +76,6 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 });
             }
         }
-
-
         public async Task<RequestResult<PaginationResponse<RoomBookingDetailDTO>>> GetRoomBookingDetailWithPaginationByOtherAsync(ViewRoomBookingDetailWithPaginationRequest request, CancellationToken cancellationToken)
         {
             try

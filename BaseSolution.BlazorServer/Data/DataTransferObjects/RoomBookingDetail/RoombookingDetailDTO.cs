@@ -10,7 +10,7 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBookingDetail
         public DateTimeOffset CheckOutBooking { get; set; }
         public DateTimeOffset CheckInReality { get; set; }
         public DateTimeOffset CheckOutReality { get; set; }
-        public decimal PrePaid { get; set; } = 0;
+        public decimal PrePaid { get; set; }
         public Guid RoomDetailId { get; set; }
     }
 }

@@ -5,6 +5,5 @@
         public Guid Id { get; set; }
         public DateTimeOffset CheckInBooking { get; set; }
         public DateTimeOffset CheckOutBooking { get; set; }
-
     }
 }

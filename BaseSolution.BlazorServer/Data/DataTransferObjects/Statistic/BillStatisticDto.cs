@@ -3,9 +3,9 @@
     public class BillStatisticDto
     {
         public int Month { get; set; }
-        public int TotalService { get; set; } // tổng số lượng của 1 dịch vụ 
-        public decimal ServicePrice { get; set; } // giá của dịch vụ 
-        public float ServiceAmount { get; set; }  // ServiceAmount = TotalService x ServicePrice
+        public int TotalService { get; set; } 
+        public decimal ServicePrice { get; set; } 
+        public float ServiceAmount { get; set; }  
         public decimal RoomPrice { get; set; }
         public int TotalRoom { get; set; }
         public float RoomAmount { get; set; }

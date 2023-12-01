@@ -61,6 +61,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 _appReadWriteDbContext.RoomBookingDetails.Update(roomBooking);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
                 return RequestResult<int>.Succeed(1);
+
             }
             catch (Exception e)
             {

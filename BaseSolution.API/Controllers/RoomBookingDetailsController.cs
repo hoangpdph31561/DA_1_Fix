@@ -51,6 +51,7 @@ namespace BaseSolution.API.Controllers
             return BadRequest(vm);
         }
 
+
             [HttpGet("getRoomBookingDetailByRoomBookingId")]
         public async Task<IActionResult> GetRoomBookingDetailByRoomBookingId([FromQuery] Guid idRoomBooking, CancellationToken cancellationToken)
         {

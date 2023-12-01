@@ -3,13 +3,7 @@ using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Services;
 using BaseSolution.Application.ValueObjects.Common;
 using BaseSolution.Application.ViewModels;
-using BaseSolution.Domain.Entities;
-using BaseSolution.Infrastructure.Implements.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace BaseSolution.Infrastructure.ViewModels.ServiceOrderDetail
 {

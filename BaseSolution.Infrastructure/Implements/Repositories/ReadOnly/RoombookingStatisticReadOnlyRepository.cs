@@ -41,11 +41,12 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                         c.NameRoom,
                         c.Month
                     })
-              .Select(gcs => new RoomBookingStatisticDto()
-              {
-                  NameRoom = gcs.Key.NameRoom,
-                  Month = gcs.Key.Month,
-                  BookingCount = gcs.Count(),
+
+                    .Select(gcs => new RoomBookingStatisticDto()
+                    {
+                      NameRoom = gcs.Key.NameRoom,
+                      Month = gcs.Key.Month,
+                      BookingCount = gcs.Count(),
               }).OrderBy(x => x.Month).ToList();
                 }
                 var roomWithMaxBookings = lstTepRests.GroupBy(x => x.Month)

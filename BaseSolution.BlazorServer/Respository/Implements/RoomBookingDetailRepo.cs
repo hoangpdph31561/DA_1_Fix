@@ -1,7 +1,6 @@
 ﻿using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBookingDetail;
 using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBookingDetail.Request;
 using BaseSolution.BlazorServer.Respository.Interfaces;
-using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace BaseSolution.BlazorServer.Respository.Implements
 {

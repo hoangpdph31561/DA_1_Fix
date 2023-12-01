@@ -2,7 +2,6 @@
 using AutoMapper.QueryableExtensions;
 using BaseSolution.Application.DataTransferObjects.Statistic.Bill;
 using BaseSolution.Application.DataTransferObjects.Statistic.Bill.Request;
-using BaseSolution.Application.DataTransferObjects.Statistic.RoomBooking;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Services;
 using BaseSolution.Application.ValueObjects.Common;
@@ -10,9 +9,6 @@ using BaseSolution.Application.ValueObjects.Response;
 using BaseSolution.Domain.Enums;
 using BaseSolution.Infrastructure.Database.AppDbContext;
 using BaseSolution.Infrastructure.Extensions;
-using BaseSolution.Infrastructure.Implements.Services;
-using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
 {

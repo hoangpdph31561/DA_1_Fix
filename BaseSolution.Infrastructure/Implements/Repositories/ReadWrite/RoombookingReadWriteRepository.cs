@@ -47,12 +47,12 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
             catch (Exception e)
             {
 
-                return RequestResult<Guid>.Fail(_localizationService["Unable to create RoomBookingDetail"], new[]
+                return RequestResult<Guid>.Fail(_localizationService["Unable to create RoomBooking"], new[]
                 {
                     new ErrorItem
                     {
                         Error = e.Message,
-                        FieldName = LocalizationString.Common.FailedToCreate + "RoomBookingDetail"
+                        FieldName = LocalizationString.Common.FailedToCreate + "RoomBookin"
                     }
                 });
             }

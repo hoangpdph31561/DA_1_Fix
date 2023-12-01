@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using BaseSolution.Application.DataTransferObjects.Example;
 using BaseSolution.Application.DataTransferObjects.ServiceOrderDetail;
 using BaseSolution.Application.DataTransferObjects.ServiceOrderDetail.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
@@ -13,11 +12,7 @@ using BaseSolution.Domain.Enums;
 using BaseSolution.Infrastructure.Database.AppDbContext;
 using BaseSolution.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
 {

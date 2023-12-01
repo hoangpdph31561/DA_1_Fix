@@ -7,5 +7,6 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
     {
         Task<List<RoomBookingStatisticDto>> GetRoomBookingStatisticsAsync(RoomBookingStatisticRequest request);
         Task<List<BillStatisticDto>> GetBillStatisticsAsync(BillStatisticRequest request);
+
     }
 }

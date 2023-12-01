@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using BaseSolution.Application.DataTransferObjects.Example;
 using BaseSolution.Application.DataTransferObjects.ServiceOrderDetail;
 using BaseSolution.Application.DataTransferObjects.ServiceOrderDetail.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
@@ -9,14 +8,11 @@ using BaseSolution.Application.ValueObjects.Common;
 using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Application.ValueObjects.Response;
 using BaseSolution.Domain.Entities;
+using BaseSolution.Domain.Enums;
 using BaseSolution.Infrastructure.Database.AppDbContext;
 using BaseSolution.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
 {
@@ -99,6 +95,30 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             catch (Exception e)
             {
                 return RequestResult<PaginationResponse<ServiceOrderDetailDTO>>.Fail(_localizationService["List of service order detail are not found"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "list of service order detail"
+                    }
+                });
+            }
+        }
+        public async Task<RequestResult<List<ServiceOrderDetailDTO>>> GetServiceOrderDetailsByServiceOrderAsync(ViewServiceOrderDetailByIdServiceOderRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _appReadOnlyDbContext.ServiceOrderDetails.AsNoTracking().Where(x => x.Status != EntityStatus.Deleted).ProjectTo<ServiceOrderDetailDTO>(_mapper.ConfigurationProvider);
+
+                if (request.idServiceOrder != Guid.Empty)
+                {
+                    query = query.Where(x => x.ServiceOrderId == request.idServiceOrder);
+                }
+                return RequestResult<List<ServiceOrderDetailDTO>>.Succeed( await query.ToListAsync(cancellationToken));
+            }
+            catch (Exception e)
+            {
+                return RequestResult<List<ServiceOrderDetailDTO>>.Fail(_localizationService["List of service order detail are not found"], new[]
                 {
                     new ErrorItem
                     {

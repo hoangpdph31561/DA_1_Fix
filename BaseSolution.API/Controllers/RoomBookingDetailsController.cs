@@ -51,6 +51,19 @@ namespace BaseSolution.API.Controllers
             return BadRequest(vm);
         }
 
+
+            [HttpGet("getRoomBookingDetailByRoomBookingId")]
+        public async Task<IActionResult> GetRoomBookingDetailByRoomBookingId([FromQuery] Guid idRoomBooking, CancellationToken cancellationToken)
+        {
+            RoomBookingDetailByRoomBookingIdViewModel vm = new(_roomBookingDetailReadOnlyRepository, _localizationService);
+            await vm.HandleAsync(idRoomBooking, cancellationToken);
+            if (vm.Success)
+            {
+                RoomBookingDetailDTO result = (RoomBookingDetailDTO)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
+        }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRoomBookingDetailByAdmin(Guid id, CancellationToken cancellationToken)
         {

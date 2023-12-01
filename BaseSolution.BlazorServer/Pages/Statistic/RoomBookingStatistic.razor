@@ -1,0 +1,39 @@
+﻿@page "/statistic/roombookingstatistic"
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Statistic;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Statistic.Request;
+@using BaseSolution.BlazorServer.Respository.Interfaces;
+
+<MudText Color="Color.Dark" Typo="Typo.subtitle1">Thống kê phòng được đặt nhiều nhất theo tháng</MudText>
+<MudPaper Elevation="12">
+    <div id="basic-bar-chart"></div>
+</MudPaper>
+@code {
+    [Inject]
+    private IStatistic statisticRepo { get; set; }
+    [Inject]
+    IJSRuntime jsRuntime { get; set; }
+    private List<RoomBookingStatisticDto>? _lstRoomBookingStatisticDto { get; set; }
+    RoomBookingStatisticRequest roomBookingStatisticRequest = new();
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+
+    }
+    private async Task LoadData()
+    {
+        _lstRoomBookingStatisticDto = await statisticRepo.GetRoomBookingStatisticsAsync(roomBookingStatisticRequest);
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (_lstRoomBookingStatisticDto != null)
+            {
+                var labels = "số lượng đặt";
+                var s1 = _lstRoomBookingStatisticDto.Select(gs => "Tháng" + " " + gs.Month + " " + gs.NameRoom).ToList();
+                var s2 = _lstRoomBookingStatisticDto.Select(gs => gs.BookingCount).ToList();
+                await jsRuntime.InvokeVoidAsync("createBasicBarChart", labels, s1, s2);
+            }
+        }
+    }
+}

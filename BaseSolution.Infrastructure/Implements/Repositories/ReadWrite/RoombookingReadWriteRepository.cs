@@ -24,8 +24,18 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
         {
             try
             {
+                var idRoomDetail = entity.RoomBookingDetails.Select(x => x.RoomDetailId).FirstOrDefault();
+                if(idRoomDetail != null)
+                {
+                    var roomRetail = _appReadWriteDbContext.RoomDetails.Find(idRoomDetail);
+                    if(roomRetail != null)
+                    {
+                        roomRetail.Status = RoomStatus.Reserved;
+                        _appReadWriteDbContext.Update(roomRetail);
+                        await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
+                    }
+                }
                 entity.Id = Guid.NewGuid();
-
                 entity.Status = entity.Status;
                 entity.CustomerId = entity.CustomerId;
                 entity.CreatedBy = entity.CreatedBy;
@@ -37,12 +47,12 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
             catch (Exception e)
             {
 
-                return RequestResult<Guid>.Fail(_localizationService["Unable to create RoomBookingDetail"], new[]
+                return RequestResult<Guid>.Fail(_localizationService["Unable to create RoomBooking"], new[]
                 {
                     new ErrorItem
                     {
                         Error = e.Message,
-                        FieldName = LocalizationString.Common.FailedToCreate + "RoomBookingDetail"
+                        FieldName = LocalizationString.Common.FailedToCreate + "RoomBookin"
                     }
                 });
             }

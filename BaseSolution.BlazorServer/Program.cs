@@ -38,7 +38,9 @@ builder.Services.AddTransient<IRoomTypeRespo, RoomTypeRespo>();
 builder.Services.AddTransient<IUserRepo, UserRepo>();
 builder.Services.AddTransient<IRoleRespo, RoleRespo>();
 builder.Services.AddTransient<IRoomBookingDetailRepo, RoomBookingDetailRepo>();
+builder.Services.AddTransient<IStatistic, Statistic>();
 #endregion
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

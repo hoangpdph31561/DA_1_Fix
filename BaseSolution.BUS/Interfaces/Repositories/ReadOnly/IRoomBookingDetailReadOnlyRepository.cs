@@ -11,5 +11,7 @@ namespace BaseSolution.Application.Interfaces.Repositories.ReadOnly
         Task<RequestResult<RoomBookingDetailDTO?>> GetRoomBookingDetailByIdRoomBookingAsync(Guid idRoomBooking, CancellationToken cancellationToken);
         Task<RequestResult<PaginationResponse<RoomBookingDetailDTO>>> GetRoomBookingDetailWithPaginationByAdminAsync(ViewRoomBookingDetailWithPaginationRequest request, CancellationToken cancellationToken);
         Task<RequestResult<PaginationResponse<RoomBookingDetailDTO>>> GetRoomBookingDetailWithPaginationByOtherAsync(ViewRoomBookingDetailWithPaginationRequest request, CancellationToken cancellationToken);
+        Task<RequestResult<RoomBookingDetailDTO>> GetRoomBookingDetailWithPaginationByIdRoomBookingAsync(Guid idRoomBooking, CancellationToken cancellationToken);
+
     }
 }

@@ -1,10 +1,11 @@
 ﻿using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBookingDetail;
+using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBookingDetail.Request;
 
 namespace BaseSolution.BlazorServer.Respository.Interfaces
 {
-    public interface IRoomBookingDetailRepo
+    public interface IRoomBookingDetailRepo 
     {
-        Task<RoomBookingDetailDTO> GetRoomBookingDetailByIdRoomBooking(Guid idRoomBooking);
-        Task<bool> UpdateRoomBookingDetail(RoomBookingDetailDTO request);
+       Task<RoombookingDetailDTO> GetRoomBookingDetailByRoomBookingId(Guid idRoomBooking);
+       Task<bool> UpdateRoomBookingDetail(RoomBookingDetailUpdateRequest request);
     }
 }

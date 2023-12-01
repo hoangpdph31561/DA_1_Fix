@@ -1,0 +1,10 @@
+﻿@page "/"
+
+@code {
+    [Inject]
+    NavigationManager navigation { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        navigation.NavigateTo("/login"); // chuyển hướng đến trang login đầu tiên
+    }
+}

@@ -2,7 +2,7 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.AmenityRoomDetail
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.AmenityRoomDetail.Request
 @using BaseSolution.BlazorServer.Respository.Interfaces
-
+@attribute [Authorize(Roles = "Admin")]
 <MudDialog>
     <DialogContent>
         @if(isLoadingList || lstAmenity == null)

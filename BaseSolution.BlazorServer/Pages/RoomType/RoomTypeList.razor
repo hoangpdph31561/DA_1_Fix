@@ -4,6 +4,7 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType.Request
 @using BaseSolution.BlazorServer.Pages.AmenityRoomTypeDetail
 @using BaseSolution.BlazorServer.Respository.Interfaces
+@attribute [Authorize(Roles = "Admin")]
 <PageTitle>Quản lý loại phòng khách sạn</PageTitle>
 <CustomListDisplayP2 Label="@("Danh sách loại phòng của khách sạn")" IsLoading="lstRoomType == null && _isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>

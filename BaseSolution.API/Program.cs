@@ -1,4 +1,4 @@
-using BaseSolution.Infrastructure.Extensions;
+﻿using BaseSolution.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +15,6 @@ builder.Services.AddEventBus(builder.Configuration);
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwaggerGen();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

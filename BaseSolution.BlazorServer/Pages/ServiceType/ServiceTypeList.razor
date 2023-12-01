@@ -2,10 +2,13 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceType.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceType;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
+@attribute [Authorize(Roles = "Admin")]
 <PageTitle>Quản lý loại dịch vụ khách sạn</PageTitle>
 <CustomListDisplayP2 Label="@("Danh sách loại dịch vụ của khách sạn")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>
+         <AuthorizeView Roles="Admin"> 
         <MudChip Icon="@Icons.Material.Filled.Add" @onclick="async() => await OpenAdd()" Color="Color.Primary">Thêm</MudChip>
+        </AuthorizeView>
     </HeaderContent>
     <BodyContent>
         <MudPaper Elevation="0" Class="custom-list-display-border">

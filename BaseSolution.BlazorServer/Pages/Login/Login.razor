@@ -1,0 +1,107 @@
+﻿@page "/login"
+@layout EmptyLayout
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Acount;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Acount.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Role.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Role;
+@using BaseSolution.BlazorServer.Pages.Manager;
+@using BaseSolution.BlazorServer.Respository.Interfaces;
+@using Blazored.SessionStorage;
+@using System.Security.Claims;
+@inject AuthenticationStateProvider _authProvider
+@inject ISessionStorageService _session
+<div class="d-flex align-center justify-center w-100" style="height: 70vh">
+            <MudPaper Class="pa-4">
+                 <h3>Login</h3>
+                <MudForm Model="request" @ref="form">
+                    <MudTextField T="string" Label="Tài khoản" @bind-Value="request.UserName" Required="true" />
+                    <MudTextField T="string" Label="Mật khẩu" @bind-Value="request.Password" Required="true" />
+                    <MudCheckBox Checked="checkAdmin" Label="Admin" @onclick="@(() => checkAdmin = !checkAdmin)"></MudCheckBox>
+                    <MudCheckBox Checked="!checkAdmin" Label="Nhân viên" @onclick="@(() => checkAdmin = !checkAdmin)"></MudCheckBox>
+                    <MudSpacer></MudSpacer>
+                    <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="@LoginUser">Đăng nhập</MudButton>
+                </MudForm>
+            </MudPaper>
+</div>
+
+@code {
+    [Inject] 
+    NavigationManager navigation { get; set; }
+    public bool checkAdmin { get; set; } = false;
+    MudForm form;
+    [Inject]
+    public ILogin loginRepo { get; set; }
+    [Inject]
+    public IRoleRespo roleRespo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    private List<RoleDto> lstRole;
+    private PaginationResponse<RoleDto> roleVM;
+    private ViewRoleWithPaginationRequest roleRequest = new();
+
+    private LoginInputRequest request = new();
+    private ViewLoginInput loginVm = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        roleVM = await roleRespo.GetAllRole(roleRequest);
+        lstRole = roleVM.Data!.ToList();
+    }
+    private async Task LoginUser()
+    {
+        if (checkAdmin == true)
+        {
+            request.UserRoleId = Guid.Parse("afce7ccf-2ab3-4350-be1c-791362258386"); // Id của Admin
+        }
+        else 
+        {
+            request.UserRoleId = Guid.Parse("5b521626-9f7f-49c8-a6e8-9fc79bfd9d29"); // Id của nhân viên 
+        }
+        loginVm = await loginRepo.Login(request);
+        if (loginVm == null)
+        {
+            await _dialogService.ShowMessageBox("Lỗi", "Vui lòng nhập đúng tài khoản và mật khẩu!");
+        }
+        else
+        {
+            var confirm = await _dialogService.ShowMessageBox(
+          "Thông báo",
+          "Xác nhận đăng nhập?",
+          "Xác nhận",
+          cancelText: "Hủy"
+      );
+
+            if (confirm == true)
+            {
+                _snackbar.Add("Đăng nhập thành công", Severity.Success);
+                await HandlingAuthentication();
+                navigation.NavigateTo("/statistic/roombookingstatistic"); // sau khi login xong thì muốn chuyển đến màn nào thì chuyển sang màn đó
+
+            }
+            else
+            {
+                _snackbar.Add("Đăng nhập thất bại", Severity.Error);
+            }
+        }
+        return;
+    }
+    // nhét thông tin đăng nhập vào thôi
+    private async Task HandlingAuthentication()
+    {
+        List<Claim> lstClaim = new()
+        {
+            new Claim(ClaimTypes.Name,loginVm.UserName),
+            new Claim(ClaimTypes.Role, loginVm.RoleCode),
+        };
+        var customAuth = (CustomAuthenticationStateProvider)_authProvider;
+        await customAuth.UpdateAuthenticationState(lstClaim);
+    }
+
+}

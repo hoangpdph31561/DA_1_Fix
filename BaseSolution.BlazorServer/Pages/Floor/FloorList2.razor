@@ -4,9 +4,12 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Floor.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
 @using BaseSolution.BlazorServer.Respository.Interfaces;
+@attribute [Authorize(Roles = "Admin")]
 <CustomListDisplayP2 Label="Danh sách tầng trong khách sạn" IsLoading="lstBuilding == null" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>
+         <AuthorizeView Roles="Admin"> 
         <MudChip Icon="@Icons.Material.Filled.Add" OnClick="@(async() => await OpenAdd())" Color="Color.Primary">Thêm</MudChip>
+        </AuthorizeView>
     </HeaderContent>
     <AdditionalSearchBarColumn>
         <MudSelect Variant="Variant.Outlined" Style="background-color: white;" AnchorOrigin="Origin.BottomCenter" Label="Tòa nhà" @bind-Value="_idBuilding">

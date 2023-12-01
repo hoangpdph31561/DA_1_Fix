@@ -14,11 +14,6 @@
     IJSRuntime jsRuntime { get; set; }
     private List<RoomBookingStatisticDto>? _lstRoomBookingStatisticDto { get; set; }
     RoomBookingStatisticRequest roomBookingStatisticRequest = new();
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadData();
-
-    }
     private async Task LoadData()
     {
         _lstRoomBookingStatisticDto = await statisticRepo.GetRoomBookingStatisticsAsync(roomBookingStatisticRequest);
@@ -27,13 +22,18 @@
     {
         if (firstRender)
         {
-            if (_lstRoomBookingStatisticDto != null)
-            {
-                var labels = "số lượng đặt";
-                var s1 = _lstRoomBookingStatisticDto.Select(gs => "Tháng" + " " + gs.Month + " " + gs.NameRoom).ToList();
-                var s2 = _lstRoomBookingStatisticDto.Select(gs => gs.BookingCount).ToList();
-                await jsRuntime.InvokeVoidAsync("createBasicBarChart", labels, s1, s2);
-            }
+            await LoadData().ContinueWith(async (result) => { await LoadChart(); }); // chạy lần luọt
+        }
+    }
+    private async Task LoadChart()
+    {
+        if (_lstRoomBookingStatisticDto != null)
+        {
+            var labels = "số lượng đặt";
+            var s1 = _lstRoomBookingStatisticDto.Select(gs => "Tháng" + " " + gs.Month + " " + gs.NameRoom).ToList();
+            var s2 = _lstRoomBookingStatisticDto.Select(gs => gs.BookingCount).ToList();
+            await jsRuntime.InvokeVoidAsync("createBasicBarChart", labels, s1, s2);
+            StateHasChanged();
         }
     }
 }

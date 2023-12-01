@@ -13,12 +13,12 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             _httpClient = httpClient;
         }
 
-        public async Task <RoombookingDetailDTO> GetRoomBookingDetailByRoomBookingId(Guid idRoomBooking)
+        public async Task <RoomBookingDetailDTO> GetRoomBookingDetailByRoomBookingId(Guid idRoomBooking)
         {
             try
             {
                 string url = $"/api/RoomBookingDetails/getRoomBookingDetailByRoomBookingId?idRoomBooking={idRoomBooking}";
-                var result = await _httpClient.GetFromJsonAsync<RoombookingDetailDTO>(url);
+                var result = await _httpClient.GetFromJsonAsync<RoomBookingDetailDTO>(url);
                 return result;
             }
             catch (Exception)

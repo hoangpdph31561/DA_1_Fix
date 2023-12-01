@@ -55,7 +55,7 @@ namespace BaseSolution.API.Controllers
             [HttpGet("getRoomBookingDetailByRoomBookingId")]
         public async Task<IActionResult> GetRoomBookingDetailByRoomBookingId([FromQuery] Guid idRoomBooking, CancellationToken cancellationToken)
         {
-            RoomBookingDetailByRoomBookingIdViewModel vm = new(_roomBookingDetailReadOnlyRepository, _localizationService);
+            RoomBookingDetailByRoomBookingIdViewModel vm = new(_RoomBookingDetailReadOnlyRepository, _localizationService);
             await vm.HandleAsync(idRoomBooking, cancellationToken);
             if (vm.Success)
             {
@@ -100,7 +100,14 @@ namespace BaseSolution.API.Controllers
 
             return Ok(vm);
         }
+        [HttpPut("updateRoomBookingDetail")]
+        public async Task<IActionResult> UpdateRoomBookingDetail(RoomBookingDetailUpdate2Request request, CancellationToken cancellationToken)
+        {
+            RoomBookingDetailUpdate2ViewModel vm = new(_RoomBookingDetailReadWriteRepository, _mapper, _localizationService);
+            await vm.HandleAsync(request, cancellationToken);
 
+            return Ok(vm);
+        }
         [HttpDelete]
         public async Task<IActionResult> Delete(RoomBookingDetailDeleteRequest request, CancellationToken cancellationToken)
         {

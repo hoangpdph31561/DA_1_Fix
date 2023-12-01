@@ -18,7 +18,7 @@
                               Validation='new EmailAddressAttribute() { ErrorMessage = "The email address is invalid" }' @bind-Value="createRequest.Email" />
                 <MudTextField T="string" Label="Số điện thoại" @bind-Value="createRequest.PhoneNumber" Disabled="isFormLocked" />
                 <MudSpacer></MudSpacer>
-                <MudButton  style="top: 10px; left: 560px;"
+                <MudButton 
                 Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)"  OnClick="@SendEmail">Gửi mã</MudButton>
             </MudForm>
         </MudPaper>

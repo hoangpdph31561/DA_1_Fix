@@ -9,7 +9,7 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.AmenityRoomDetail.R
         public string NameOfAmenity { get; set; }
         public Guid RoomTypeId { get; set; }
         public int Amount { get; set; }
-        public EntityStatus Status { get; set; } = EntityStatus.Active;
+        public EntityStatus Status { get; set; }
         public Guid? ModifiedBy { get; set; }
     }
 }

@@ -29,7 +29,7 @@ builder.Services.AddTransient<IServiceTypeRespo, ServiceTypeRespo>();
 builder.Services.AddTransient<IRoomBookingRepo, RoomBookingRepo>();
 builder.Services.AddTransient<IBillRepo, BillRepo>();
 builder.Services.AddTransient<IRoomTypeRepo, RoomTypeRepo>();
-builder.Services.AddTransient<IAmenityRoomDetailRepo, AmenityRoomDetailRepo>();
+builder.Services.AddTransient<IAmenityRoomDetailRespo, AmenityRoomDetailRespo>();
 builder.Services.AddTransient<IServiceRespo, ServiceRespo>();
 builder.Services.AddTransient<IRoomBookingRespo, RoomBookingRespo>();
 builder.Services.AddTransient<IBillRespo, BillRespo>();

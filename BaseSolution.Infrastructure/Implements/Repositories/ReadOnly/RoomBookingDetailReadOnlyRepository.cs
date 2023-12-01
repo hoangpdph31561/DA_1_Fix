@@ -48,6 +48,28 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             }
         }
 
+        public async Task<RequestResult<RoomBookingDetailDTO?>> GetRoomBookingDetailByIdRoomBookingAsync(Guid idRoomBooking, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var roombooking = await _dbContext.RoomBookingDetails.AsNoTracking().Where(x => x.RoomBookingId == idRoomBooking).ProjectTo<RoomBookingDetailDTO>(_mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
+                return RequestResult<RoomBookingDetailDTO?>.Succeed(roombooking);
+
+            }
+            catch (Exception e)
+            {
+
+                return RequestResult<RoomBookingDetailDTO?>.Fail(_localizationService["RoomBookingDetail is not found"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "roomBookingDetail"
+                    }
+                });
+            }
+        }
+
         public async Task<RequestResult<PaginationResponse<RoomBookingDetailDTO>>> GetRoomBookingDetailWithPaginationByAdminAsync(ViewRoomBookingDetailWithPaginationRequest request, CancellationToken cancellationToken)
         {
             try

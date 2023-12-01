@@ -60,6 +60,17 @@ namespace BaseSolution.API.Controllers
             await vm.HandleAsync(request, cancellationToken);
             return Ok(vm);
         }
+        [HttpPut("createUpdateDeleteAmenityRoomDetail")]
+        public async Task<IActionResult> CreateUpdateDeleteAmenityRoomDetail(List<AmenityCreateUpdateDeleteRequest> request, CancellationToken cancellationToken)
+        {
+            AmenityRoomDetailCreateUpdateDeleteViewModel vm = new(_AmenityRoomDetailReadWriteRespository, _localizationService);
+            await vm.HandleAsync(request, cancellationToken);
+            if(vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
+        }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteAmenityRoomDetail(AmenityRoomDetailDeleteRequest request, CancellationToken cancellationToken)

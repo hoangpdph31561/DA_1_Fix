@@ -35,6 +35,7 @@
                         </MudItem>
                     </MudGrid>
                     <MudTextField @bind-Value="@serviceUpdateRequest.Description" For="@(() => serviceUpdateRequest.Description)" Label="Mô tả"></MudTextField>
+                    <MudCheckBox @bind-Checked="@serviceUpdateRequest.IsRoomBookingNeed" Label="Dịch vụ có cần đặt phòng không?" LabelPosition="LabelPosition.Start" Color="Color.Primary"></MudCheckBox>
                     <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="serviceUpdateRequest.Status" For="@(() => serviceUpdateRequest.Status)">
                         <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
                         <MudSelectItem Value="EntityStatus.InActive">Không hoạt động</MudSelectItem>
@@ -110,6 +111,7 @@
         serviceUpdateRequest.Name = service.Name;
         serviceUpdateRequest.Description = service.Description;
         serviceUpdateRequest.ServiceTypeId = service.ServiceTypeId;
+        serviceUpdateRequest.IsRoomBookingNeed = service.IsRoomBookingNeed;
     }
     private void OnClickCancel()
     {
@@ -121,7 +123,7 @@
     }
     private bool CheckChangeData()
     {
-        return service!.Status != serviceUpdateRequest.Status || service.Unit != serviceUpdateRequest.Unit || service.Price != serviceUpdateRequest.Price || service.Name != serviceUpdateRequest.Name || service.Description != serviceUpdateRequest.Description || service.ServiceTypeId != serviceUpdateRequest.ServiceTypeId;
+        return service!.Status != serviceUpdateRequest.Status || service.Unit != serviceUpdateRequest.Unit || service.Price != serviceUpdateRequest.Price || service.Name != serviceUpdateRequest.Name || service.Description != serviceUpdateRequest.Description || service.ServiceTypeId != serviceUpdateRequest.ServiceTypeId || service.IsRoomBookingNeed != serviceUpdateRequest.IsRoomBookingNeed;
     }
     private async Task UpdateService()
     {

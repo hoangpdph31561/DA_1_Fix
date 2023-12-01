@@ -1,3 +1,4 @@
+
 ﻿namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBookingDetail.Request
 {
     public class RoomBookingDetailUpdateRequest

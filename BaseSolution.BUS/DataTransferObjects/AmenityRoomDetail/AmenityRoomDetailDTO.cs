@@ -9,6 +9,6 @@ namespace BaseSolution.Application.DataTransferObjects.AmenityRoomDetail
         public Guid AmenityId { get; set; }
         public Guid RoomTypeId { get; set; }
         public int Amount { get; set; }
-        public EntityStatus Status { get; set; } = EntityStatus.Active;
+        public EntityStatus Status { get; set; } 
     }
 }

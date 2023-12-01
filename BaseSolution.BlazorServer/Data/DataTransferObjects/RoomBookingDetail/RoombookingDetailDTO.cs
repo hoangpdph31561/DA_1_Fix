@@ -2,7 +2,7 @@
 
 namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBookingDetail
 {
-    public class RoombookingDetailDTO
+    public class RoomBookingDetailDTO
     {
         public Guid Id { get; set; }
         public decimal Price { get; set; }

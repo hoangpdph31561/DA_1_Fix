@@ -52,8 +52,12 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                IQueryable<AmenityRoomDetailEntity> queryable = _dbContext.AmenityRoomDetails.AsNoTracking().AsQueryable();
-                var result = await _dbContext.AmenityRoomDetails.AsNoTracking().PaginateAsync<AmenityRoomDetailEntity, AmenityRoomDetailDTO>(request, _mapper, cancellationToken);
+                IQueryable<AmenityRoomDetailEntity> queryable = _dbContext.AmenityRoomDetails.AsNoTracking().AsQueryable().Where(x => !x.Deleted);
+                if(request.RoomTypeId != Guid.Empty)
+                {
+                    queryable = queryable.Where(x => x.RoomTypeId == request.RoomTypeId);
+                }
+                var result = await queryable.PaginateAsync<AmenityRoomDetailEntity, AmenityRoomDetailDTO>(request, _mapper, cancellationToken);
                 return RequestResult<PaginationResponse<AmenityRoomDetailDTO>>.Succeed(new PaginationResponse<AmenityRoomDetailDTO>
                 {
                     PageNumber = request.PageNumber,

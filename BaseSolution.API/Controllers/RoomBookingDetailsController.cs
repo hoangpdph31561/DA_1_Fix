@@ -14,22 +14,22 @@ namespace BaseSolution.API.Controllers
     [ApiController]
     public class RoomBookingDetailsController : ControllerBase
     {
-        private readonly IRoomBookingDetailReadOnlyRepository _roomBookingDetailReadOnlyRepository;
-        private readonly IRoomBookingDetailReadWriteRepository _roomBookingDetailReadWriteRepository;
+        private readonly IRoomBookingDetailReadOnlyRepository _RoomBookingDetailReadOnlyRepository;
+        private readonly IRoomBookingDetailReadWriteRepository _RoomBookingDetailReadWriteRepository;
         private readonly IMapper _mapper;
         private readonly ILocalizationService _localizationService;
-        public RoomBookingDetailsController(IRoomBookingDetailReadOnlyRepository roomBookingDetailReadOnlyRepository, IRoomBookingDetailReadWriteRepository RoomBookingDetailReadWriteRepository,
+        public RoomBookingDetailsController(IRoomBookingDetailReadOnlyRepository RoomBookingDetailReadOnlyRepository, IRoomBookingDetailReadWriteRepository RoomBookingDetailReadWriteRepository,
             IMapper mapper, ILocalizationService localizationService)
         {
-            _roomBookingDetailReadOnlyRepository = roomBookingDetailReadOnlyRepository;
-            _roomBookingDetailReadWriteRepository = RoomBookingDetailReadWriteRepository;
+            _RoomBookingDetailReadOnlyRepository = RoomBookingDetailReadOnlyRepository;
+            _RoomBookingDetailReadWriteRepository = RoomBookingDetailReadWriteRepository;
             _mapper = mapper;
             _localizationService = localizationService;
         }
         [HttpGet("getRoomBookingDetailByAdmin")]
         public async Task<IActionResult> GetListRoomBookingDetailByAdmin([FromQuery] ViewRoomBookingDetailWithPaginationRequest request, CancellationToken cancellationToken)
         {
-            RoomBookingDetailListWithPaginationViewModel vm = new(_roomBookingDetailReadOnlyRepository, _localizationService);
+            RoomBookingDetailListWithPaginationViewModel vm = new(_RoomBookingDetailReadOnlyRepository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
             if (vm.Success)
             {
@@ -41,7 +41,7 @@ namespace BaseSolution.API.Controllers
         [HttpGet("getRoomBookingDetailByOther")]
         public async Task<IActionResult> GetListRoomBookingDetailByOther([FromQuery] ViewRoomBookingDetailWithPaginationRequest request, CancellationToken cancellationToken)
         {
-            RoomBookingDetailWithPaginationByOtherViewModel vm = new(_roomBookingDetailReadOnlyRepository, _localizationService);
+            RoomBookingDetailWithPaginationByOtherViewModel vm = new(_RoomBookingDetailReadOnlyRepository, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
             if (vm.Success)
             {
@@ -67,15 +67,26 @@ namespace BaseSolution.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRoomBookingDetailByAdmin(Guid id, CancellationToken cancellationToken)
         {
-            RoomBookingDetailViewModel vm = new(_roomBookingDetailReadOnlyRepository, _localizationService);
+            RoomBookingDetailViewModel vm = new(_RoomBookingDetailReadOnlyRepository, _localizationService);
             await vm.HandleAsync(id, cancellationToken);
             return Ok(vm);
         }
-
+        [HttpGet("{idRoomBooking}/details")]
+        public async Task<IActionResult> GetRoomBookingDetailByIdRoomBooking(Guid idRoomBooking, CancellationToken cancellationToken)
+        {
+            RoomBookingDetailViewByIdRoomBookingModel vm = new(_RoomBookingDetailReadOnlyRepository, _localizationService);
+            await vm.HandleAsync(idRoomBooking, cancellationToken);
+            if (vm.Success)
+            {
+                RoomBookingDetailDTO result = (RoomBookingDetailDTO)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
+        }
         [HttpPost]
         public async Task<IActionResult> Post(RoomBookingDetailCreateRequest request, CancellationToken cancellationToken)
         {
-            RoomBookingDetailCreateViewModel vm = new(_roomBookingDetailReadOnlyRepository, _roomBookingDetailReadWriteRepository, _mapper, _localizationService);
+            RoomBookingDetailCreateViewModel vm = new(_RoomBookingDetailReadOnlyRepository, _RoomBookingDetailReadWriteRepository, _mapper, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
 
             return Ok(vm);
@@ -84,7 +95,7 @@ namespace BaseSolution.API.Controllers
         [HttpPut]
         public async Task<IActionResult> Put(RoomBookingDetailUpdateRequest request, CancellationToken cancellationToken)
         {
-            RoomBookingDetailUpdateViewModel vm = new(_roomBookingDetailReadWriteRepository, _mapper, _localizationService);
+            RoomBookingDetailUpdateViewModel vm = new(_RoomBookingDetailReadWriteRepository, _mapper, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
 
             return Ok(vm);
@@ -93,7 +104,7 @@ namespace BaseSolution.API.Controllers
         [HttpDelete]
         public async Task<IActionResult> Delete(RoomBookingDetailDeleteRequest request, CancellationToken cancellationToken)
         {
-            RoomBookingDetailDeleteViewModel vm = new(_roomBookingDetailReadWriteRepository, _localizationService, _mapper);
+            RoomBookingDetailDeleteViewModel vm = new(_RoomBookingDetailReadWriteRepository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);
 

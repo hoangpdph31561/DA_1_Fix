@@ -1,6 +1,8 @@
 ﻿@page "/roomtype"
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType.Request
+@using BaseSolution.BlazorServer.Pages.AmenityRoomTypeDetail
 @using BaseSolution.BlazorServer.Respository.Interfaces
 <PageTitle>Quản lý loại phòng khách sạn</PageTitle>
 <CustomListDisplayP2 Label="@("Danh sách loại phòng của khách sạn")" IsLoading="lstRoomType == null && _isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
@@ -31,7 +33,7 @@
                             <MudTd>@context.Name</MudTd>
                                 <MudTd>
                                     @context.NumberOfAmenities
-                                    <MudIconButton Icon="@Icons.Material.Filled.Checklist"></MudIconButton>
+                                <MudIconButton Icon="@Icons.Material.Filled.Checklist" OnClick="@(async() => await OpenAmenityRoomDetail(context.Id))"></MudIconButton>
                                 </MudTd>
                                 <MudTh>
                                     @context.NumberOfRoomDetails
@@ -60,6 +62,8 @@
     public IDialogService _dialogService { get; set; }
     [Inject]
     public ISnackbar _snackbar { get; set; }
+    [Inject]
+    public IRoomDetailRespo roomDetailRespo { get; set; }
     private PaginationResponse<RoomTypeDTO> roomTypeVM;
     private List<RoomTypeDTO> lstRoomType;
     private ViewRoomTypeWithPaginationRequest roomTypeViewRequest = new();
@@ -67,6 +71,8 @@
     private bool _isLoadingAll = true;
     private bool _isLoadingList = true;
     private bool _isDisableControls = false;
+    private PaginationResponse<RoomDetailDTO> roomDetailVM;
+    private List<RoomDetailDTO> lstRoomDetail;
     #endregion
     #region Code xử lý
     protected override async Task OnInitializedAsync()
@@ -98,17 +104,31 @@
         );
         if (confirm == true)
         {
-            roomTypeDeleteRequest.Id = deleteId;
-            var removeConfirm = await roomTypeRespo.DeleteRoomType(roomTypeDeleteRequest);
-            if (removeConfirm)
+            roomDetailVM = await roomDetailRespo.GetAllRoomDetails(new Data.DataTransferObjects.RoomDetail.Request.ViewRoomDetailWithPaginationRequest
+                {
+                    PageSize = int.MaxValue - 1,
+                    RoomTypeId = deleteId
+                });
+            lstRoomDetail = roomDetailVM.Data!.ToList();
+            if (lstRoomDetail.Any(x => x.Status == RoomStatus.Occupied))
             {
-                _snackbar.Add("Xóa thành công", Severity.Success);
+                _snackbar.Add("Có phòng đang được thuê tại loại phòng này, không xóa được", Severity.Error);
             }
             else
             {
-                _snackbar.Add("Xóa thất bại", Severity.Error);
+                roomTypeDeleteRequest.Id = deleteId;
+                var removeConfirm = await roomTypeRespo.DeleteRoomType(roomTypeDeleteRequest);
+                if (removeConfirm)
+                {
+                    _snackbar.Add("Xóa thành công", Severity.Success);
+                }
+                else
+                {
+                    _snackbar.Add("Xóa thất bại", Severity.Error);
+                }
+                await LoadData();
             }
-            await LoadData();
+           
         }
     }
     private async Task OnSearch(string? searchString)
@@ -149,6 +169,17 @@
         {
             await LoadData();
             StateHasChanged();
+        }
+    }
+    private async Task OpenAmenityRoomDetail(Guid idRoomType)
+    {
+        var parameters = new DialogParameters<AmenityRoomTypeDetailView>();
+        parameters.Add(x => x.idRoomType, idRoomType);
+        var dialog = await _dialogService.ShowAsync<AmenityRoomTypeDetailView>("Chi tiết các tiện ích phòng", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
         }
     }
     #endregion

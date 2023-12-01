@@ -107,6 +107,20 @@ namespace BaseSolution.API.Controllers
             return Ok();
         }
         [AllowAnonymous]
+        [HttpPost("verifyCustomerBooking/{identification}/{code}")]
+        public async Task<IActionResult> VerifyCustomerBooking(string identification, string code, CancellationToken cancellationToken)
+        {
+            var details = await _CustomerReadOnlyRepository.GetCustomerByIdentificationAsync(identification, cancellationToken);
+            if (details.Data?.ApprovedCode == code)
+            {
+                return Ok("Xác nhận mã thành công");
+            }
+            else
+            {
+                return BadRequest("Xác nhận mã thất bại");
+            }
+        }
+        [AllowAnonymous]
         [HttpPost("verifyCode/{code}/{idCard}")]
         public async Task<IActionResult> VerifyCode(string code, string idCard, CancellationToken cancellationToken)
         {
@@ -178,6 +192,25 @@ namespace BaseSolution.API.Controllers
                     var newCustomers = new CustomerEntity()
                     {
                         Id = detailCustomer.Data.Id,
+                        Email = customerCreateRequest.Email,
+                        PhoneNumber = customerCreateRequest.PhoneNumber,
+                        Name = customerCreateRequest.Name,
+                        ApprovedCode = customerCreateRequest.ApprovedCode,
+                        ModifiedTime = DateTime.Now,
+                        IdentificationNumber = customerCreateRequest.IdentificationNumber,
+                        ApprovedCodeExpiredTime = DateTime.Now.AddMinutes(5),
+                        Status = Domain.Enums.EntityStatus.PendingForConfirmation,
+                    };
+                    await _CustomerReadWriteRepository.UpdateCustomerAsync(newCustomers, cancellationToken);
+                    return Ok("Mã đã được gửi, vui lòng kiểm tra email!");
+                }
+                else if (detailCustomer.Data?.ApprovedCode == null && detailCustomer.Data?.ApprovedCodeExpiredTime == null)
+                {
+                    await SendGmailAsync(customerCreateRequest.Email);
+                    customerCreateRequest.ApprovedCode = _verifyCode;
+                    var newCustomers = new CustomerEntity()
+                    {
+                        Id = detailCustomer.Data!.Id,
                         Email = customerCreateRequest.Email,
                         PhoneNumber = customerCreateRequest.PhoneNumber,
                         Name = customerCreateRequest.Name,

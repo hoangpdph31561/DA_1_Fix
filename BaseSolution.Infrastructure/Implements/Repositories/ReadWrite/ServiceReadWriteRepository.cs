@@ -95,6 +95,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 Service.ModifiedBy = entity.ModifiedBy;
                 Service.ModifiedTime = DateTimeOffset.UtcNow;
                 Service.ServiceTypeId = entity.ServiceTypeId;
+                Service.IsRoomBookingNeed = entity.IsRoomBookingNeed;
                 _dbContext.Services.Update(Service);
                 await _dbContext.SaveChangesAsync(cancellationToken);
 

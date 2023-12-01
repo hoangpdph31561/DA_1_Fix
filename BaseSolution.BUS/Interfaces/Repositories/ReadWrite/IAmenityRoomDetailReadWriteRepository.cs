@@ -9,5 +9,6 @@ namespace BaseSolution.Application.Interfaces.Repositories.ReadWrite
         Task<RequestResult<Guid>> AddAmenityRoomDetailAsync(AmenityRoomDetailEntity entity, CancellationToken cancellationToken);
         Task<RequestResult<int>> UpdateAmenityRoomDetailAsync(AmenityRoomDetailEntity entity, CancellationToken cancellationToken);
         Task<RequestResult<int>> DeleteAmenityRoomDetailAsync(AmenityRoomDetailDeleteRequest request, CancellationToken cancellationToken);
+        Task<RequestResult<int>> CreateUpdateDeleteAmenityRoomDetailAsync( List<AmenityCreateUpdateDeleteRequest> request, CancellationToken cancellationToken);
     }
 }

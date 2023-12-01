@@ -14,6 +14,7 @@ namespace BaseSolution.Application.DataTransferObjects.Services.Request
         public decimal Price { get; set; }
         public string Unit { get; set; } = string.Empty;
         public Guid ServiceTypeId { get; set; }
+        public bool IsRoomBookingNeed { get; set; }
         public Guid? CreatedBy { get; set; }
     }
 }

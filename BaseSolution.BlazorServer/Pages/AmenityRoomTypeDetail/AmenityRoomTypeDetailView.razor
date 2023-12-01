@@ -1,0 +1,180 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Amenity
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.AmenityRoomDetail
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.AmenityRoomDetail.Request
+@using BaseSolution.BlazorServer.Respository.Interfaces
+
+<MudDialog>
+    <DialogContent>
+        @if(isLoadingList || lstAmenity == null)
+        {
+            <MudText>Không có danh sách tiện ích</MudText>
+        }
+        else
+        {
+            <MudTable Items="lstAmenityRoomDetailSelected" Style="height: 40vh; overflow: auto;" Hover="true" >
+                <HeaderContent>
+                    <MudTd>Kích hoạt</MudTd>
+                    <MudTd>Tên tiện ích</MudTd>
+                    <MudTd>Số lượng</MudTd>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>
+                        
+                        <MudCheckBox T="bool" @bind-Checked="context.IsExist"></MudCheckBox>
+                    </MudTd>
+                    <MudTd>@context.Name</MudTd>
+                    <MudNumericField @bind-Value="@context.Amount" Disabled="!context.IsExist" Max="@(!context.IsExist? 0: 500)" Min="@(!context.IsExist ? 0: 1)"></MudNumericField>
+                </RowTemplate>
+            </MudTable>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+        <MudButton OnClick="Reset">Khôi phục</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@(async() => await UpdateFloor())">Lưu</MudButton>
+        
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #region Khai báo
+    [Parameter]
+    public Guid idRoomType { get; set; }
+    [Inject]
+    public IAmenityRespo amenityRespo { get; set; }
+    [Inject]
+    public IAmenityRoomDetailRespo amenityRoomDetailRespo { get; set; }
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    [Inject]
+    public IDialogService dialogService { get; set; }
+    [Inject]
+    public ISnackbar snackbar { get; set; }
+    private ViewAmenityRoomDetailWithPaginationRequest amenityRoomDetailRequest = new();
+    private PaginationResponse<AmenityRoomDetailDTO> amenityRoomDetailVM;
+    private List<AmenityRoomDetailDTO> lstAmenityRoomDetail;
+    private List<AmenityRoomDetailInfo> lstAmenityRoomDetailSelected = new();
+    private List<AmenityRoomDetailInfo> lstAmenityRoomDetailSelectedOriginal = new();
+    private PaginationResponse<AmenityDTO> amenityVM;
+    private List<AmenityDTO> lstAmenity;
+    private bool isLoadingList = true;
+    private bool disableSave = true;
+    #endregion
+    #region Code xử lý
+    private async Task LoadData()
+    {
+        amenityVM = await amenityRespo.GetAllAmentity(new Data.DataTransferObjects.Amenity.Request.ViewAmenityWithPaginationRequest
+            {
+                PageSize = int.MaxValue - 1
+            });
+        lstAmenity = amenityVM.Data!.ToList();
+        amenityRoomDetailRequest.RoomTypeId = idRoomType;
+        amenityRoomDetailVM = await amenityRoomDetailRespo.GetAllAmentityRoomDetail(amenityRoomDetailRequest);
+        lstAmenityRoomDetail = amenityRoomDetailVM.Data!.ToList();
+        if(lstAmenityRoomDetail.Any())
+        {
+            foreach (var item in lstAmenityRoomDetail)
+            {
+                lstAmenityRoomDetailSelected.Add(new AmenityRoomDetailInfo
+                    {
+                        IsExist = true,
+                        AmenityId = item.AmenityId,
+                        Name = item.NameOfAmenity,
+                        Amount = item.Amount
+                    });
+                lstAmenityRoomDetailSelectedOriginal.Add(new AmenityRoomDetailInfo
+                {
+                        IsExist = true,
+                        AmenityId = item.AmenityId,
+                        Name = item.NameOfAmenity,
+                        Amount = item.Amount
+                });
+            }
+
+        }
+        if(lstAmenity.Any())
+        {
+            foreach (var item in lstAmenity)
+            {
+                if(!lstAmenityRoomDetailSelected.Any(x => x.AmenityId == item.Id))
+                {
+                    lstAmenityRoomDetailSelected.Add(new AmenityRoomDetailInfo
+                        {
+                            IsExist = false,
+                            AmenityId = item.Id,
+                            Name = item.Name,
+                            Amount = 0,
+                        });
+                    lstAmenityRoomDetailSelectedOriginal.Add(new AmenityRoomDetailInfo
+                        {
+                            IsExist = false,
+                            AmenityId = item.Id,
+                            Name = item.Name,
+                            Amount = 0,
+                        });
+                }
+            }
+        }
+        isLoadingList = false;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private bool GetAmenityCheckState(Guid idAmenity)
+    {
+        if (lstAmenityRoomDetailSelected.Any(c => c.AmenityId == idAmenity))
+        {
+            return true;
+        }
+        return false;
+    }
+    private async Task UpdateFloor()
+    {
+
+        var confirm = await dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận cập nhật tiện ích vào phòng",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            List<AmenityRoomDetailCreateUpdateDelete> lstCreateUpdateDelete = new();
+            foreach (var item in lstAmenityRoomDetailSelected)
+            {
+                if (item.IsExist)
+                {
+                    lstCreateUpdateDelete.Add(new AmenityRoomDetailCreateUpdateDelete
+                        {
+                            RoomTypeId = idRoomType,
+                            AmenityId = item.AmenityId,
+                            Amount = item.Amount
+                        });
+                }
+            }
+            var result = await amenityRoomDetailRespo.CreateUpdateDeleteAmenityRoomDetail(lstCreateUpdateDelete);
+            if (result)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Cập nhật thành công", Severity.Success);
+            }
+            else
+            {
+                snackbar.Add("Sửa thất bại", Severity.Error);
+            }
+        }
+    }
+    private void OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+    private async Task Reset()
+    {
+        lstAmenityRoomDetailSelected = new();
+        lstAmenityRoomDetailSelectedOriginal = new();
+        await LoadData();
+    }
+    #endregion
+}

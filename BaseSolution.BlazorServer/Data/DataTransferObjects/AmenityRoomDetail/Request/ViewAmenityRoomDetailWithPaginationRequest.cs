@@ -4,5 +4,6 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.AmenityRoomDetail.R
 {
     public class ViewAmenityRoomDetailWithPaginationRequest : PaginationRequest
     {
+        public Guid RoomTypeId { get; set; } = Guid.Empty;
     }
 }

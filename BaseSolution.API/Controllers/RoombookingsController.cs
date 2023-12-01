@@ -80,7 +80,7 @@ public class RoombookingsController : ControllerBase
         RoombookingCreateViewModel vm = new(_roombookingrReadOnlyRespository, _roombookingReadWriteRespository, _mapper, _localizationService);
         await vm.HandleAsync(request, cancellationToken);
 
-        return Ok(vm);
+        return Ok(vm.Data);
     }
 
     [HttpPut]

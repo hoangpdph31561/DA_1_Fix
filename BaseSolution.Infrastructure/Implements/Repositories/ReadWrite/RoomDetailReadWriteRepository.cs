@@ -117,6 +117,38 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 });
             }
         }
+
+        public async Task<RequestResult<int>> UpdateStatusRoomDetailAsync(RoomDetailUpdateStatusRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                // Get existed roomDetail
+                var roomDetail = await GetRoomDetailByIdAsync(request.Id, cancellationToken);
+
+                // Update value to existed roomDetail
+
+                roomDetail!.Status = request.Status;
+                roomDetail.ModifiedBy = request.ModifiedBy;
+                roomDetail.ModifiedTime = DateTimeOffset.Now;
+
+                _dbContext.RoomDetails.Update(roomDetail);
+                await _dbContext.SaveChangesAsync(cancellationToken);
+
+                return RequestResult<int>.Succeed(1);
+            }
+            catch (Exception e)
+            {
+                return RequestResult<int>.Fail(_localizationService["Unable to update RoomDetail"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToUpdate + "RoomDetail"
+                    }
+                });
+            }
+        }
+
         private async Task<RoomDetailEntity?> GetRoomDetailByIdAsync(Guid idRoomDetail, CancellationToken cancellationToken)
         {
             var roomDetail = await _dbContext.RoomDetails.FirstOrDefaultAsync(c => c.Id == idRoomDetail && !c.Deleted, cancellationToken);

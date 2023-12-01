@@ -1,4 +1,5 @@
 ﻿@page "/building"
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
 @using Respository.Interfaces
 @using Data.DataTransferObjects.Building
 @using Data.DataTransferObjects.Building.Request
@@ -51,6 +52,8 @@
     public IDialogService _dialogService { get; set; }
     [Inject]
     public ISnackbar _snackbar { get; set; }
+    [Inject]
+    public IRoomDetailRespo roomDetailRespo { get; set; }
     private Guid _idBuildingDetail = Guid.Empty;
     private bool closeAdd = true;
     private bool closeDetail = true;
@@ -61,6 +64,8 @@
     private ViewBuildingWithPaginationRequest _buildingRequest = new();
     private List<BuildingDTO> _lstBuildings;
     private BuildingDeleteRequest requestDelete = new();
+    private PaginationResponse<RoomDetailDTO> roomDetailVM;
+    private List<RoomDetailDTO> lstRoomDetail;
     #endregion
     #region Code xử lý
     protected override async Task OnInitializedAsync()
@@ -92,17 +97,31 @@
         );
         if(confirm == true)
         {
-            requestDelete.Id = deleteId;
-            var removeConfirm = await _buildingRespo.DeleteBuilding(requestDelete);
-            if(removeConfirm)
+            roomDetailVM = await roomDetailRespo.GetAllRoomDetails(new Data.DataTransferObjects.RoomDetail.Request.ViewRoomDetailWithPaginationRequest
+                {
+                    PageSize = int.MaxValue - 1,
+                    BuildingId = deleteId
+                });
+            lstRoomDetail = roomDetailVM.Data!.ToList();
+            if(lstRoomDetail.Any(x => x.Status == RoomStatus.Occupied))
             {
-                _snackbar.Add("Xóa thành công", Severity.Success);
+                _snackbar.Add("Có phòng đang được thuê tại tòa này, không xóa được", Severity.Error);
             }
             else
             {
-                _snackbar.Add("Xóa thất bại", Severity.Error);
+                requestDelete.Id = deleteId;
+                var removeConfirm = await _buildingRespo.DeleteBuilding(requestDelete);
+                if (removeConfirm)
+                {
+                    _snackbar.Add("Xóa thành công", Severity.Success);
+                }
+                else
+                {
+                    _snackbar.Add("Xóa thất bại", Severity.Error);
+                }
+                await LoadData();
             }
-            await LoadData();
+           
         }
     }
     private async Task OnSearch(string? searchString)

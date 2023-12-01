@@ -105,5 +105,38 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 });
             }
         }
+
+        public async Task<RequestResult<int>> UpdateRoomBookingDetail2Async(RoomBookingDetailUpdate2Request request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var roomBookingDetail = await GetRoomBookingDetailByIdAsync(request.Id, cancellationToken);
+
+                roomBookingDetail.Price = request.Price;
+                roomBookingDetail.PrePaid = request.PrePaid;
+                roomBookingDetail.RoomDetailId = request.RoomDetailId;
+                roomBookingDetail.RoomBookingId = request.RoomBookingId;
+                roomBookingDetail.CheckInBooking = request.CheckInBooking;
+                roomBookingDetail.CheckOutBooking = request.CheckOutBooking;
+                roomBookingDetail.CheckInReality = request.CheckInBooking;
+                roomBookingDetail.CheckOutReality = request.CheckOutBooking;
+                roomBookingDetail.ModifiedTime = DateTimeOffset.Now;
+                _appReadWriteDbContext.RoomBookingDetails.Update(roomBookingDetail);
+                await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
+                return RequestResult<int>.Succeed(1);
+            }
+            catch (Exception e)
+            {
+
+                return RequestResult<int>.Fail(_localizationService["Unable to update RoomBookingDetail"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToUpdate + "RoomBookingDetail"
+                    }
+                });
+            }
+        }
     }
 }

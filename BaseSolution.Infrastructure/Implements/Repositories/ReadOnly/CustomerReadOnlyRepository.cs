@@ -51,11 +51,11 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             }
         }
 
-        public async Task<RequestResult<CustomerDto>> GetCustomerByIdentificationAsync(string identifiaction, CancellationToken cancellationToken)
+        public async Task<RequestResult<CustomerDto>> GetCustomerByIdentificationAsync(string identification, CancellationToken cancellationToken)
         {
             try
             {
-                var Customer = await _dbContext.Customers.AsNoTracking().Where(c => c.IdentificationNumber == identifiaction && !c.Deleted).ProjectTo<CustomerDto>(_mapper.ConfigurationProvider)
+                var Customer = await _dbContext.Customers.AsNoTracking().Where(c => c.IdentificationNumber == identification && !c.Deleted).ProjectTo<CustomerDto>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(cancellationToken);
 
                 return RequestResult<CustomerDto>.Succeed(Customer);

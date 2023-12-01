@@ -79,9 +79,9 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             return result.IsSuccessStatusCode;
         }
 
-        public async Task<bool> VerifyCustomerBooking(string Identification, string code)
+        public async Task<bool> VerifyCustomerBooking(Guid id, string Identification, string code)
         {
-            var result = await _httpClient.PostAsJsonAsync($"/api/Customers/verifyCustomerBooking/{Identification}/{code}", "");
+            var result = await _httpClient.PostAsJsonAsync($"/api/Customers/verifyCustomerBooking/{id}/{Identification}/{code}", "");
             var convert = result.Content.ReadAsStringAsync();
             return result.IsSuccessStatusCode;
         }

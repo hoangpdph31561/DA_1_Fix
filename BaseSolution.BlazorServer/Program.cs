@@ -1,8 +1,11 @@
 ﻿using BaseSolution.BlazorServer.Data;
+using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer;
+using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request;
 using BaseSolution.BlazorServer.Pages.Manager;
 using BaseSolution.BlazorServer.Respository.Implements;
 using BaseSolution.BlazorServer.Respository.Interfaces;
 using Blazored.SessionStorage;
+using FluentValidation;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using MudBlazor.Services;
@@ -17,10 +20,12 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddMudServices();
 
+
 builder.Services.AddScoped(c => new HttpClient
 {
     BaseAddress = new Uri("https://localhost:7005")
 });
+builder.Services.AddTransient<IValidator<CustomerCreateRequest>, CustomerCreateRequestValidator>();
 #region AddTransient
 builder.Services.AddTransient<IBuildingRespo, BuildingRespo>();
 builder.Services.AddTransient<IFloorRespo, FloorRespo>();

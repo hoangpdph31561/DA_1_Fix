@@ -11,21 +11,19 @@
 <MudGrid>
     <MudItem xs="12" sm="7">
         <MudPaper Class="pa-4">
-            <MudForm Model="createRequest" @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
-                <MudTextField T="string" Label="Tên" @bind-Value="createRequest.Name" Disabled="isFormLocked" />
+            <MudForm Model="createRequest" Validator="@validator" @ref="form" @bind-IsValid="@success">
+                <MudTextField T="string" Label="Tên" @bind-Value="createRequest.Name" Disabled="isFormLocked" Required="true" />
                 <MudTextField T="string" Label="Mã định danh" @bind-Value="createRequest.IdentificationNumber" Required="true" Disabled="isFormLocked" />
-                <MudTextField T="string" Label="Email" Disabled="isFormLocked"
-                              Validation='new EmailAddressAttribute() { ErrorMessage = "The email address is invalid" }' @bind-Value="createRequest.Email" />
-                <MudTextField T="string" Label="Số điện thoại" @bind-Value="createRequest.PhoneNumber" Disabled="isFormLocked" />
+                <MudTextField T="string" Label="Email" Disabled="isFormLocked" @bind-Value="createRequest.Email" Required="true" />
+                <MudTextField T="string" Label="Số điện thoại" @bind-Value="createRequest.PhoneNumber" Disabled="isFormLocked" Required="true" />
                 <MudSpacer></MudSpacer>
-                <MudButton 
-                Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)"  OnClick="@SendEmail">Gửi mã</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" OnClick="@SendEmail">Gửi mã</MudButton>
             </MudForm>
         </MudPaper>
         <MudPaper Class="pa-4 mt-4">
             <div class="d-flex align-center justify-space-between">
-                <MudTextField T="string" Label="Nhập code" Required="true" @bind-Value="createRequest.ApprovedCode" ></MudTextField>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto"  OnClick="@Login">Đăng nhập</MudButton>
+                <MudTextField T="string" Label="Nhập code" Required="true" @bind-Value="createRequest.ApprovedCode"></MudTextField>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@Login">Đăng nhập</MudButton>
             </div>
         </MudPaper>
     </MudItem>
@@ -36,7 +34,6 @@
     bool isCodeSent = false;
     bool isFormLocked = false;
     MudForm form;
-    string[] errors = { };
     [Parameter]
     public string identification { get; set; }
     [Inject]
@@ -48,10 +45,21 @@
     [Inject]
     public ISendMailService sendMailService { get; set; }
     public CustomerCreateRequest createRequest = new CustomerCreateRequest();
+    public CustomerCreateRequestValidator validator = new();
 
 
     private async Task SendEmail()
     {
+        // var validationResult = await form.Validate();
+        // if (!validationResult.IsValid)
+        // {
+        //     foreach (var error in validationResult.Errors)
+        //     {
+        //         await _dialogService.ShowMessageBox("Lỗi", error.ErrorMessage);
+        //     }
+        //     return;
+        // }
+
         if (!isCodeSent)
         {
 
@@ -71,7 +79,7 @@
     {
         if (isCodeSent && isFormLocked)
         {
-            var checkCode = await customerRepo.VerifyCode(createRequest.ApprovedCode,createRequest.IdentificationNumber);
+            var checkCode = await customerRepo.VerifyCode(createRequest.ApprovedCode, createRequest.IdentificationNumber);
             if (!checkCode)
             {
                 await _dialogService.ShowMessageBox("Lỗi", "Vui lòng nhập đúng mã code!");
@@ -92,7 +100,7 @@
                     isFormLocked = true;
 
                     var result = await customerRepo.GetIdentificationNumber(createRequest.IdentificationNumber);
-                    
+
 
                     if (result != null)
                     {
@@ -105,7 +113,7 @@
                     }
                 }
             }
-           
+
         }
     }
 }

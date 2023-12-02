@@ -22,7 +22,7 @@
             <MudForm Model="@_roomBookingCreateRequest" @ref="_form">
                 <MudPaper Elevation="0">
                     <MudSelect T="string" Label="Khách hàng" Class="mb-2"
-                               AnchorOrigin="Origin.BottomCenter" @bind-Value="@customerId" For="@(() => customerId)">
+                               AnchorOrigin="Origin.BottomCenter" @bind-Value="@customerId" For="@(() => customerId)" Required="true">
                         @foreach (var item in lstCustomer)
                         {
                             <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
@@ -31,10 +31,10 @@
                     <MudTextField T="string" Label="Mã định danh" @bind-Value="createRequest.IdentificationNumber" Required="true" />
                     <MudTextField T="string" Label="Nhập code" Required="true" @bind-Value="createRequest.ApprovedCode"></MudTextField>
                     <MudItem>
-                        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Giờ vào" DateFormat="dd/MM/yyyy" @bind-Date="checkIn" />
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Giờ vào" DateFormat="dd/MM/yyyy" @bind-Date="checkIn" Required="true" />
                     </MudItem>
                     <MudItem>
-                        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Giờ ra" DateFormat="dd/MM/yyyy" @bind-Date="checkOut" />
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Giờ ra" DateFormat="dd/MM/yyyy" @bind-Date="checkOut" Required="true" />
                     </MudItem>
                 </MudPaper>
             </MudForm>
@@ -126,8 +126,9 @@
         );
         if (confirm == true)
         {
+            var getStatusCustomer = await customerRespo.GetCustomerById(Guid.Parse(customerId));
             var verifyCustomer = await customerRespo.VerifyCustomerBooking(Guid.Parse(customerId), createRequest.IdentificationNumber, createRequest.ApprovedCode);
-            if (verifyCustomer == true)
+            if (verifyCustomer == true && getStatusCustomer.Status == EntityStatus.Active)
             {
                 var code = UtilityExtentions.GenerateRandomString(6);
                 _roomBookingCreateRequest.RoomDetailId = idRoomDetail;

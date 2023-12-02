@@ -10,38 +10,38 @@
         }
         else
         {
-           @*  <MudGrid>
-                <MudItem xs="12" md="3" lg="2">
-                    <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Checkin" DateFormat="dd/MM/yyyy" Date="@(new System.DateTime(2023,12,11))" />
-                </MudItem>
-                <MudItem xs="12" md="3" lg="2">
-                    <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Checkout" DateFormat="dd/MM/yyyy" Date="@(new System.DateTime(2023,12,15))" />
-                </MudItem>
+            @*  <MudGrid>
+        <MudItem xs="12" md="3" lg="2">
+        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Checkin" DateFormat="dd/MM/yyyy" Date="@(new System.DateTime(2023,12,11))" />
+        </MudItem>
+        <MudItem xs="12" md="3" lg="2">
+        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Checkout" DateFormat="dd/MM/yyyy" Date="@(new System.DateTime(2023,12,15))" />
+        </MudItem>
 
-                <MudItem xs="12" md="3" lg="2">
-                    <MudSelect Label="Số người tối đa" @bind-Value="_idRoomDetail">
-                        @foreach (var item in _lstRoomDetail)
-                        {
-                            <MudSelectItem Value="@item.Id.ToString()">@item.MaxPeopleStay</MudSelectItem>
-                        }
-                    </MudSelect>
-                </MudItem>
-                <MudItem xs="12" md="3" lg="2">
-                    <MudSelect Label="Giá" @bind-Value="_idRoomDetail">
-                        @foreach (var item in _lstRoomDetail)
-                        {
-                            <MudSelectItem Value="@item.Id.ToString()">@item.Price</MudSelectItem>
-                        }
-                    </MudSelect>
-                    <MudSelect Label="Diện tích phòng" @bind-Value="_idRoomDetail">
-                        @foreach (var item in _lstRoomDetail)
-                        {
-                            <MudSelectItem Value="@item.Id.ToString()">@item.RoomSize</MudSelectItem>
-                        }
-                    </MudSelect>
-                </MudItem>
+        <MudItem xs="12" md="3" lg="2">
+        <MudSelect Label="Số người tối đa" @bind-Value="_idRoomDetail">
+        @foreach (var item in _lstRoomDetail)
+        {
+        <MudSelectItem Value="@item.Id.ToString()">@item.MaxPeopleStay</MudSelectItem>
+        }
+        </MudSelect>
+        </MudItem>
+        <MudItem xs="12" md="3" lg="2">
+        <MudSelect Label="Giá" @bind-Value="_idRoomDetail">
+        @foreach (var item in _lstRoomDetail)
+        {
+        <MudSelectItem Value="@item.Id.ToString()">@item.Price</MudSelectItem>
+        }
+        </MudSelect>
+        <MudSelect Label="Diện tích phòng" @bind-Value="_idRoomDetail">
+        @foreach (var item in _lstRoomDetail)
+        {
+        <MudSelectItem Value="@item.Id.ToString()">@item.RoomSize</MudSelectItem>
+        }
+        </MudSelect>
+        </MudItem>
 
-            </MudGrid> *@
+        </MudGrid> *@
             <MudTable Items="_lstRoomDetail">
                 <HeaderContent>
                     <MudTh>STT</MudTh>
@@ -114,14 +114,24 @@
     }
     public async Task OpenAdd(Guid idRoomDetail)
     {
-        var parameters = new DialogParameters<RoomBookingCreate>();
-        parameters.Add(x => x.idRoomDetail, idRoomDetail);
-        var dialog = await _dialogService.ShowAsync<RoomBookingCreate>("Đặt phòng", parameters);
-        var result = await dialog.Result;
-        if (!result.Canceled)
+        var getStatus = await roomDetailRespo.GetRoomDetailById(idRoomDetail);
+        if (getStatus.Status != RoomStatus.Occupied)
         {
-            await LoadData();
+            var parameters = new DialogParameters<RoomBookingCreate>();
+            parameters.Add(x => x.idRoomDetail, idRoomDetail);
+            var dialog = await _dialogService.ShowAsync<RoomBookingCreate>("Đặt phòng", parameters);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData();
+            }
         }
+        else
+        {
+            _snackbar.Add("Phòng đã được thuê", Severity.Error);
+        }
+
+
     }
     public async Task OpenDetail(Guid idRoomDetail)
     {

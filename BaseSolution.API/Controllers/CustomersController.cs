@@ -160,6 +160,7 @@ namespace BaseSolution.API.Controllers
                     CreatedTime = DateTime.Now,
                     ApprovedCodeExpiredTime = DateTime.Now.AddMinutes(5),
                     Status = Domain.Enums.EntityStatus.PendingForConfirmation,
+                    CustomerType = Domain.Enums.CustomerType.Customer
                 };
                 await _CustomerReadWriteRepository.AddCustomerAsync(newCustomers, cancellationToken);
                 return Ok("Gửi mã thành công!");

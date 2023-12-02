@@ -4,6 +4,8 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Acount.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Role.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Role;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.User;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.User.Request;
 @using BaseSolution.BlazorServer.Pages.Manager;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
 @using Blazored.SessionStorage;
@@ -11,21 +13,26 @@
 @inject AuthenticationStateProvider _authProvider
 @inject ISessionStorageService _session
 <div class="d-flex align-center justify-center w-100" style="height: 70vh">
-            <MudPaper Class="pa-4">
-                 <h3>Login</h3>
-                <MudForm Model="request" @ref="form">
-                    <MudTextField T="string" Label="Tài khoản" @bind-Value="request.UserName" Required="true" />
-                    <MudTextField T="string" Label="Mật khẩu" @bind-Value="request.Password" Required="true" />
-                    <MudCheckBox Checked="checkAdmin" Label="Admin" @onclick="@(() => checkAdmin = !checkAdmin)"></MudCheckBox>
-                    <MudCheckBox Checked="!checkAdmin" Label="Nhân viên" @onclick="@(() => checkAdmin = !checkAdmin)"></MudCheckBox>
-                    <MudSpacer></MudSpacer>
-                    <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="@LoginUser">Đăng nhập</MudButton>
-                </MudForm>
-            </MudPaper>
+    <MudPaper Class="pa-4">
+        <h3>Login</h3>
+        <MudForm Model="request" @ref="form">
+            <MudTextField T="string" Label="Tài khoản" @bind-Value="request.UserName" Required="true" />
+            <MudTextField @bind-Value="request.Password" Label="Password" Variant="Variant.Text" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" AdornmentAriaLabel="Show Password" />
+            <MudCheckBox Checked="checkAdmin" Label="Admin" @onclick="@(() => checkAdmin = !checkAdmin)"></MudCheckBox>
+            <MudCheckBox Checked="!checkAdmin" Label="Nhân viên" @onclick="@(() => checkAdmin = !checkAdmin)"></MudCheckBox>
+            <MudSpacer></MudSpacer>
+            <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="@LoginUser">Đăng nhập</MudButton>
+        </MudForm>
+    </MudPaper>
 </div>
 
 @code {
-    [Inject] 
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+    [Inject]
+    public IUserRepo userRespo { get; set; }
+    [Inject]
     NavigationManager navigation { get; set; }
     public bool checkAdmin { get; set; } = false;
     MudForm form;
@@ -37,9 +44,10 @@
     public IDialogService _dialogService { get; set; }
     [Inject]
     public ISnackbar _snackbar { get; set; }
-    private List<RoleDto> lstRole;
-    private PaginationResponse<RoleDto> roleVM;
-    private ViewRoleWithPaginationRequest roleRequest = new();
+
+    private List<UserHotelDTO> lstUser;
+    private PaginationResponse<UserHotelDTO> userVM;
+    private ViewUsersHotelWithPaginationRequest userRequest = new();
 
     private LoginInputRequest request = new();
     private ViewLoginInput loginVm = new();
@@ -51,8 +59,8 @@
 
     private async Task LoadData()
     {
-        roleVM = await roleRespo.GetAllRole(roleRequest);
-        lstRole = roleVM.Data!.ToList();
+        userVM = await userRespo.GetAllUser(userRequest);
+        lstUser = userVM.Data!.ToList();
     }
     private async Task LoginUser()
     {
@@ -60,37 +68,63 @@
         {
             request.UserRoleId = Guid.Parse("afce7ccf-2ab3-4350-be1c-791362258386"); // Id của Admin
         }
-        else 
+        else
         {
-            request.UserRoleId = Guid.Parse("5b521626-9f7f-49c8-a6e8-9fc79bfd9d29"); // Id của nhân viên 
+            request.UserRoleId = Guid.Parse("5b521626-9f7f-49c8-a6e8-9fc79bfd9d29"); // Id của nhân viên
         }
-        loginVm = await loginRepo.Login(request);
-        if (loginVm == null)
+
+        bool loginSuccessful = false;
+
+        foreach (var item in lstUser)
         {
-            await _dialogService.ShowMessageBox("Lỗi", "Vui lòng nhập đúng tài khoản và mật khẩu!");
+            if (request.UserName == item.UserName && request.Password == item.Password)
+            {
+                if (request.UserRoleId != item.UserRoleId)
+                {
+                    _snackbar.Add("Quyền đăng nhập không tồn tại!", Severity.Error);
+                }
+                else
+                {
+                    LoginSuccess();
+                    loginSuccessful = true;
+                    break;
+                }
+            }
+        }
+
+        if (!loginSuccessful && !lstUser.Any(user => user.UserName == request.UserName && user.Password == request.Password))
+        {
+            _snackbar.Add("Tài khoản hoặc mật khẩu không đúng!", Severity.Error);
+        }
+
+
+        return;
+    }
+    // Sự kiện pass word
+
+    private async Task LoginSuccess()
+    {
+
+        loginVm = await loginRepo.Login(request);
+        _snackbar.Add("Đăng nhập thành công", Severity.Success);
+        await HandlingAuthentication();
+        navigation.NavigateTo("/statistic/roombookingstatistic"); // sau khi login xong thì muốn chuyển đến màn nào thì chuyển sang màn đó
+    }
+
+    void ButtonTestclick()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
         }
         else
         {
-            var confirm = await _dialogService.ShowMessageBox(
-          "Thông báo",
-          "Xác nhận đăng nhập?",
-          "Xác nhận",
-          cancelText: "Hủy"
-      );
-
-            if (confirm == true)
-            {
-                _snackbar.Add("Đăng nhập thành công", Severity.Success);
-                await HandlingAuthentication();
-                navigation.NavigateTo("/statistic/roombookingstatistic"); // sau khi login xong thì muốn chuyển đến màn nào thì chuyển sang màn đó
-
-            }
-            else
-            {
-                _snackbar.Add("Đăng nhập thất bại", Severity.Error);
-            }
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
         }
-        return;
     }
     // nhét thông tin đăng nhập vào thôi
     private async Task HandlingAuthentication()

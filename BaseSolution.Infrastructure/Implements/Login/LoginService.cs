@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using BaseSolution.Application.DataTransferObjects.Account;
 using BaseSolution.Application.DataTransferObjects.Account.request;
 using BaseSolution.Application.Interfaces.Login;
@@ -13,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BaseSolution.Infrastructure.Implements.Login
@@ -31,32 +33,12 @@ namespace BaseSolution.Infrastructure.Implements.Login
         }
         public async Task<RequestResult<ViewLoginInput>> Login(LoginInputRequest request)
         {
-            // Bước 1 : lấy ra được User có user Name và password truyền xuống 
             try
             {
-                var result = new ViewLoginInput(); // khai báo để còn return 
-                var user = _dbContext.Users.FirstOrDefault(x => x.UserName == request.UserName && x.Password == request.Password);
-                if(user == null)
-                {
-                    return RequestResult<ViewLoginInput>.Fail(_localizationService["Login fail"]);
-                }
-                else
-                {
-                    // lấy ra Role của User đó
-                    result.UserName = user.UserName;
-                    result.Password = user.Password;
-                    var role = _dbContext.Users.FirstOrDefault(x => x.UserRoleId == request.UserRoleId && x.UserName == user.UserName && x.Password == user.Password);
-                    if(role == null)
-                    {
-                        return RequestResult<ViewLoginInput>.Fail(_localizationService["Login fail"]);
-                    }
-                    else 
-                    {
-                        result.UserRoleId = role.UserRoleId;
-                        result.RoleCode = _dbContext.UserRoles.Where(x => x.Id == result.UserRoleId).Select(x => x.RoleCode).FirstOrDefault();
-                    }
-                }
+                var result =  _dbContext.Users.AsNoTracking().Where(x => x.UserName == request.UserName && x.Password == request.Password && x.UserRoleId == request.UserRoleId)
+                 .ProjectTo<ViewLoginInput>(_mapper.ConfigurationProvider).FirstOrDefault();
                 return RequestResult<ViewLoginInput>.Succeed(result);
+
             }
             catch (Exception e)
             {
@@ -66,7 +48,7 @@ namespace BaseSolution.Infrastructure.Implements.Login
                     {
                         Error = e.Message,
                     }
-                });
+});
             }
         }
     }

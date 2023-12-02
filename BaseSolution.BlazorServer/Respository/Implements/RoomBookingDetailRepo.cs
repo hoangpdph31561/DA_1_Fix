@@ -1,5 +1,6 @@
 ﻿using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBookingDetail;
 using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBookingDetail.Request;
+using BaseSolution.BlazorServer.Data.ValueObjects.Pagination;
 using BaseSolution.BlazorServer.Respository.Interfaces;
 
 namespace BaseSolution.BlazorServer.Respository.Implements
@@ -11,6 +12,21 @@ namespace BaseSolution.BlazorServer.Respository.Implements
         public RoomBookingDetailRepo(HttpClient httpClient)
         {
             _httpClient = httpClient;
+        }
+
+        public async Task<PaginationResponse<RoomBookingDetailDTO>> GetRoomBookingDetailAsync(ViewRoomBookingDetailRequest request)
+        {
+            try
+            {
+                string url = $"/api/RoomBookingDetails/getRoomBookingDetailByOther";
+                var result = await _httpClient.GetFromJsonAsync<PaginationResponse<RoomBookingDetailDTO>>(url);
+                return result;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         public async Task <RoomBookingDetailDTO> GetRoomBookingDetailByRoomBookingId(Guid idRoomBooking)

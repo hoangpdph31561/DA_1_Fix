@@ -22,7 +22,7 @@ namespace BaseSolution.Infrastructure.ViewModels.Login
             {
                 var result = await _loginService.Login(data);
                 Data = result.Data;
-                Success  = true;
+                Success  = result.Success;
                 ErrorItems = result.Errors;
                 Message = result.Message;
                 return;

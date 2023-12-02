@@ -61,15 +61,23 @@
     IRoomBookingDetailRepo roomBookingDetailRepo { get; set; }
 
     RoomBookingDetailDTO _roomBookingDetail = new();
+    ViewRoomBookingDetailRequest getRoombookingrequest = new();
+
+    List<RoomBookingDetailDTO> _lstRoomBookingdetail = new();
+    PaginationResponse<RoomBookingDetailDTO> roomBookingDetailVM = new();
 
     DateTime? checkIn;
     DateTime? checkOut;
+    DateTime getDate = DateTime.Now;
     #endregion
 
     #region Code xử lý
     protected async override Task OnInitializedAsync()
     {
         await LoadData();
+        roomBookingDetailVM = await roomBookingDetailRepo.GetRoomBookingDetailAsync(getRoombookingrequest);
+        _lstRoomBookingdetail = (List<RoomBookingDetailDTO>)roomBookingDetailVM.Data!;
+
     }
     private async Task LoadData()
     {
@@ -100,7 +108,7 @@
                 Id = _roomBookingDetail.Id,
                 CheckInBooking = (DateTimeOffset)checkIn,
                 CheckOutBooking = (DateTimeOffset)checkOut,
-                
+
             };
         var confirm = await _dialogService.ShowMessageBox
         (
@@ -111,10 +119,33 @@
         );
         if (confirm == true)
         {
-            await roomBookingDetailRepo.UpdateRoomBookingDetail(RoomBookingDetailUpdateRequest);
-            MudDialog.Close(DialogResult.Ok(true));
-            _snackbar.Add("Sửa thành công", Severity.Success);
-            await Reset();
+
+            bool check = false;
+
+            foreach (var item in _lstRoomBookingdetail)
+            {
+                if (RoomBookingDetailUpdateRequest.CheckOutBooking == item.CheckInBooking)
+                {
+                    check = true;
+                    break; // Nếu có xung đột, thoát khỏi vòng lặp
+                }
+            }
+            if (check)
+            {
+                _snackbar.Add("Thời gian này có người vào", Severity.Error);
+            }
+            else if (RoomBookingDetailUpdateRequest.CheckInBooking < getDate || RoomBookingDetailUpdateRequest.CheckOutBooking < getDate)
+            {
+                _snackbar.Add("Thời gian không hợp lệ!", Severity.Error);
+            }
+
+            else
+            {
+                await roomBookingDetailRepo.UpdateRoomBookingDetail(RoomBookingDetailUpdateRequest);
+                MudDialog.Close(DialogResult.Ok(true));
+                _snackbar.Add("Sửa thành công", Severity.Success);
+                await Reset();
+            }
         }
         else
         {

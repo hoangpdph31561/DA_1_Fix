@@ -41,11 +41,12 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
             CreateMap<RoombookingCreateRequest, RoomBookingEntity>()
                 .ForPath(des => des.RoomBookingDetails,opt => opt.MapFrom(src => new List<RoomBookingDetailEntity>
                 {
-                     new RoomBookingDetailEntity
+                     new RoomBookingDetailEntity // tạo mới 1 đối tượng RoomBookingDetailEntity từ RoombookingCreateRequest truyền xuống
                      {
                          RoomDetailId = src.RoomDetailId,
                          CheckInBooking = src.CheckInBooking,
-                         CheckOutBooking = src.CheckOutBooking
+                         CheckOutBooking = src.CheckOutBooking,
+                         RoomBookingId = src.Id
                      }
                 }))
                 .ForMember(des => des.CustomerId,opt => opt.MapFrom(src => src.CustomerId))

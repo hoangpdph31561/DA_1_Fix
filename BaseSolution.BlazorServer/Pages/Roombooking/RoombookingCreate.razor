@@ -6,6 +6,7 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Service.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceType;
+@using BaseSolution.BlazorServer.Extensions;
 @using BaseSolution.BlazorServer.Pages.Customer;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
 <MudDialog>
@@ -35,13 +36,13 @@
                         }
                     </MudSelect>
     
-                 @*    <MudItem>
-                        <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="checkIn" Label="Giờ vào" DateFormat="dd/MM/yyyy hh:mm" />
+                    <MudItem>
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="checkIn" Label="Giờ vào" DateFormat="dd/MM/yyyy" />
                     </MudItem>
 
                     <MudItem>
-                        <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="checkOut" Label="Giờ ra" DateFormat="dd/MM/yyyy hh:mm" />
-                    </MudItem> *@
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="checkOut" Label="Giờ ra" DateFormat="dd/MM/yyyy " />
+                    </MudItem>
             </MudPaper>
             </MudForm>
         }
@@ -133,8 +134,11 @@
 
                 roomBookingCreateRequest.RoomDetailId = Guid.Parse(roomDetailId);
                 roomBookingCreateRequest.CustomerId = Guid.Parse(customerId);
-                // roomBookingCreateRequest.CheckOutBooking = (DateTimeOffset)checkOut;
-                // roomBookingCreateRequest.CheckInBooking = (DateTimeOffset)checkIn;
+                roomBookingCreateRequest.BookingType = BookingType.Offline;
+                roomBookingCreateRequest.CodeBooking = UtilityExtentions.GenerateRandomString(6);
+                 roomBookingCreateRequest.CheckOutBooking = (DateTimeOffset)checkOut;
+                roomBookingCreateRequest.CheckInBooking = (DateTimeOffset)checkIn;
+
                 var result = await roomBookingRespo.CreateNewRoomBooking(roomBookingCreateRequest);
                 if (result == true)
                 {

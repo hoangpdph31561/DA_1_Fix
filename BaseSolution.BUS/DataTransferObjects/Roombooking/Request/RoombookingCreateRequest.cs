@@ -5,6 +5,7 @@ namespace BaseSolution.Application.DataTransferObjects.Roombooking.Request
     public class RoombookingCreateRequest
     {
         public Guid CustomerId { get; set; }
+        public Guid Id { get; set; } = new Guid();
         public Guid RoomDetailId { get; set; }
         public BookingType BookingType { get; set; }
         public string CodeBooking { get; set; }

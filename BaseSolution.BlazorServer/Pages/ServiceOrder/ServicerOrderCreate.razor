@@ -32,6 +32,9 @@
                             <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
                         }
                     </MudSelect>
+                    <MudItem>
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="ngayđat" Label="Ngày đặt" DateFormat="dd/MM/yyyy" />
+                    </MudItem>
                 </MudPaper>
             </MudForm>
         }
@@ -57,7 +60,7 @@
     [Inject]
     public IServiceOrderRepo ServiceOderRepo { get; set; }
 
-
+    DateTime? ngayđat;
     private ServiceOrderCreateRequest serviceOderRequest = new();
     private ViewServiceWithPaginationRequest serviceViewRequest = new();
     private PaginationResponse<CustomerDTO> CustomerVM;
@@ -112,6 +115,7 @@
         {
             serviceOderRequest.CustomerId = Guid.Parse(customerId);
             serviceOderRequest.ServiceId = Guid.Parse(serviceId);
+            serviceOderRequest.CreatedTime = (DateTimeOffset)ngayđat;
             var result = await ServiceOderRepo.CreateNewService(serviceOderRequest);
             if (result == true)
             {

@@ -42,13 +42,13 @@
 @code {
     #region Khai báo
     [Inject]
-    public IBillRepo billRepo { get; set; }
+    public IBillRespo billRepo { get; set; }
 
     [Inject]
     public IDialogService dialogService { get; set; }
     [Inject]
     public ISnackbar snackbar { get; set; }
-    private ViewCustomerBillWithPaginationRequest billRequest = new();
+    private ViewBillWithPaginationRequest billRequest = new();
     private List<BillDTO> lstBill;
     private PaginationResponse<BillDTO> billPagination;
     private Guid _idBill = Guid.Empty;
@@ -80,6 +80,7 @@
         if (_isDisableControls) return;
         _isLoadingList = true;
         billRequest.PageNumber = 1;
+        billRequest.Search = searchString;
         await LoadData();
     }
 }

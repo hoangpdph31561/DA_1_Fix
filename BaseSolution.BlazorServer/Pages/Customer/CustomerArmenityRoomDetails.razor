@@ -69,7 +69,10 @@
     {
         _roomTypeInfo = await roomTypeRespo.GetRoomTypeById(idRoomType);
         _amenityRoomDetail = await amenityRoomDetailRepo.GetAllAmentityRoomDetail(amenityRoomDetailRequest);
-        lstAmenityRoomDetail = _amenityRoomDetail.Data!.ToList();
+        lstAmenityRoomDetail = _amenityRoomDetail.Data?
+         .GroupBy(a => a.NameOfAmenity) // Nhóm các tiện ích theo tên
+         .Select(g => g.First()) // Chỉ lấy bản ghi đầu tiên trong mỗi nhóm
+         .ToList();
         
     }
     private void OnClickCancel()

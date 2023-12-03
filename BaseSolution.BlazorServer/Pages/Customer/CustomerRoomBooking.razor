@@ -58,7 +58,7 @@
 
 @code {
     [Inject]
-    public IRoomBookingRepo _roomBookingRepo { get; set; }
+    public IRoomBookingRespo _roomBookingRepo { get; set; }
     [Inject]
     public IDialogService _dialogService { get; set; }
     [Inject]
@@ -82,7 +82,7 @@
     }
     private async Task LoadData()
     {
-        _roomBookingVM = await _roomBookingRepo.GetListRoomBookingByOther(_roomBookingRequest);
+        _roomBookingVM = await _roomBookingRepo.GetAllRoomBooking(_roomBookingRequest);
         _lstRoomBooking = _roomBookingVM.Data!.ToList();
         _isLoadingAll = false;
         _isLoadingList = false;

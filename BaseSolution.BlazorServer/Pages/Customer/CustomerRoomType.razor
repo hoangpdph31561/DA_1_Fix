@@ -42,7 +42,7 @@
 </CustomListDisplayP2>
 @code {
     [Inject]
-    public IRoomTypeRepo _roomTypeRepo { get; set; }
+    public IRoomTypeRespo _roomTypeRepo { get; set; }
     [Inject]
     public IDialogService _dialogService { get; set; }
     [Inject]
@@ -71,7 +71,7 @@
     #region RoomType
     private async Task LoadData()
     {
-        _RoomTypeVM = await _roomTypeRepo.GetRoomType(_roomTypeRequest);
+        _RoomTypeVM = await _roomTypeRepo.GetAllRoomTypes(_roomTypeRequest);
         _lstRoomType = _RoomTypeVM.Data!.ToList();
         _isLoadingList = false;
         _isLoadingAll = false;

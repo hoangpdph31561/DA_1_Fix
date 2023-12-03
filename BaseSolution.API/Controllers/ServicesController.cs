@@ -35,7 +35,7 @@ namespace BaseSolution.API.Controllers
             ServiceListWithPaginationViewModel vm = new(_ServiceReadOnlyRepository, _localizationService);
 
             await vm.HandleAsync(request, cancellationToken);
-            if(vm.Success)
+            if (vm.Success)
             {
                 PaginationResponse<ServiceDTO> result = (PaginationResponse<ServiceDTO>)vm.Data;
                 return Ok(result);
@@ -44,6 +44,22 @@ namespace BaseSolution.API.Controllers
             return BadRequest(vm);
         }
 
+        [HttpGet("getServiceAsync")]
+        public async Task<IActionResult> GetServiceAsync([FromQuery] ViewServiceWithPaginationRequest request, CancellationToken cancellationToken)
+        {
+            GetServiceViewModel vm = new(_ServiceReadOnlyRepository, _localizationService);
+
+            await vm.HandleAsync(request, cancellationToken);
+            if (vm.Success)
+            {
+                List<ServiceDTO> result = (List<ServiceDTO>)vm.Data;
+                return Ok(result);
+            }
+
+            return BadRequest(vm);
+        }
+
+
         // GET api/<ServiceController>/5
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id, CancellationToken cancellationToken)
@@ -51,9 +67,9 @@ namespace BaseSolution.API.Controllers
             ServiceViewModel vm = new(_ServiceReadOnlyRepository, _localizationService);
 
             await vm.HandleAsync(id, cancellationToken);
-            if( vm.Success)
+            if (vm.Success)
             {
-                return Ok((ServiceDTO) vm.Data);
+                return Ok((ServiceDTO)vm.Data);
             }
             return BadRequest(vm);
         }
@@ -64,7 +80,7 @@ namespace BaseSolution.API.Controllers
             ServiceCreateViewModel vm = new(_ServiceReadOnlyRepository, _ServiceReadWriteRepository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);
-            if(vm.Success)
+            if (vm.Success)
             {
                 return Ok(vm);
             }
@@ -85,7 +101,7 @@ namespace BaseSolution.API.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete([FromQuery]ServiceDeleteRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> Delete([FromQuery] ServiceDeleteRequest request, CancellationToken cancellationToken)
         {
             ServiceDeleteViewModel vm = new(_ServiceReadWriteRepository, _localizationService, _mapper);
 

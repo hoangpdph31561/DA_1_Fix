@@ -10,5 +10,6 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
        Task<PaginationResponse<RoomBookingDetailDTO>> GetRoomBookingDetailAsync(ViewRoomBookingDetailRequest roomBookingDetailRequest);
        Task<bool> UpdateRoomBookingDetail(RoomBookingDetailUpdateRequest request);
        Task<bool> UpdateRoomBookingDetail2(RoomBookingDetailUpdate2Request request);
+        Task<bool> CreateNewRoomBookingDetail(RoomBookingDetailCreateRequest request);
     }
 }

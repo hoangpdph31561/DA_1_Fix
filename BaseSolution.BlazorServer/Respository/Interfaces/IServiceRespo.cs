@@ -7,6 +7,7 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
     public interface IServiceRespo
     {
         Task<PaginationResponse<ServiceDTO>> GetAllServices(ViewServiceWithPaginationRequest request);
+        Task<List<ServiceDTO>> GetServices(ViewServiceWithPaginationRequest request);
         Task<bool> CreateNewService(ServiceCreateRequest request);
         Task<bool> UpdateService(ServiceUpdateRequest request);
         Task<bool> DeleteService(ServiceDeleteRequest request);

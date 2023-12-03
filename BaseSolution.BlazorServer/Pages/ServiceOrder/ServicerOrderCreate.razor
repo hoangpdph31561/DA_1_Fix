@@ -2,7 +2,10 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Service;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Service.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceOrder.Request;
+@using BaseSolution.BlazorServer.Pages.Customer;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
 <MudDialog>
     <DialogContent>
@@ -17,6 +20,14 @@
                     <MudSelect T="string" Label="Khách hàng" Class="mb-2"
                                AnchorOrigin="Origin.BottomCenter" @bind-Value="@customerId" For="@(() => customerId)">
                         @foreach (var item in lstCustomer)
+                        {
+                            <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudChip Icon="@Icons.Material.Filled.Add" @onclick="async() => await OpenAdd()" Color="Color.Primary">Thêm khách hàng mới</MudChip>
+                    <MudSelect T="string" Label="Dịch vụ" Class="mb-2"
+                               AnchorOrigin="Origin.BottomCenter" @bind-Value="@serviceId" For="@(() => serviceId)">
+                        @foreach (var item in lstService)
                         {
                             <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
                         }
@@ -39,7 +50,8 @@
     public IDialogService _dialogService { get; set; }
     [Inject]
     public ISnackbar _snackbar { get; set; }
-
+    [Inject]
+    public IServiceRespo serviceRespo { get; set; }
     [Inject]
     public ICustomerRepo cumtomerRespo { get; set; }
     [Inject]
@@ -47,16 +59,22 @@
 
 
     private ServiceOrderCreateRequest serviceOderRequest = new();
-
-
+    private ViewServiceWithPaginationRequest serviceViewRequest = new();
     private PaginationResponse<CustomerDTO> CustomerVM;
     List<CustomerDTO> lstCustomer = new();
+    private List<ServiceDTO> lstService;
     private string customerId;
+    private string serviceId;
+
 
     private ViewCustomerWithPaginationRequest customer = new();
 
     private bool _isLoadingList = true;
     MudForm _form;
+
+
+
+
     #endregion
     #region Code xử lý
     protected override async Task OnInitializedAsync()
@@ -68,7 +86,7 @@
 
         CustomerVM = await cumtomerRespo.GetCustomer(customer);
         lstCustomer = CustomerVM.Data!.ToList();
-
+        lstService = await serviceRespo.GetServices(serviceViewRequest);
         _isLoadingList = false;
     }
     private void OnClickCancel()
@@ -93,6 +111,7 @@
         if (confirm == true)
         {
             serviceOderRequest.CustomerId = Guid.Parse(customerId);
+            serviceOderRequest.ServiceId = Guid.Parse(serviceId);
             var result = await ServiceOderRepo.CreateNewService(serviceOderRequest);
             if (result == true)
             {
@@ -108,6 +127,15 @@
                 );
             }
             Reset();
+        }
+    }
+    private async Task OpenAdd()
+    {
+        var dialog = await _dialogService.ShowAsync<AdminCreateCustomer>("Thêm khách hàng đặt ");
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            StateHasChanged();
         }
     }
 

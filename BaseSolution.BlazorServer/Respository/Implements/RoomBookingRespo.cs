@@ -17,8 +17,17 @@ namespace BaseSolution.BlazorServer.Respository.Implements
 
         public async Task<bool> CreateNewRoomBooking(RoombookingCreateRequest request)
         {
-            var result = await _httpClient.PostAsJsonAsync("/api/Roombookings", request);
-            return result.IsSuccessStatusCode;
+            try
+            {
+                var result = await _httpClient.PostAsJsonAsync("/api/Roombookings", request);
+                return result.IsSuccessStatusCode;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
         }
 
         public async Task<Guid> CreateRoomBooking(RoombookingCreateRequest request)

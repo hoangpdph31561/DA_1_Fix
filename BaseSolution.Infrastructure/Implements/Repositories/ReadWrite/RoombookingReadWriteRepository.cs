@@ -6,6 +6,7 @@ using BaseSolution.Application.ValueObjects.Response;
 using BaseSolution.Domain.Entities;
 using BaseSolution.Domain.Enums;
 using BaseSolution.Infrastructure.Database.AppDbContext;
+using BaseSolution.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
@@ -40,6 +41,8 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 entity.CustomerId = entity.CustomerId;
                 entity.CreatedBy = entity.CreatedBy;
                 entity.CreatedTime = DateTimeOffset.Now;
+                entity.BookingType = BookingType.Offline;
+                entity.CodeBooking = UtilityExtensions.GenerateRandomString(6);
                 await _appReadWriteDbContext.RoomBookings.AddAsync(entity);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
                 return RequestResult<Guid>.Succeed(entity.Id);

@@ -32,6 +32,30 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             _localizationService = localizationService;
         }
 
+        public async Task<RequestResult<List<ServiceDTO>>> GetServiceAsync(ViewServiceWithPaginationRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+
+                var query = _ServiceEntities.AsNoTracking().Where(x => !x.Deleted).ProjectTo<ServiceDTO>(_mapper.ConfigurationProvider);
+
+                var result = await query.PaginateAsync(request, cancellationToken);
+              
+                return RequestResult<List<ServiceDTO>>.Succeed( await query.ToListAsync());
+            }
+            catch (Exception e)
+            {
+                return RequestResult<List<ServiceDTO>>.Fail(_localizationService["List of service  are not found"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "list of service "
+                    }
+                });
+            }
+        }
+
         public async Task<RequestResult<ServiceDTO?>> GetServiceByIdAsync(Guid idService, CancellationToken cancellationToken)
         {
             try

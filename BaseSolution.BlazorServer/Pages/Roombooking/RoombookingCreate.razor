@@ -34,13 +34,15 @@
                             <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
                         }
                     </MudSelect>
+    
+                 @*    <MudItem>
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="checkIn" Label="Giờ vào" DateFormat="dd/MM/yyyy hh:mm" />
+                    </MudItem>
 
-                    <MudSelect T="BookingType" AnchorOrigin="Origin.BottomCenter" Label="Loại đặt phòng" @bind-Value="roomBookingCreateRequest.BookingType" For="@(() => roomBookingCreateRequest.BookingType)">
-                        <MudSelectItem Value="BookingType.Online">Online</MudSelectItem>
-                        <MudSelectItem Value="BookingType.Offline">Offline</MudSelectItem>
-                    </MudSelect>           
-                    <MudTextField @bind-Value="@roomBookingCreateRequest.CodeBooking" For="@(() => roomBookingCreateRequest.CodeBooking)" Label="Mã đặt phòng"></MudTextField>
-                </MudPaper>
+                    <MudItem>
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="checkOut" Label="Giờ ra" DateFormat="dd/MM/yyyy hh:mm" />
+                    </MudItem> *@
+            </MudPaper>
             </MudForm>
         }
     </DialogContent>
@@ -58,6 +60,10 @@
     [Inject]
     public IRoomDetailRespo roomDetailRespo { get; set; }
     [Inject]
+
+    public IRoomBookingDetailRepo roomBookingDetailRespo { get; set; }
+    [Inject]
+
     public IRoomBookingRespo roomBookingRespo { get; set; }
     [Inject]
     public ICustomerRepo cumtomerRespo { get; set; }
@@ -79,6 +85,9 @@
 
     private string roomDetailId;
     private string customerId;
+
+    DateTime? checkIn;
+    DateTime? checkOut;
 
     private bool _isLoadingList = true;
     MudForm _form;
@@ -119,30 +128,41 @@
         );
         if (confirm == true)
         {
-            roomBookingCreateRequest.RoomDetailId = Guid.Parse(roomDetailId);
-            roomBookingCreateRequest.CustomerId = Guid.Parse(customerId);
+            try
+            {
 
-            var result = await roomBookingRespo.CreateNewRoomBooking(roomBookingCreateRequest);
-            if (result == true)
-            {
-                MudDialog.Close(DialogResult.Ok(true));
-                _snackbar.Add("Thêm thành công", Severity.Success);
+                roomBookingCreateRequest.RoomDetailId = Guid.Parse(roomDetailId);
+                roomBookingCreateRequest.CustomerId = Guid.Parse(customerId);
+                // roomBookingCreateRequest.CheckOutBooking = (DateTimeOffset)checkOut;
+                // roomBookingCreateRequest.CheckInBooking = (DateTimeOffset)checkIn;
+                var result = await roomBookingRespo.CreateNewRoomBooking(roomBookingCreateRequest);
+                if (result == true)
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    _snackbar.Add("Thêm thành công", Severity.Success);
+                }
+                else
+                {
+                    _snackbar.Add
+                    (
+                        "Thêm thất bại",
+                         Severity.Error
+                    );
+                }
+                Reset();
             }
-            else
+            catch (Exception)
             {
-                _snackbar.Add
-                (
-                    "Thêm thất bại",
-                     Severity.Error
-                );
+                
+                throw;
             }
-            Reset();
+          
         }
     }
 
     private async Task OpenAdd()
     {
-        var dialog = await _dialogService.ShowAsync<CustomerCreate>("Thêm khách hàng đặt ");
+        var dialog = await _dialogService.ShowAsync<AdminCreateCustomer>("Thêm khách hàng đặt ");
         var result = await dialog.Result;
         if (!result.Canceled)
         {

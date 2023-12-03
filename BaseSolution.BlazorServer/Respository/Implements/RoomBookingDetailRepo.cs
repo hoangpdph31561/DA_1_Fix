@@ -14,6 +14,20 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             _httpClient = httpClient;
         }
 
+        public async Task<bool> CreateNewRoomBookingDetail(RoomBookingDetailCreateRequest request)
+        {
+            try
+            {
+                var result = await _httpClient.PostAsJsonAsync("/api/RoomBookingDetails", request);
+                return result.IsSuccessStatusCode;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
         public async Task<PaginationResponse<RoomBookingDetailDTO>> GetRoomBookingDetailAsync(ViewRoomBookingDetailRequest request)
         {
             try
@@ -54,5 +68,8 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             var result = await _httpClient.PutAsJsonAsync("/api/RoomBookingDetails/updateRoomBookingDetail", request);
             return result.IsSuccessStatusCode;
         }
+
+
+
     }
 }

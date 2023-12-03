@@ -15,5 +15,10 @@ namespace BaseSolution.Application.Interfaces.Repositories.ReadOnly
         Task<RequestResult<ServiceDTO?>> GetServiceByIdAsync(Guid idService, CancellationToken cancellationToken);
         Task<RequestResult<PaginationResponse<ServiceDTO>>> GetServiceWithPaginationByAdminAsync(
             ViewServiceWithPaginationRequest request, CancellationToken cancellationToken);
+
+            Task<RequestResult<List<ServiceDTO>>> GetServiceAsync(
+            ViewServiceWithPaginationRequest request, CancellationToken cancellationToken);
+
+
     }
 }

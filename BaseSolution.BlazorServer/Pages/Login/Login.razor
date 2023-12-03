@@ -18,8 +18,13 @@
         <MudForm Model="request" @ref="form">
             <MudTextField T="string" Label="Tài khoản" @bind-Value="request.UserName" Required="true" />
             <MudTextField @bind-Value="request.Password" Label="Password" Variant="Variant.Text" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" AdornmentAriaLabel="Show Password" />
-            <MudCheckBox Checked="checkAdmin" Label="Admin" @onclick="@(() => checkAdmin = !checkAdmin)"></MudCheckBox>
-            <MudCheckBox Checked="!checkAdmin" Label="Nhân viên" @onclick="@(() => checkAdmin = !checkAdmin)"></MudCheckBox>
+            <MudRadioGroup @bind-SelectedOption="@RoleId" ReadOnly="ReadOnly">
+                @foreach (var role in lstRole)
+                {
+                    <MudRadio Option="role.Id.ToString()">@role.RoleCode</MudRadio>
+                }
+
+            </MudRadioGroup>
             <MudSpacer></MudSpacer>
             <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="@LoginUser">Đăng nhập</MudButton>
         </MudForm>
@@ -45,6 +50,11 @@
     [Inject]
     public ISnackbar _snackbar { get; set; }
 
+    private ViewRoleWithPaginationRequest roleRequest = new();
+    private List<RoleDto> lstRole = new();
+    private PaginationResponse<RoleDto> roleVM;
+
+
     private List<UserHotelDTO> lstUser;
     private PaginationResponse<UserHotelDTO> userVM;
     private ViewUsersHotelWithPaginationRequest userRequest = new();
@@ -52,6 +62,9 @@
     private LoginInputRequest request = new();
     private ViewLoginInput loginVm = new();
 
+
+    private string RoleId { get; set; }
+    public bool ReadOnly { get; set; }
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
@@ -61,18 +74,13 @@
     {
         userVM = await userRespo.GetAllUser(userRequest);
         lstUser = userVM.Data!.ToList();
+        roleVM = await roleRespo.GetAllRole(roleRequest);
+        lstRole = roleVM.Data!.ToList();
+
     }
     private async Task LoginUser()
     {
-        if (checkAdmin == true)
-        {
-            request.UserRoleId = Guid.Parse("afce7ccf-2ab3-4350-be1c-791362258386"); // Id của Admin
-        }
-        else
-        {
-            request.UserRoleId = Guid.Parse("5b521626-9f7f-49c8-a6e8-9fc79bfd9d29"); // Id của nhân viên
-        }
-
+        request.UserRoleId = Guid.Parse(RoleId);
         bool loginSuccessful = false;
 
         foreach (var item in lstUser)

@@ -13,13 +13,15 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
             CreateMap<ServiceOrderEntity, ServiceOrderDTO>()
                 .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer.Name))
                 .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.Customer.Id))
-                .ForMember(des => des.Price, opt => opt.MapFrom(src => src.Customer.ServiceOrders.SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Price).FirstOrDefault()))
-                .ForMember(des => des.Quantity, opt => opt.MapFrom(src => src.Customer.ServiceOrders.Select(x => x.ServiceOrderDetails).Count()))
-                .ForMember(des => des.Name, opt => opt.MapFrom(src => src.Customer.ServiceOrders.SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Name).FirstOrDefault()))
+                .ForMember(dest => dest.ServiceId, opt => opt.MapFrom(src => src.ServiceOrderDetails.Select(x => x.Service.Id).FirstOrDefault()))
+                .ForMember(dest => dest.ServiceName, opt => opt.MapFrom(src => src.ServiceOrderDetails.Select(x => x.Service.Name).FirstOrDefault()))
+                .ForMember(des => des.Price, opt => opt.MapFrom(src => src.ServiceOrderDetails.Select(x => x.Service.Price).FirstOrDefault()))
+                .ForMember(des => des.Quantity, opt => opt.MapFrom(src => src.ServiceOrderDetails.Select(x => x.ServiceId).Count()))
                  ;
 
             CreateMap<ServiceOrderCreateRequest, ServiceOrderEntity>()
-                  .ForPath(des => des.ServiceOrderDetails, opt => opt.MapFrom(src => new List<ServiceOrderDetailEntity>
+                  .ForPath(des => des.ServiceOrderDetails, opt => opt.MapFrom(src =>
+                 new List<ServiceOrderDetailEntity>
                 {
                      new ServiceOrderDetailEntity
                      {

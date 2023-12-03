@@ -20,18 +20,19 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
                      .ForMember(des => des.RoomDetailId, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.RoomDetail.Id).FirstOrDefault()))
 
                      // room
-                     .ForMember(des => des.RoomPrice, otp => otp.MapFrom(src => src.Customer.RoomBookings.SelectMany(x => x.RoomBookingDetails).Select(x => x.RoomDetail.Price).FirstOrDefault()))
-                     .ForMember(des => des.PrePaid, otp => otp.MapFrom(src => src.Customer.RoomBookings.SelectMany(x => x.RoomBookingDetails).Select(x => x.PrePaid).FirstOrDefault()))
-                     .ForMember(des => des.CheckInBooking, otp => otp.MapFrom(src => src.Customer.RoomBookings.SelectMany(x => x.RoomBookingDetails).Select(x => x.CheckInBooking).FirstOrDefault()))
-                     .ForMember(des => des.CheckOutBooking, otp => otp.MapFrom(src => src.Customer.RoomBookings.SelectMany(x => x.RoomBookingDetails).Select(x => x.CheckOutBooking).FirstOrDefault()))
-                      .ForMember(des => des.RoomPrice, otp => otp.MapFrom(src => src.Customer.RoomBookings.SelectMany(x => x.RoomBookingDetails).Select(x => x.RoomDetail.Price).FirstOrDefault()))
+
+                     .ForMember(des => des.RoomPrice, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.RoomDetail.Price).FirstOrDefault()))
+                     .ForMember(des => des.PrePaid, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.PrePaid).FirstOrDefault()))
+                     .ForMember(des => des.CheckInBooking, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.CheckInBooking).FirstOrDefault()))
+                     .ForMember(des => des.CheckInBooking, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.CheckOutBooking).FirstOrDefault()))
+                      .ForMember(des => des.RoomPrice, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.RoomDetail.Price).FirstOrDefault()))
+
                      .ForMember(des => des.NameRoomType, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.RoomDetail.RoomType.Name).FirstOrDefault()))
 
 
                      // service
-                     .ForMember(des => des.TotalService, otp => otp.MapFrom(src => src.Customer.ServiceOrders.Count())) // tổng số service hiển thị ra mockup
+                     .ForMember(des => des.TotalService, otp => otp.MapFrom(src => src.Customer.ServiceOrders.SelectMany(x => x.ServiceOrderDetails).Select(x => x.ServiceId).Count())) // tổng số service hiển thị ra mockup
                      .ForMember(des => des.ServicePrice, otp => otp.MapFrom(src => src.Customer.ServiceOrders.SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Price).FirstOrDefault()))
-                     .ForMember(des => des.PrePaid, otp => otp.MapFrom(src => src.Customer.RoomBookings.SelectMany(x => x.RoomBookingDetails).Select(x => x.PrePaid).FirstOrDefault()))
                      .ForMember(des => des.NameService, otp => otp.MapFrom(src => src.Customer.ServiceOrders.SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Name).FirstOrDefault()))
                      .ForMember(des => des.CountServices, otp => otp.MapFrom(src => src.Customer.ServiceOrders.Select(x => x.CustomerId).Count())) // tổng số service khách hàng đấy sử dụng 
                      .ForMember(des => des.ServicePrice, otp => otp.MapFrom(src => src.Customer.ServiceOrders.SelectMany(x => x.ServiceOrderDetails.Select(x => x.Price)).FirstOrDefault()));
@@ -46,6 +47,8 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
                          RoomDetailId = src.RoomDetailId,
                          CheckInBooking = src.CheckInBooking,
                          CheckOutBooking = src.CheckOutBooking,
+                         CheckInReality = src.CheckInBooking,
+                         CheckOutReality =  src.CheckOutBooking,
                          RoomBookingId = src.Id
                      }
                 }))

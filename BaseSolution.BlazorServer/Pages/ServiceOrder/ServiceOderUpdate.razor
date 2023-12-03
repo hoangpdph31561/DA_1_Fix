@@ -13,7 +13,7 @@
 <MudDialog>
     <DialogContent>
         <MudForm Model="serviceOrderUpdate" @ref="@_form" @bind-IsValid="@_formIsValid">
-            <MudPaper Width="100%" Elevation="0">
+            <MudPaper Elevation="0">
                 <MudGrid>
                     <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" Label="Trạng thái" @bind-Value="serviceOrderUpdate.Status" For="@(() => serviceOrderUpdate.Status)">
                             <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
@@ -48,6 +48,8 @@
     #region Khai báo
     [Parameter]
     public Guid idServiceOrder { get; set; }
+    [Parameter]
+    public Guid idCustomer { get; set; }
 
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
@@ -133,14 +135,6 @@
             await Reset();
         }
     }
-    private async Task OpenAdd()
-    {
-        var dialog = await _dialogService.ShowAsync<CustomerCreate>("Thêm khách hàng đặt ");
-        var result = await dialog.Result;
-        if (!result.Canceled)
-        {
-            StateHasChanged();
-        }
-    }
+    
     #endregion
 }

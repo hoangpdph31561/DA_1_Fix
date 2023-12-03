@@ -62,8 +62,7 @@
     private LoginInputRequest request = new();
     private ViewLoginInput loginVm = new();
 
-
-    private string RoleId { get; set; }
+    private string RoleId = "4f49aa59-b4df-4149-ac60-c595c3926ffb"; // vì RoleId ở radio không được null => gán 1 giá trị tạm thời vào 
     public bool ReadOnly { get; set; }
     protected override async Task OnInitializedAsync()
     {
@@ -80,9 +79,9 @@
     }
     private async Task LoginUser()
     {
+      
         request.UserRoleId = Guid.Parse(RoleId);
         bool loginSuccessful = false;
-
         foreach (var item in lstUser)
         {
             if (request.UserName == item.UserName && request.Password == item.Password)
@@ -99,16 +98,13 @@
                 }
             }
         }
-
         if (!loginSuccessful && !lstUser.Any(user => user.UserName == request.UserName && user.Password == request.Password))
         {
             _snackbar.Add("Tài khoản hoặc mật khẩu không đúng!", Severity.Error);
         }
 
-
         return;
     }
-    // Sự kiện pass word
 
     private async Task LoginSuccess()
     {
@@ -118,7 +114,7 @@
         await HandlingAuthentication();
         navigation.NavigateTo("/statistic/roombookingstatistic"); // sau khi login xong thì muốn chuyển đến màn nào thì chuyển sang màn đó
     }
-
+    // Sự kiện pass word
     void ButtonTestclick()
     {
         @if (isShow)

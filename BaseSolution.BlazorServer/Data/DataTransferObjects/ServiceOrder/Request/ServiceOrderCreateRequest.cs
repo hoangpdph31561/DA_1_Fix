@@ -4,5 +4,6 @@
     {
         public Guid CustomerId { get; set; }
         public Guid ServiceId { get; set; }
+        public DateTimeOffset CreatedTime { get; set; }
     }
 }

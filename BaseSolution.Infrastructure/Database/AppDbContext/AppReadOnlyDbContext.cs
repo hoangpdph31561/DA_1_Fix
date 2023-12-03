@@ -12,11 +12,11 @@ namespace BaseSolution.Infrastructure.Database.AppDbContext
     {
         public AppReadOnlyDbContext()
         {
-            
+
         }
-        public AppReadOnlyDbContext(DbContextOptions<AppReadOnlyDbContext> options) : base(options) 
+        public AppReadOnlyDbContext(DbContextOptions<AppReadOnlyDbContext> options) : base(options)
         {
-            
+
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -27,7 +27,7 @@ namespace BaseSolution.Infrastructure.Database.AppDbContext
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=DA1_HotelBooking;Integrated Security=True;TrustServerCertificate=true");
+                optionsBuilder.UseSqlServer("Data Source=PHAMDUCHOANG\\SQLEXPRESS;Initial Catalog=DA1_HotelBooking;Integrated Security=True;TrustServerCertificate=true");
             }
         }
 

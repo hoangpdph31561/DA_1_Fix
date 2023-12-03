@@ -10,10 +10,10 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
         {
             CreateMap<BillEntity, BillStatisticDto>()
                 .ForMember(des => des.Month, opt => opt.MapFrom(src => src.CreatedTime.Month))
-                .ForMember(des => des.TotalService, opt => opt.MapFrom(src => src.Customer.ServiceOrders.Select(x => x.ServiceOrderDetails).Count()))
+                .ForMember(des => des.TotalService, opt => opt.MapFrom(src => src.Customer.ServiceOrders.SelectMany(x => x.ServiceOrderDetails).Select(x => x.ServiceId).Count()))
                 .ForMember(des => des.ServicePrice, opt => opt.MapFrom(src => src.Customer.ServiceOrders.SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Price).FirstOrDefault()))
                 .ForMember(des => des.RoomPrice, opt => opt.MapFrom(src => src.Customer.RoomBookings.SelectMany(x => x.RoomBookingDetails).Select(x => x.RoomDetail.Price).FirstOrDefault()))
-                .ForMember(des => des.TotalRoom, opt => opt.MapFrom(src => src.Customer.RoomBookings.Select(x => x.RoomBookingDetails).Count()));
+                .ForMember(des => des.TotalRoom, opt => opt.MapFrom(src => src.Customer.RoomBookings.SelectMany(x => x.RoomBookingDetails).Select(x => x.RoomDetailId).Count()));
         }
     }
 }

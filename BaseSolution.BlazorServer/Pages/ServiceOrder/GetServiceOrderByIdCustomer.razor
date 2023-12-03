@@ -11,10 +11,10 @@
         }
         else
         {
-            <MudTable Items="_lstServiceOrder.DistinctBy(x => x.Name).ToList()">
+            <MudTable Items="_lstServiceOrder.DistinctBy(x => x.ServiceName).ToList()">
                 <RowTemplate>
                     <MudTd>@(_lstServiceOrder.IndexOf(context) + 1)</MudTd>
-                        <MudTd>@context.Name</MudTd>
+                        <MudTd>@context.ServiceName</MudTd>
                         <MudTd>@context.Quantity</MudTd>
                     </RowTemplate>
                 </MudTable>

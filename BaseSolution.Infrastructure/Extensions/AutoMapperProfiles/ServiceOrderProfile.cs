@@ -18,7 +18,17 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
                 .ForMember(des => des.Name, opt => opt.MapFrom(src => src.Customer.ServiceOrders.SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Name).FirstOrDefault()))
                  ;
 
-            CreateMap<ServiceOrderCreateRequest, ServiceOrderEntity>();
+            CreateMap<ServiceOrderCreateRequest, ServiceOrderEntity>()
+                  .ForPath(des => des.ServiceOrderDetails, opt => opt.MapFrom(src => new List<ServiceOrderDetailEntity>
+                {
+                     new ServiceOrderDetailEntity
+                     {
+                         ServiceId = src.ServiceId,
+                     }
+                }))
+                .ForMember(des => des.CustomerId, opt => opt.MapFrom(src => src.CustomerId))
+                ;
+            ;
             CreateMap<ServiceOrderUpdateRequest, ServiceOrderEntity>();
         }
     }

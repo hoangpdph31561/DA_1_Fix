@@ -28,6 +28,10 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
 
                 entity.Status = entity.Status == EntityStatus.Active ? EntityStatus.Active : EntityStatus.InActive;
                 entity.CreatedTime = DateTimeOffset.Now;
+                entity.CheckOutBooking = entity.CheckOutBooking;
+                entity.CheckInBooking = entity.CheckInBooking;
+                entity.CheckInReality = entity.CheckInBooking;
+                entity.CheckOutReality = entity.CheckOutBooking;
                 await _appReadWriteDbContext.RoomBookingDetails.AddAsync(entity);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
                 return RequestResult<Guid>.Succeed(entity.Id);

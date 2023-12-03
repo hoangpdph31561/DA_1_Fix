@@ -48,6 +48,13 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             return result;
         }
 
+        public async Task<List<ServiceDTO>> GetServices(ViewServiceWithPaginationRequest request)
+        {
+            string url = $"/api/Services/getServiceAsync";
+            var result = await _httpClient.GetFromJsonAsync<List<ServiceDTO>>(url);
+            return result;
+        }
+
         public async Task<bool> UpdateService(ServiceUpdateRequest request)
         {
             var result = await _httpClient.PutAsJsonAsync("/api/Services", request);

@@ -30,7 +30,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
             try
             {
                 entity.CreatedTime = DateTimeOffset.UtcNow;
-
+                
                 await _appReadWriteDbContext.ServiceOrderDetails.AddAsync(entity);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
 

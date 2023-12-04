@@ -13,7 +13,9 @@ using Microsoft.AspNetCore.Authorization;
 using BaseSolution.Application.DataTransferObjects.Customer;
 using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Domain.Entities;
-using System.Threading;
+using FluentValidation;
+using FluentValidation.Results;
+using FluentValidation.AspNetCore;
 
 namespace BaseSolution.API.Controllers
 {
@@ -25,14 +27,20 @@ namespace BaseSolution.API.Controllers
         public readonly ICustomerReadWriteRepository _CustomerReadWriteRepository;
         private readonly ILocalizationService _localizationService;
         private readonly IMapper _mapper;
+        private readonly IValidator<CustomerCreateRequest> _validator;
+        private readonly IValidator<CustomerUpdateRequest> _validatorUpdate;
         private string _verifyCode = string.Empty;
 
-        public CustomersController(ICustomerReadOnlyRepository CustomerReadOnlyRepository, ICustomerReadWriteRepository CustomerReadWriteRepository, ILocalizationService localizationService, IMapper mapper)
+        public CustomersController(ICustomerReadOnlyRepository CustomerReadOnlyRepository, ICustomerReadWriteRepository CustomerReadWriteRepository, ILocalizationService localizationService, IMapper mapper,
+            IValidator<CustomerCreateRequest> validator, IValidator<CustomerUpdateRequest> validatorUpdate
+            )
         {
             _CustomerReadOnlyRepository = CustomerReadOnlyRepository;
             _CustomerReadWriteRepository = CustomerReadWriteRepository;
             _localizationService = localizationService;
             _mapper = mapper;
+            _validator = validator;
+            _validatorUpdate = validatorUpdate;
         }
 
         // GET api/<CustomerController>/5
@@ -234,6 +242,12 @@ namespace BaseSolution.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(CustomerCreateRequest request, CancellationToken cancellationToken)
         {
+            ValidationResult validate = await _validator.ValidateAsync(request);
+            if (!validate.IsValid)
+            {
+                validate.AddToModelState(this.ModelState);
+                return BadRequest(ModelState);
+            }
             CustomerCreateViewModel vm = new(_CustomerReadOnlyRepository, _CustomerReadWriteRepository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);
@@ -247,6 +261,12 @@ namespace BaseSolution.API.Controllers
         [HttpPut]
         public async Task<IActionResult> Put(CustomerUpdateRequest request, CancellationToken cancellationToken)
         {
+            ValidationResult validate = await _validatorUpdate.ValidateAsync(request);
+            if (!validate.IsValid)
+            {
+                validate.AddToModelState(this.ModelState);
+                return BadRequest(ModelState);
+            }
             CustomerUpdateViewModel vm = new(_CustomerReadWriteRepository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);

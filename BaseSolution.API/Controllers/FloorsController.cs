@@ -6,6 +6,9 @@ using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
 using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Infrastructure.ViewModels.Floor;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,12 +22,19 @@ namespace BaseSolution.API.Controllers
         private readonly IFloorReadWriteRespository _floorReadWriteRespository;
         private readonly IMapper _mapper;
         private readonly ILocalizationService _localizationService;
-        public FloorsController(IFloorReadOnlyRespository floorReadOnlyRespository, IFloorReadWriteRespository floorReadWriteRespository, IMapper mapper, ILocalizationService localizationService)
+        private readonly IValidator<FloorCreateRequest> _validator;
+        private readonly IValidator<FloorUpdateRequest> _validatorUpdate;
+
+        public FloorsController(IFloorReadOnlyRespository floorReadOnlyRespository, IFloorReadWriteRespository floorReadWriteRespository, IMapper mapper, ILocalizationService localizationService,
+             IValidator<FloorCreateRequest> validator, IValidator<FloorUpdateRequest> validatorUpdate
+            )
         {
             _floorReadOnlyRespository = floorReadOnlyRespository;
             _floorReadWriteRespository = floorReadWriteRespository;
             _mapper = mapper;
             _localizationService = localizationService;
+            _validator = validator;
+            _validatorUpdate = validatorUpdate;
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFloorById(Guid id, CancellationToken cancellationToken)
@@ -60,6 +70,12 @@ namespace BaseSolution.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateNewFloor(FloorCreateRequest request, CancellationToken cancellationToken)
         {
+            ValidationResult validate = await _validator.ValidateAsync(request);
+            if (!validate.IsValid)
+            {
+                validate.AddToModelState(this.ModelState);
+                return BadRequest(ModelState);
+            }
             FloorCreateViewModel vm = new(_floorReadOnlyRespository, _floorReadWriteRespository,_mapper, _localizationService);
             await vm.HandleAsync(request,cancellationToken); 
             if(vm.Success)
@@ -71,6 +87,12 @@ namespace BaseSolution.API.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateFloor(FloorUpdateRequest request, CancellationToken cancellationToken)
         {
+            ValidationResult validate = await _validatorUpdate.ValidateAsync(request);
+            if (!validate.IsValid)
+            {
+                validate.AddToModelState(this.ModelState);
+                return BadRequest(ModelState);
+            }
             FloorUpdateViewModel vm = new(_floorReadWriteRespository, _mapper, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
             if (vm.Success)

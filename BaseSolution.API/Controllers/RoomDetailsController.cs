@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BaseSolution.Application.DataTransferObjects.Role.Request;
 using BaseSolution.Application.DataTransferObjects.RoomDetail;
 using BaseSolution.Application.DataTransferObjects.RoomDetail.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
@@ -9,6 +10,9 @@ using BaseSolution.Infrastructure.Implements.Repositories.ReadOnly;
 using BaseSolution.Infrastructure.Implements.Repositories.ReadWrite;
 using BaseSolution.Infrastructure.ViewModels.Customer;
 using BaseSolution.Infrastructure.ViewModels.RoomDetail;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,14 +27,21 @@ namespace BaseSolution.API.Controllers
         public readonly IRoomDetailReadWriteRepository _RoomDetailReadWriteRepository;
         private readonly ILocalizationService _localizationService;
         private readonly IMapper _mapper;
+        private readonly IValidator<RoomDetailCreateRequest> _validator;
+        private readonly IValidator<RoomDetailUpdateRequest> _validatorUpdate;
+        private readonly IValidator<RoomDetailDeleteRequest> _validatorDelete;
 
-
-        public RoomDetailsController(IRoomDetailReadOnlyRepository RoomDetailReadOnlyRepository, IRoomDetailReadWriteRepository RoomDetailReadWriteRepository, ILocalizationService localizationService, IMapper mapper)
+        public RoomDetailsController(IRoomDetailReadOnlyRepository RoomDetailReadOnlyRepository, IRoomDetailReadWriteRepository RoomDetailReadWriteRepository, ILocalizationService localizationService, IMapper mapper,
+             IValidator<RoomDetailCreateRequest> validator, IValidator<RoomDetailUpdateRequest> validatorUpdate, IValidator<RoomDetailDeleteRequest> validatorDelete)
         {
             _RoomDetailReadOnlyRepository = RoomDetailReadOnlyRepository;
             _RoomDetailReadWriteRepository = RoomDetailReadWriteRepository;
             _localizationService = localizationService;
             _mapper = mapper;
+            _validator = validator;
+            _validatorUpdate = validatorUpdate;
+            _validatorDelete = validatorDelete;
+
         }
         [HttpGet]
         public async Task<IActionResult> GetListRoomDetailByAdmin([FromQuery] ViewRoomDetailWithPaginationRequest request, CancellationToken cancellationToken)
@@ -96,6 +107,12 @@ namespace BaseSolution.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(RoomDetailCreateRequest request, CancellationToken cancellationToken)
         {
+            ValidationResult validate = await _validator.ValidateAsync(request);
+            if (!validate.IsValid)
+            {
+                validate.AddToModelState(this.ModelState);
+                return BadRequest(ModelState);
+            }
             RoomDetailCreateViewModel vm = new(_RoomDetailReadOnlyRepository, _RoomDetailReadWriteRepository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);
@@ -109,6 +126,12 @@ namespace BaseSolution.API.Controllers
         [HttpPut]
         public async Task<IActionResult> Put(RoomDetailUpdateRequest request, CancellationToken cancellationToken)
         {
+            ValidationResult validate = await _validatorUpdate.ValidateAsync(request);
+            if (!validate.IsValid)
+            {
+                validate.AddToModelState(this.ModelState);
+                return BadRequest(ModelState);
+            }
             RoomDetailUpdateViewModel vm = new(_RoomDetailReadWriteRepository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);
@@ -134,6 +157,12 @@ namespace BaseSolution.API.Controllers
         [HttpDelete]
         public async Task<IActionResult> Delete([FromQuery]RoomDetailDeleteRequest request, CancellationToken cancellationToken)
         {
+            ValidationResult validate = await _validatorDelete.ValidateAsync(request);
+            if (!validate.IsValid)
+            {
+                validate.AddToModelState(this.ModelState);
+                return BadRequest(ModelState);
+            }
             RoomDetailDeleteViewModel vm = new(_RoomDetailReadWriteRepository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);

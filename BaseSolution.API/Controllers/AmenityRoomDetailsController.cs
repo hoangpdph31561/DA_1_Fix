@@ -6,6 +6,9 @@ using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
 using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Infrastructure.ViewModels.AmenityRoomDetail;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BaseSolution.API.Controllers
@@ -18,12 +21,22 @@ namespace BaseSolution.API.Controllers
         private readonly IAmenityRoomDetailReadWriteRepository _AmenityRoomDetailReadWriteRespository;
         private readonly IMapper _mapper;
         private readonly ILocalizationService _localizationService;
-        public AmenityRoomDetailsController(IAmenityRoomDetailReadOnlyRepository AmenityRoomDetailReadOnlyRepository, IAmenityRoomDetailReadWriteRepository AmenityRoomDetailReadWriteRepository, IMapper mapper, ILocalizationService localizationService)
+        private readonly IValidator<AmenityRoomDetailCreateRequest> _validator;
+        private readonly IValidator<AmenityRoomDetailUpdateRequest> _validatorUpdate;
+        private readonly IValidator<AmenityRoomDetailDeleteRequest> _validatorDetete;
+
+        public AmenityRoomDetailsController(IAmenityRoomDetailReadOnlyRepository AmenityRoomDetailReadOnlyRepository, IAmenityRoomDetailReadWriteRepository AmenityRoomDetailReadWriteRepository, IMapper mapper, ILocalizationService localizationService,
+            IValidator<AmenityRoomDetailCreateRequest> validator, IValidator<AmenityRoomDetailUpdateRequest> validatorUpdate,
+            IValidator<AmenityRoomDetailDeleteRequest> validatorDetete
+            )
         {
             _AmenityRoomDetailReadOnlyRespository = AmenityRoomDetailReadOnlyRepository;
             _AmenityRoomDetailReadWriteRespository = AmenityRoomDetailReadWriteRepository;
             _mapper = mapper;
             _localizationService = localizationService;
+            _validator = validator;
+            _validatorUpdate = validatorUpdate;
+            _validatorDetete = validatorDetete;
         }
         [HttpGet]
         public async Task<IActionResult> GetListAmenityRoomDetailByAdmin([FromQuery] ViewAmenityRoomDetailWithPaginationRequest request, CancellationToken cancellationToken)
@@ -48,6 +61,12 @@ namespace BaseSolution.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateNewAmenityRoomDetail(AmenityRoomDetailCreateRequest request, CancellationToken cancellationToken)
         {
+            ValidationResult validate = await _validator.ValidateAsync(request);
+            if (!validate.IsValid)
+            {
+                validate.AddToModelState(this.ModelState);
+                return BadRequest(ModelState);
+            }
             AmenityRoomDetailCreateViewModel vm = new(_AmenityRoomDetailReadOnlyRespository, _AmenityRoomDetailReadWriteRespository, _mapper, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
             return Ok(vm);
@@ -56,6 +75,12 @@ namespace BaseSolution.API.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateAmenityRoomDetail(AmenityRoomDetailUpdateRequest request, CancellationToken cancellationToken)
         {
+            ValidationResult validate = await _validatorUpdate.ValidateAsync(request);
+            if (!validate.IsValid)
+            {
+                validate.AddToModelState(this.ModelState);
+                return BadRequest(ModelState);
+            }
             AmenityRoomDetailUpdateViewModel vm = new(_AmenityRoomDetailReadWriteRespository, _mapper, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
             return Ok(vm);
@@ -75,6 +100,12 @@ namespace BaseSolution.API.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteAmenityRoomDetail(AmenityRoomDetailDeleteRequest request, CancellationToken cancellationToken)
         {
+            ValidationResult validate = await _validatorDetete.ValidateAsync(request);
+            if (!validate.IsValid)
+            {
+                validate.AddToModelState(this.ModelState);
+                return BadRequest(ModelState);
+            }
             AmenityRoomDetailDeleteViewModel vm = new(_AmenityRoomDetailReadWriteRespository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);

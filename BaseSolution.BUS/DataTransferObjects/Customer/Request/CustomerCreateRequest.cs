@@ -1,4 +1,6 @@
 ﻿using BaseSolution.Domain.Enums;
+using FluentValidation;
+using FluentValidation.Validators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +18,21 @@ namespace BaseSolution.Application.DataTransferObjects.Customer.Request
         public string? ApprovedCode { get; set; }
         public DateTimeOffset? ApprovedCodeExpiredTime { get; set; }
         public CustomerType CustomerType { get; set; }
+
+        public class CustomerValication : AbstractValidator<CustomerCreateRequest>
+        {
+            public CustomerValication()
+            {
+                RuleFor(x => x.Name).NotEmpty().WithMessage("Name cannot be empty.");
+
+                RuleFor(x => x.IdentificationNumber).NotEmpty().WithMessage("IdentificationNumber cannot be empty.");
+
+                RuleFor(x => x.PhoneNumber).NotEmpty().WithMessage("Phone number cannot be empty.")
+                                           .Matches(@"^\d{10,}$").WithMessage("Invalid phone number format.");
+                 RuleFor(x => x.Email).NotEmpty().WithMessage("Phone number cannot be empty.")
+                                           .EmailAddress(EmailValidationMode.Net4xRegex).WithMessage("Invalid email address.");
+
+            }
+        }
     }
 }

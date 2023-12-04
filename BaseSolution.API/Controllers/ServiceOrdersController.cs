@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BaseSolution.Application.DataTransferObjects.Role.Request;
 using BaseSolution.Application.DataTransferObjects.ServiceOrder;
 using BaseSolution.Application.DataTransferObjects.ServiceOrder.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
@@ -6,6 +7,9 @@ using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
 using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Infrastructure.ViewModels.ServiceOrder;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,14 +21,21 @@ namespace BaseSolution.API.Controllers
     {
         private readonly IServiceOrderReadOnlyRespository _serviceOrderReadOnly;
         private readonly ILocalizationService _localizationService;
+        private readonly IValidator<ServiceOrderCreateRequest> _validator;
+        private readonly IValidator<ServiceOrderUpdateRequest> _validatorUpdate;
+        private readonly IValidator<ServiceOrderDeleteRequest> _validatorDelete;
         private readonly IMapper _mapper;
         private readonly IServiceOrderReadWriteRespository _serviceOrderReadWrite;
-        public ServiceOrdersController(IServiceOrderReadOnlyRespository serviceOrderReadOnly, IServiceOrderReadWriteRespository serviceOrderReadWrite, IMapper mapper, ILocalizationService localizationService)
+        public ServiceOrdersController(IServiceOrderReadOnlyRespository serviceOrderReadOnly, IServiceOrderReadWriteRespository serviceOrderReadWrite, IMapper mapper, ILocalizationService localizationService,
+              IValidator<ServiceOrderCreateRequest> validator, IValidator<ServiceOrderUpdateRequest> validatorUpdate, IValidator<ServiceOrderDeleteRequest> validatorDelete)
         {
             _serviceOrderReadOnly = serviceOrderReadOnly;
             _serviceOrderReadWrite = serviceOrderReadWrite;
             _mapper = mapper;
             _localizationService = localizationService;
+            _validator = validator;
+            _validatorUpdate = validatorUpdate;
+            _validatorDelete = validatorDelete;
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetServiceOrderById(Guid id, CancellationToken cancellationToken)
@@ -72,6 +83,13 @@ namespace BaseSolution.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateNewServiceOrder(ServiceOrderCreateRequest request, CancellationToken cancellationToken)
         {
+            ValidationResult validate = await _validator.ValidateAsync(request);
+            if (!validate.IsValid)
+            {
+                validate.AddToModelState(this.ModelState);
+                return BadRequest(ModelState);
+            }
+
             ServiceOrderCreateViewModel vm = new(_serviceOrderReadOnly, _serviceOrderReadWrite, _mapper, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
             return Ok(vm);
@@ -79,6 +97,13 @@ namespace BaseSolution.API.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateServiceOrder (ServiceOrderUpdateRequest request, CancellationToken cancellationToken)
         {
+            ValidationResult validate = await _validatorUpdate.ValidateAsync(request);
+            if (!validate.IsValid)
+            {
+                validate.AddToModelState(this.ModelState);
+                return BadRequest(ModelState);
+            }
+
             ServiceOrderUpdateViewModel vm = new(_serviceOrderReadWrite, _mapper, _localizationService);
             await vm.HandleAsync (request, cancellationToken);
             return Ok(vm);
@@ -86,6 +111,13 @@ namespace BaseSolution.API.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteServiceOrder(ServiceOrderDeleteRequest request, CancellationToken cancellationToken)
         {
+            ValidationResult validate = await _validatorDelete.ValidateAsync(request);
+            if (!validate.IsValid)
+            {
+                validate.AddToModelState(this.ModelState);
+                return BadRequest(ModelState);
+            }
+
             ServiceOrderDeleteViewModel vm = new(_serviceOrderReadWrite, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
             return Ok(vm);

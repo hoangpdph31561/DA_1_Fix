@@ -17,7 +17,7 @@ namespace BaseSolution.Application.DataTransferObjects.Amenity.Request
             {
                 RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required");
                 RuleFor(x => x.Description).NotEmpty().WithMessage("Description is required");
-                RuleFor(x => x.Status).NotEmpty().WithMessage("Status is required");
+                RuleFor(x => x.Status).IsInEnum().WithMessage("Status is required");
             }
         }
     }

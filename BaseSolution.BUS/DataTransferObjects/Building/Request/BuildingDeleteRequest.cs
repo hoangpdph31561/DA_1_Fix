@@ -10,5 +10,6 @@ namespace BaseSolution.Application.DataTransferObjects.Building.Request
     {
         public Guid Id { get; set; }
         public Guid? DeletedBy { get; set; }
+
     }
 }

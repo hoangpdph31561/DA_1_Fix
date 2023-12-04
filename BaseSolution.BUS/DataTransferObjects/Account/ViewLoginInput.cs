@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BaseSolution.Application.DataTransferObjects.Account.request;
+using FluentValidation;
 
 namespace BaseSolution.Application.DataTransferObjects.Account
 {
@@ -13,4 +10,5 @@ namespace BaseSolution.Application.DataTransferObjects.Account
         public Guid UserRoleId { get; set; }
         public string RoleCode { get; set; }
     }
+   
 }

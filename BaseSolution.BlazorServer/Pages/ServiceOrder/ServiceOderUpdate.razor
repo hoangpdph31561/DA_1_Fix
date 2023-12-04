@@ -87,6 +87,7 @@
         lstCustomer = CustomerVM.Data!.ToList();
         serviceOrderUpdate.Id = serviceOrder.Id;
         serviceOrderUpdate.Status = serviceOrder.Status;
+        serviceOrderUpdate.CreatedTime = serviceOrder.CreatedTime;
         serviceOrderUpdate.CustomerId = serviceOrder.CustomerId;
     }
     private void OnClickCancel()

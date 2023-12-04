@@ -12,9 +12,9 @@ namespace BaseSolution.Application.DataTransferObjects.ServiceOrder
         public Guid Id { get; set; }
         public int Quantity { get; set; } // số lượng 
         public decimal Price { get; set; }
-        public float TotalAmount { get; set; }
-        public EntityStatus Status { get; set; } 
-
+        public decimal TotalAmount { get; set; }
+        public EntityStatus Status { get; set; }
+        public DateTimeOffset CreatedTime { get; set; }
         // base on 
         public string CustomerName { get; set; }  // Tên khách hàng
         public Guid CustomerId { get; set; }

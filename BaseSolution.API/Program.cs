@@ -1,9 +1,7 @@
 ﻿using BaseSolution.Application.DataTransferObjects.Account.request;
 using BaseSolution.Infrastructure.Extensions;
-using BaseSolution.Infrastructure.validation;
 using FluentValidation;
-using FluentValidation.AspNetCore;
-using System;
+using static BaseSolution.Application.DataTransferObjects.Account.request.LoginInputRequest;
 
 var builder = WebApplication.CreateBuilder(args);
 

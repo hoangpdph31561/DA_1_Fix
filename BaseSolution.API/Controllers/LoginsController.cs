@@ -7,8 +7,10 @@ using BaseSolution.Infrastructure.Implements.Login;
 using BaseSolution.Infrastructure.Implements.Services;
 using BaseSolution.Infrastructure.ViewModels.Login;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -34,10 +36,12 @@ namespace BaseSolution.API.Controllers
         public async Task<IActionResult> Login([FromBody] LoginInputRequest request,CancellationToken cancellationToken)
         {
             ValidationResult validate = await _validator.ValidateAsync(request);
-            if(!ModelState.IsValid)
+            if (!validate.IsValid)
             {
+                validate.AddToModelState(this.ModelState);
                 return BadRequest(ModelState);
             }
+           
             LoginViewModel vm = new(_loginService, _localizationService);
             await vm.HandleAsync(request,cancellationToken);
             if(vm.Success)

@@ -11,9 +11,9 @@ namespace BaseSolution.Application.DataTransferObjects.ServiceOrder.Request
     {
         public Guid Id { get; set; }
         public Guid? DeletedBy { get; set; }
-        public class ServiceOrderValication : AbstractValidator<ServiceOrderUpdateRequest>
+        public class ServiceOrderDeleteValication : AbstractValidator<ServiceOrderDeleteRequest>
         {
-            public ServiceOrderValication()
+            public ServiceOrderDeleteValication()
             {
                 RuleFor(x => x.Id).NotEmpty().WithMessage("Id cannot be empty.").NotEqual(Guid.Empty).WithMessage("Id cannot be empty Guid.");
             }

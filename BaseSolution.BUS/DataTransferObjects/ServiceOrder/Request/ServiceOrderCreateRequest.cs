@@ -20,8 +20,6 @@ namespace BaseSolution.Application.DataTransferObjects.ServiceOrder.Request
             {
                 RuleFor(x => x.CustomerId).NotEmpty().WithMessage("CustomerId cannot be empty.").NotEqual(Guid.Empty).WithMessage("CustomerId cannot be empty Guid.");
                 RuleFor(x => x.ServiceId).NotEmpty().WithMessage("ServiceId cannot be empty.").NotEqual(Guid.Empty).WithMessage("ServiceId cannot be empty Guid.");
-
-
             }
         }
     }

@@ -12,6 +12,7 @@ namespace BaseSolution.Application.Interfaces.Repositories.ReadWrite
     public interface IServiceOrderReadWriteRespository
     {
         Task<RequestResult<Guid>> CreateNewServiceOrder(ServiceOrderEntity entity, CancellationToken cancellationToken);
+        Task<RequestResult<Guid>> CreateNewServiceOrderForRoomBooking(ServiceOrderEntity entity, CancellationToken cancellationToken);
         Task<RequestResult<int>> UpdateServiceOrder(ServiceOrderEntity entity, CancellationToken cancellationToken);
         Task<RequestResult<int>> DeleteServiceOrder(ServiceOrderDeleteRequest request, CancellationToken cancellationToken);
     }

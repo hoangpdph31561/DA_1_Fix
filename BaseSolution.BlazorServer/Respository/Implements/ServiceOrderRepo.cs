@@ -1,4 +1,5 @@
 ﻿using BaseSolution.BlazorServer.Data.DataTransferObjects.Service;
+using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceOrder;
 using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceOrder.Request;
 using BaseSolution.BlazorServer.Data.ValueObjects.Pagination;
 using BaseSolution.BlazorServer.Respository.Interfaces;
@@ -22,6 +23,12 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             return result.IsSuccessStatusCode;
         }
 
+        public async Task<bool> CreateServiceForRoomBooking(ServiceOrderCreateForRoomBookingRequest request)
+        {
+            var result = await _httpClient.PostAsJsonAsync("/api/ServiceOrders/CreateNewServiceOrderForRoomBooking", request);
+            return result.IsSuccessStatusCode;
+        }
+
         public async Task<PaginationResponse<ServiceOrderDTO>> GetAllServices(ViewServiceOrderWithPaginationRequest request)
         {
             string url = $"/api/ServiceOrders/serviceOrdersByOther?PageNumber={request.PageNumber}&PageSize={request.PageSize}";
@@ -33,9 +40,9 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             return result;
         }
 
-        public async Task<List<ServiceOrderDTO>> GetRoomDetailByIdCustomer(Guid id)
+        public async Task<List<ServiceOrderForRoomBookingDTO>> GetRoomDetailByIdRoomBooking(Guid id)
         {
-            var result = await _httpClient.GetFromJsonAsync<List<ServiceOrderDTO>>($"api/ServiceOrders/ServiceOrdersByIdCustomer?idCustomer={id}");
+            var result = await _httpClient.GetFromJsonAsync<List<ServiceOrderForRoomBookingDTO>>($"api/ServiceOrders/ServiceOrdersByIdRoomBooking?idRoombooking={id}");
             return result;
         }
         public async Task<ServiceOrderDTO> GetServiceOrderById(Guid id)

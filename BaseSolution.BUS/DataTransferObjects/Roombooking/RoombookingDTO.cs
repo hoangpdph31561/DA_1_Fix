@@ -5,7 +5,8 @@ namespace BaseSolution.Application.DataTransferObjects.Roombooking
     public class RoombookingDTO
     {
         public Guid Id { get; set; }
-        public EntityStatus Status { get; set; } 
+      
+        public RoomStatus Status { get; set; } 
         public BookingType BookingType { get; set; }
 
         // Base on
@@ -31,6 +32,8 @@ namespace BaseSolution.Application.DataTransferObjects.Roombooking
         public DateTimeOffset CheckOutReality { get; set; }
         public DateTimeOffset CheckInBooking { get; set; }
         public DateTimeOffset CheckOutBooking { get; set; }
+        public Guid RoomBookingDetailId { get; set; }
+
 
     }
 }

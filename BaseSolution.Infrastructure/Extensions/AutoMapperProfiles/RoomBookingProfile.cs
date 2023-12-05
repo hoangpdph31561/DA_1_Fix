@@ -28,14 +28,14 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
                       .ForMember(des => des.CheckInBooking, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.CheckInBooking).FirstOrDefault()))
                      .ForMember(des => des.CheckOutBooking, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.CheckOutBooking).FirstOrDefault()))
                      .ForMember(des => des.NameRoomType, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.RoomDetail.RoomType.Name).FirstOrDefault()))
+                     .ForMember(des => des.Status, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.RoomDetail.Status).FirstOrDefault()))
+                     .ForMember(des => des.RoomBookingDetailId, otp => otp.MapFrom(src => src.RoomBookingDetails.Select(x => x.Id).FirstOrDefault()))
 
                      // service
-                     .ForMember(des => des.TotalService, otp => otp.MapFrom(src => src.Customer.ServiceOrders.SelectMany(x => x.ServiceOrderDetails).Select(x => x.ServiceId).Count())) // tổng số service hiển thị ra mockup
-                     .ForMember(des => des.ServicePrice, otp => otp.MapFrom(src => src.Customer.ServiceOrders.SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Price).FirstOrDefault()))
-                     .ForMember(des => des.NameService, otp => otp.MapFrom(src => src.Customer.ServiceOrders.SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Name).FirstOrDefault()));
+                     .ForMember(des => des.TotalService, otp => otp.MapFrom(src => src.RoomBookingDetails.SelectMany(x => x.ServiceOrders).SelectMany(x => x.ServiceOrderDetails).Select(x => x.ServiceId).Count())) // tổng số service hiển thị ra mockup
+                     .ForMember(des => des.ServicePrice, otp => otp.MapFrom(src => src.RoomBookingDetails.SelectMany(x => x.ServiceOrders).SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Price).FirstOrDefault())) 
+                     .ForMember(des => des.NameService, otp => otp.MapFrom(src => src.RoomBookingDetails.SelectMany(x => x.ServiceOrders).SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Name).FirstOrDefault()));
                     
-
-
             CreateMap<RoombookingCreateRequest, RoomBookingEntity>()
                 .ForPath(des => des.RoomBookingDetails,opt => opt.MapFrom(src => new List<RoomBookingDetailEntity>
                 {

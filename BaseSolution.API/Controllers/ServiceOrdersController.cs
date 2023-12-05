@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using BaseSolution.Application.DataTransferObjects.Role.Request;
 using BaseSolution.Application.DataTransferObjects.ServiceOrder;
 using BaseSolution.Application.DataTransferObjects.ServiceOrder.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
@@ -10,7 +9,6 @@ using BaseSolution.Infrastructure.ViewModels.ServiceOrder;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using FluentValidation.Results;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BaseSolution.API.Controllers
@@ -27,7 +25,7 @@ namespace BaseSolution.API.Controllers
         private readonly IMapper _mapper;
         private readonly IServiceOrderReadWriteRespository _serviceOrderReadWrite;
         public ServiceOrdersController(IServiceOrderReadOnlyRespository serviceOrderReadOnly, IServiceOrderReadWriteRespository serviceOrderReadWrite, IMapper mapper, ILocalizationService localizationService,
-              IValidator<ServiceOrderCreateRequest> validator, IValidator<ServiceOrderUpdateRequest> validatorUpdate, IValidator<ServiceOrderDeleteRequest> validatorDelete)
+           IValidator<ServiceOrderCreateRequest> validator, IValidator<ServiceOrderUpdateRequest> validatorUpdate, IValidator<ServiceOrderDeleteRequest> validatorDelete)
         {
             _serviceOrderReadOnly = serviceOrderReadOnly;
             _serviceOrderReadWrite = serviceOrderReadWrite;
@@ -68,14 +66,14 @@ namespace BaseSolution.API.Controllers
             }
             return BadRequest(vm);
         }
-        [HttpGet("ServiceOrdersByIdCustomer")]
-        public async Task<IActionResult> GetServiceOrdersByIdCustomer(Guid idCustomer, CancellationToken cancellationToken)
+        [HttpGet("ServiceOrdersByIdRoomBooking")]
+        public async Task<IActionResult> GetServiceOrdersByIdRoomBooking(Guid idRoombooking, CancellationToken cancellationToken)
         {
             ServiceOrderListWithPaginationByIdCustomerViewModel vm = new(_serviceOrderReadOnly, _localizationService);
-            await vm.HandleAsync(idCustomer, cancellationToken);
+            await vm.HandleAsync(idRoombooking, cancellationToken);
             if(vm.Success)
             {
-                List<ServiceOrderDTO> result = (List<ServiceOrderDTO>)vm.Data;
+                List<ServiceOrderForRoomBookingDTO> result = (List<ServiceOrderForRoomBookingDTO>)vm.Data;
                 return Ok(result);
             }
             return BadRequest(vm);
@@ -91,6 +89,15 @@ namespace BaseSolution.API.Controllers
             }
 
             ServiceOrderCreateViewModel vm = new(_serviceOrderReadOnly, _serviceOrderReadWrite, _mapper, _localizationService);
+            await vm.HandleAsync(request, cancellationToken);
+            return Ok(vm);
+        }
+
+        [HttpPost("CreateNewServiceOrderForRoomBooking")]
+        public async Task<IActionResult> CreateNewServiceOrderForRoomBooking(ServiceOrderCreateForRoomBookingRequest request, CancellationToken cancellationToken)
+        {
+
+            CreateNewServiceOrderForRoomBookingVM vm = new(_serviceOrderReadOnly, _serviceOrderReadWrite, _mapper, _localizationService);
             await vm.HandleAsync(request, cancellationToken);
             return Ok(vm);
         }

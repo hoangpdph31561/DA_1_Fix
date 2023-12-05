@@ -6,12 +6,8 @@ using BaseSolution.Application.ValueObjects.Response;
 using BaseSolution.Domain.Entities;
 using BaseSolution.Domain.Enums;
 using BaseSolution.Infrastructure.Database.AppDbContext;
+using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
 {
@@ -30,6 +26,33 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
             {
                 entity.CreatedTime = entity.CreatedTime;
                 entity.CustomerId = entity.CustomerId;
+                await _appReadWriteDbContext.ServiceOrders.AddAsync(entity);
+                await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
+
+                return RequestResult<Guid>.Succeed(entity.Id);
+            }
+            catch (Exception e)
+            {
+                return RequestResult<Guid>.Fail(_localizationService["Unable to create service order"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToCreate + "service order"
+                    }
+                });
+            }
+        }
+
+        public async Task<RequestResult<Guid>> CreateNewServiceOrderForRoomBooking(ServiceOrderEntity entity, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var _LstIdCustomer = _appReadWriteDbContext.RoomBookingDetails.Select(x => x.RoomBooking.CustomerId).ToList();
+                var idCustomer = _LstIdCustomer.FirstOrDefault(x => x.Equals(entity.CustomerId));
+                entity.CreatedTime = entity.CreatedTime;
+                entity.RoomBookingDetailId = entity.RoomBookingDetailId;
+                entity.CustomerId = idCustomer;
                 await _appReadWriteDbContext.ServiceOrders.AddAsync(entity);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
 

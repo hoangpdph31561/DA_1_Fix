@@ -44,9 +44,9 @@
                                 <MudTd>@context.NameCustomer</MudTd>
                                 <MudTh>@context.NameBuilding / @context.NameFloor / @context.NameRoom</MudTh>
                                 <MudTh>@context.BookingType</MudTh>
-                                <MudTh>@context.TotalService <MudChip Icon="@Icons.Material.Filled.ListAlt" OnClick="@(() => OpenService(context.CustomerId))"></MudChip></MudTh>
+                                <MudTh>@context.TotalService <MudChip Icon="@Icons.Material.Filled.ListAlt" OnClick="@(() => OpenService(context.RoomBookingDetailId))"></MudChip></MudTh>
                                 <MudTh>@context.TotalAmount</MudTh>
-                                <MudTd><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTd>
+                                <MudTd><BadgeRoomStatus Status="@context.Status"></BadgeRoomStatus></MudTd>
                                 <MudTd>
                                     <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@(() => OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
                                 </MudTd>
@@ -101,16 +101,25 @@
         await LoadData();
 
     }
-    private async Task OpenService(Guid CustomerId)
+    private async Task OpenService(Guid idroomBooking)
     {
-        var parameters = new DialogParameters<GetServiceOrderByIdCustomer>();
-        parameters.Add(x => x.idCustomer, CustomerId);
-        var dialog = await _dialogService.ShowAsync<GetServiceOrderByIdCustomer>("Danh sách dịch vụ", parameters);
-        var result = await dialog.Result;
-        if (!result.Canceled)
+        try
         {
-            await LoadData();
+            var parameters = new DialogParameters<GetServiceOrderByIdCustomer>();
+            parameters.Add(x => x.idroomBooking, idroomBooking);
+            var dialog = await _dialogService.ShowAsync<GetServiceOrderByIdCustomer>("Danh sách dịch vụ", parameters);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData();
+            }
         }
+        catch (Exception)
+        {
+            
+            throw;
+        }
+      
     }
     #endregion
     #region Code event

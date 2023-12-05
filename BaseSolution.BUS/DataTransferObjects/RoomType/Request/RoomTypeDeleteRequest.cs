@@ -8,9 +8,9 @@ namespace BaseSolution.Application.DataTransferObjects.RoomType.Request
     {
         public Guid Id { get; set; }
         public Guid? DeletedBy { get; set; }
-        public class RoomTypeValication : AbstractValidator<RoleDeleteRequest>
+        public class RoomTypeDeleteValication : AbstractValidator<RoomTypeDeleteRequest>
         {
-            public RoomTypeValication()
+            public RoomTypeDeleteValication()
             {
                 RuleFor(x => x.Id).NotEmpty().WithMessage("Id cannot be empty.").NotEqual(Guid.Empty).WithMessage("Id cannot be empty Guid.");
             }

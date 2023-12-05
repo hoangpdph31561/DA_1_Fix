@@ -19,11 +19,11 @@ namespace BaseSolution.Infrastructure.ViewModels.ServiceOrder
             _serviceOrderReadOnly = serviceOrderReadOnly;
             _localizationService = localizationService;
         }
-        public override async Task HandleAsync(Guid iDCustomer, CancellationToken cancellationToken)
+        public override async Task HandleAsync(Guid iDRoomBooking, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _serviceOrderReadOnly.GetServiceOrderByIdCustomerAsync(iDCustomer, cancellationToken);
+                var result = await _serviceOrderReadOnly.GetServiceOrderByIdRoomBookingAsync(iDRoomBooking, cancellationToken);
 
                 Data = result.Data!;
                 Success = result.Success;

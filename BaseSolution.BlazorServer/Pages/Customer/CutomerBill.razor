@@ -1,8 +1,12 @@
-﻿@page "/customer/customerBill"
+﻿@page "/customer/bill"
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Bill
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Bill.Request
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
+@using BaseSolution.BlazorServer.Respository.Implements
 @using BaseSolution.BlazorServer.Respository.Interfaces
-
+@page "/customerbill"
+@inject IdCustomer idCustomer
 <CustomListDisplayP2 Label="Xem hóa đơn" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>
 
@@ -41,13 +45,16 @@
 </CustomListDisplayP2>
 @code {
     #region Khai báo
+    [Parameter]
+    public Guid customerId { get; set; }
     [Inject]
     public IBillRespo billRepo { get; set; }
-
     [Inject]
     public IDialogService dialogService { get; set; }
     [Inject]
     public ISnackbar snackbar { get; set; }
+    [Inject]
+    public ICustomerId CustomerId { get; set; }
     private ViewBillWithPaginationRequest billRequest = new();
     private List<BillDTO> lstBill;
     private PaginationResponse<BillDTO> billPagination;
@@ -58,11 +65,15 @@
     #endregion
     protected override async Task OnInitializedAsync()
     {
+        customerId = IdCustomer.Instance.Id;
         await LoadData();
     }
     private async Task LoadData()
     {
-        billPagination = await billRepo.GetAllBill(billRequest);
+        billPagination = new PaginationResponse<BillDTO>
+            {
+                Data = new List<BillDTO> { await billRepo.GetBillByIdCustomer(customerId) }
+            };
         lstBill = billPagination.Data.ToList();
         _isLoadingAll = false;
         _isLoadingList = false;

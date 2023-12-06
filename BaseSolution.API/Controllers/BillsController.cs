@@ -39,6 +39,19 @@ namespace BaseSolution.API.Controllers
             }
             return Ok(vm);
         }
+        [HttpGet("{idCustomer}/details")]
+        public async Task<IActionResult> GetBillByIdCustomer(Guid idCustomer, CancellationToken cancellationToken)
+        {
+            BillByCustomerIdViewModel vm = new(_billReadOnlyRespository, _localizationService);
+            await vm.HandleAsync(idCustomer, cancellationToken);
+            if (vm.Success)
+            {
+                BillDTO result = (BillDTO)vm.Data;
+
+                return Ok(result);
+            }
+            return Ok(vm);
+        }
         [HttpGet("getBillsByAdmin")]
         public async Task<IActionResult> GetBillsByAdmin([FromQuery]ViewBillWithPaginationRequest request, CancellationToken cancellationToken)
         {

@@ -1,9 +1,11 @@
-﻿@page "/customer/customerRoomBooking"
+﻿@page "/customerRoomBooking"
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request
 @using BaseSolution.BlazorServer.Respository.Interfaces
+@inject IdCustomer idCustomer
 
 <CustomListDisplay Label="@("Thông tin đặt phòng")" IsLoading="@(_isLoadingAll)" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>
@@ -26,7 +28,6 @@
                     <MudTable Items="@_roomBookingVM.Data">
                         <HeaderContent>
                             <MudTh>STT</MudTh>
-                            <MudTh>Tên khách hàng</MudTh>
                             <MudTh>Thời gian đặt</MudTh>
                             <MudTh>Loại phòng</MudTh>
                             <MudTh>Kiểu đặt phòng</MudTh>
@@ -36,7 +37,6 @@
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd>@(_lstRoomBooking.IndexOf(context) + 1)</MudTd>
-                            <MudTd>@context.NameCustomer</MudTd>
                                 <MudTd>@context.CreatedTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
                                 <MudTd>@context.NameRoomType</MudTd>
                                 <MudTh>@context.BookingType</MudTh>
@@ -57,6 +57,8 @@
 
 
 @code {
+    [Parameter]
+    public Guid customerId { get; set; }
     [Inject]
     public IRoomBookingRespo _roomBookingRepo { get; set; }
     [Inject]
@@ -64,7 +66,7 @@
     [Inject]
     public ISnackbar _snackbar { get; set; }
     private Guid _idRoomDetail = Guid.Empty;
-    #region 
+    #region
     private PaginationResponse<RoomBookingDto> _roomBookingVM;
     private List<RoomBookingDto> _lstRoomBooking;
     private ViewRoombookingPaginationRequest _roomBookingRequest = new();
@@ -78,11 +80,21 @@
     #endregion
     protected override async Task OnInitializedAsync()
     {
+        customerId = IdCustomer.Instance.Id;
         await LoadData();
     }
     private async Task LoadData()
     {
-        _roomBookingVM = await _roomBookingRepo.GetAllRoomBooking(_roomBookingRequest);
+        _roomBookingVM = new PaginationResponse<RoomBookingDto>
+            {
+                Data = new List<RoomBookingDto>()
+            };
+
+        var roomBookings = await _roomBookingRepo.GetRoomBookingByIdCustomerAsync(customerId);
+        foreach (var roomBooking in roomBookings)
+        {
+            _roomBookingVM.Data.Add(roomBooking);
+        }
         _lstRoomBooking = _roomBookingVM.Data!.ToList();
         _isLoadingAll = false;
         _isLoadingList = false;
@@ -103,6 +115,6 @@
         await LoadData();
     }
     #endregion
-    
-   
+
+
 }

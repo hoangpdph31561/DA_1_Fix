@@ -39,7 +39,7 @@ namespace BaseSolution.Infrastructure.ViewModels.Customer
                 {
                     var result = await _CustomerReadOnlyRepository.GetCustomerByIdAsync(createResult.Data, cancellationToken);
 
-                    Data = result.Data!;
+                    Data = createResult;
                     Success = result.Success;
                     ErrorItems = result.Errors;
                     Message = result.Message;

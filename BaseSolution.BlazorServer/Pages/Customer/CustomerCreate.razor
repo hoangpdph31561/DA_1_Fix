@@ -5,17 +5,21 @@
 @using System.Text.RegularExpressions
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request;
 @using BaseSolution.BlazorServer.Extensions;
+@using BaseSolution.BlazorServer.Respository.Implements
 @using BaseSolution.BlazorServer.Respository.Interfaces;
 @using Microsoft.AspNetCore.Mvc;
+@inject IdCustomer idCustomer
+@inject NavigationManager navigationManager
 
 <MudGrid>
     <MudItem xs="12" sm="7">
         <MudPaper Class="pa-4">
-            <MudForm Model="createRequest" Validator="@validator" @ref="form" @bind-IsValid="@success">
-                <MudTextField T="string" Label="Tên" @bind-Value="createRequest.Name" Disabled="isFormLocked" Required="true" />
-                <MudTextField T="string" Label="Mã định danh" @bind-Value="createRequest.IdentificationNumber" Required="true" Disabled="isFormLocked" />
-                <MudTextField T="string" Label="Email" Disabled="isFormLocked" @bind-Value="createRequest.Email" Required="true" />
-                <MudTextField T="string" Label="Số điện thoại" @bind-Value="createRequest.PhoneNumber" Disabled="isFormLocked" Required="true" />
+            <MudForm Model="createRequest" @ref="form" @bind-IsValid="@success">
+                <MudTextField T="string" Label="Tên" @bind-Value="createRequest.Name" For="@(() => createRequest.Name)" Disabled="isFormLocked" Required="true" />
+                <MudTextField T="string" Label="Mã định danh" @bind-Value="createRequest.IdentificationNumber" For="@(() => createRequest.IdentificationNumber)" Required="true" Disabled="isFormLocked" />
+                <MudTextField T="string" Label="Email" Disabled="isFormLocked" @bind-Value="createRequest.Email" For="@(() => createRequest.Email)" Required="true"
+                              Validation='new EmailAddressAttribute() { ErrorMessage = "Sai định dạng Email!" }' />
+                <MudTextField T="string" Label="Số điện thoại" @bind-Value="createRequest.PhoneNumber" For="@(() => createRequest.PhoneNumber)" Disabled="isFormLocked" Required="true" />
                 <MudSpacer></MudSpacer>
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" OnClick="@SendEmail">Gửi mã</MudButton>
             </MudForm>
@@ -44,32 +48,18 @@
     public ISnackbar _snackbar { get; set; }
     [Inject]
     public ISendMailService sendMailService { get; set; }
+    [Inject]
+    public ICustomerId CustomerId { get; set; }
     public CustomerCreateRequest createRequest = new CustomerCreateRequest();
-    public CustomerCreateRequestValidator validator = new();
 
 
     private async Task SendEmail()
     {
-        // var validationResult = await form.Validate();
-        // if (!validationResult.IsValid)
-        // {
-        //     foreach (var error in validationResult.Errors)
-        //     {
-        //         await _dialogService.ShowMessageBox("Lỗi", error.ErrorMessage);
-        //     }
-        //     return;
-        // }
-
         if (!isCodeSent)
         {
+            var idCustomer = await customerRepo.SignUpOrSignIn(createRequest);
 
-            if (string.IsNullOrWhiteSpace(createRequest.Email))
-            {
-                await _dialogService.ShowMessageBox("Lỗi", "Vui lòng nhập địa chỉ email!");
-                return;
-            }
-            var existingCustomer = await customerRepo.SignUpOrSignIn(createRequest);
-
+            _snackbar.Add("Đã gửi mã đến email của bạn! Vui lòng kiểm tra để kích hoạt tài khoản!", Severity.Info);
             isCodeSent = true;
             isFormLocked = true;
         }
@@ -104,7 +94,11 @@
 
                     if (result != null)
                     {
-                        _snackbar.Add("Thêm thành công", Severity.Success);
+                        _snackbar.Add("Đăng nhập thành công", Severity.Success);
+
+                        IdCustomer.Instance.Id = result.Id;
+                        navigationManager.NavigateTo($"/customer/customerRoomType");
+                        
                         var activeCustomer = await customerRepo.UpdateStatusCustomer(result.Id);
                     }
                     else
@@ -113,7 +107,14 @@
                     }
                 }
             }
-
+            Reset();
+            
         }
+    }
+    private void Reset()
+    {
+
+        createRequest = new CustomerCreateRequest();
+        isFormLocked = false;
     }
 }

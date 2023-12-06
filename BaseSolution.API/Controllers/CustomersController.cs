@@ -162,7 +162,8 @@ namespace BaseSolution.API.Controllers
                     Status = Domain.Enums.EntityStatus.PendingForConfirmation,
                     CustomerType = Domain.Enums.CustomerType.Customer
                 };
-                await _CustomerReadWriteRepository.AddCustomerAsync(newCustomers, cancellationToken);
+                var id = _CustomerReadWriteRepository.AddCustomerAsync(newCustomers, cancellationToken);
+                
                 return Ok("Gửi mã thành công!");
             }
             else if (checkExsits.Data != null)
@@ -239,7 +240,7 @@ namespace BaseSolution.API.Controllers
             await vm.HandleAsync(request, cancellationToken);
             if (vm.Success)
             {
-                return Ok(vm);
+                return Ok(vm.Data);
             }
             return BadRequest(vm);
         }

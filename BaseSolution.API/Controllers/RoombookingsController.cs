@@ -73,7 +73,25 @@ public class RoombookingsController : ControllerBase
         }
        
     }
-
+    [HttpGet("{idCustomer}/details")]
+    public async Task<IActionResult> GetRoomBookingDetailByIdCustomer(Guid idCustomer, CancellationToken cancellationToken)
+    {
+        try
+        {
+            RoomBookingByCustomerIdViewModel vm = new(_roombookingrReadOnlyRespository, _localizationService);
+            await vm.HandleAsync(idCustomer, cancellationToken);
+            if (vm.Success)
+            {
+                List<RoombookingDTO> result = (List<RoombookingDTO>)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
     [HttpPost]
     public async Task<IActionResult> Post(RoombookingCreateRequest request, CancellationToken cancellationToken)
     {

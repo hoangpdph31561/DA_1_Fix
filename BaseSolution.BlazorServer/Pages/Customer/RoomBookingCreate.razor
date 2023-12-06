@@ -11,6 +11,9 @@
 @using BaseSolution.BlazorServer.Extensions
 @using BaseSolution.BlazorServer.Pages.Customer;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
+@page "/customerRoomBookingCreate"
+@inject IdCustomer idCustomer
+
 <MudDialog>
     <DialogContent>
         @if (_isLoadingList)
@@ -21,15 +24,6 @@
         {
             <MudForm Model="@_roomBookingCreateRequest" @ref="_form">
                 <MudPaper Elevation="0">
-                    <MudSelect T="string" Label="Khách hàng" Class="mb-2"
-                               AnchorOrigin="Origin.BottomCenter" @bind-Value="@customerId" For="@(() => customerId)" Required="true">
-                        @foreach (var item in lstCustomer)
-                        {
-                            <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
-                        }
-                    </MudSelect>
-                    <MudTextField T="string" Label="Mã định danh" @bind-Value="createRequest.IdentificationNumber" Required="true" />
-                    <MudTextField T="string" Label="Nhập code" Required="true" @bind-Value="createRequest.ApprovedCode"></MudTextField>
                     <MudItem>
                         <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Giờ vào" DateFormat="dd/MM/yyyy" @bind-Date="checkIn" Required="true" />
                     </MudItem>
@@ -50,6 +44,8 @@
 @code {
     #region Khai báo
     [Parameter]
+    public Guid customerId { get; set; }
+    [Parameter]
     public Guid idRoomDetail { get; set; }
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
@@ -65,22 +61,21 @@
     public IDialogService _dialogService { get; set; }
     [Inject]
     public ISnackbar _snackbar { get; set; }
-
+    [Inject]
+    public CustomerCreateRequest createRequest { get; set; }
+    [Inject]
+    public ICustomerId CustomerId { get; set; }
     private ViewRoomDetailWithPaginationRequest _roomDetailPaginationRequest = new();
 
     private ViewCustomerWithPaginationRequest customer = new();
 
     private PaginationResponse<RoomDetailDTO> _roomDetailVM;
-    private PaginationResponse<CustomerDTO> _customerVM;
+    private CustomerDTO _customerVM;
 
     List<RoomDetailDTO> lstRoomDetails = new();
-    List<CustomerDTO> lstCustomer = new();
     private RoombookingCreateRequest _roomBookingCreateRequest = new();
-    public CustomerCreateRequest createRequest = new();
     private RoomBookingDetailUpdate2Request _roomBookingDetailUpdateRequest = new();
     private RoomDetailUpdateStatusRequest _roomDetailUpdateStatusRequest = new();
-    private string customerId;
-
     private bool _isLoadingList = true;
     MudForm _form;
 
@@ -90,15 +85,13 @@
     #region Code xử lý
     protected override async Task OnInitializedAsync()
     {
+        customerId = IdCustomer.Instance.Id;
         await LoadData();
     }
     private async Task LoadData()
     {
         _roomDetailVM = await roomDetailRespo.GetAllRoomDetailsByStatus(_roomDetailPaginationRequest);
         lstRoomDetails = _roomDetailVM.Data!.ToList();
-
-        _customerVM = await customerRespo.GetCustomer(customer);
-        lstCustomer = _customerVM.Data!.ToList();
 
         _isLoadingList = false;
     }
@@ -111,7 +104,6 @@
         _roomBookingCreateRequest = new();
         createRequest = new();
         idRoomDetail = Guid.Empty;
-        customerId = null;
     }
     private async Task CreateNewRoomBooking()
     {
@@ -126,13 +118,13 @@
         );
         if (confirm == true)
         {
-            var getStatusCustomer = await customerRespo.GetCustomerById(Guid.Parse(customerId));
-            var verifyCustomer = await customerRespo.VerifyCustomerBooking(Guid.Parse(customerId), createRequest.IdentificationNumber, createRequest.ApprovedCode);
-            if (verifyCustomer == true && getStatusCustomer.Status == EntityStatus.Active)
+            var getStatusCustomer = await customerRespo.GetCustomerById(customerId);
+            
+            if (getStatusCustomer.Status == EntityStatus.Active)
             {
                 var code = UtilityExtentions.GenerateRandomString(6);
                 _roomBookingCreateRequest.RoomDetailId = idRoomDetail;
-                _roomBookingCreateRequest.CustomerId = Guid.Parse(customerId);
+                _roomBookingCreateRequest.CustomerId = customerId;
                 _roomBookingCreateRequest.BookingType = BookingType.Online;
                 _roomBookingCreateRequest.CodeBooking = code;
                 var result = await roomBookingRespo.CreateRoomBooking(_roomBookingCreateRequest);
@@ -154,7 +146,7 @@
 
                     _roomDetailUpdateStatusRequest.Id = idRoomDetail;
                     _roomDetailUpdateStatusRequest.Status = RoomStatus.Occupied;
-                    _roomDetailUpdateStatusRequest.ModifiedBy = Guid.Parse(customerId);
+                    _roomDetailUpdateStatusRequest.ModifiedBy = customerId;
                     var updateRoomDetailStatus = await roomDetailRespo.UpdateRoomDetailStatus(_roomDetailUpdateStatusRequest);
                     MudDialog.Close(DialogResult.Ok(true));
                     _snackbar.Add("Thêm thành công", Severity.Success); 

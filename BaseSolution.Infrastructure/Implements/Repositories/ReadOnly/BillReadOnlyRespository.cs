@@ -7,7 +7,6 @@ using BaseSolution.Application.Interfaces.Services;
 using BaseSolution.Application.ValueObjects.Common;
 using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Application.ValueObjects.Response;
-using BaseSolution.Domain.Entities;
 using BaseSolution.Infrastructure.Database.AppDbContext;
 using BaseSolution.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -48,6 +47,29 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 });
             }
         }
+
+        public async Task<RequestResult<BillDTO?>> GetBillByIdCustomerAsync(Guid idCustomer, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var bill = await _appReadOnlyDbContext.Bills.AsNoTracking().Where(c => c.CustomerId == idCustomer && !c.Deleted).ProjectTo<BillDTO>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(cancellationToken);
+               
+                return RequestResult<BillDTO?>.Succeed(bill);
+            }
+            catch (Exception e)
+            {
+                return RequestResult<BillDTO?>.Fail(_localizationService["Bill is not found"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "Bill"
+                    }
+                });
+            }
+        }
+
         public async Task<RequestResult<PaginationResponse<BillDTO>>> GetBillsByAdminAsync(ViewBillWithPaginationRequest request, CancellationToken cancellationToken)
         {
             try

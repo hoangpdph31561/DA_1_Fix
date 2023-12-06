@@ -1,9 +1,15 @@
 ﻿using BaseSolution.Application.DataTransferObjects.Account.request;
+using BaseSolution.Application.DataTransferObjects.RoomType.Request;
+using BaseSolution.Application.DataTransferObjects.ServiceOrder.Request;
 using BaseSolution.Infrastructure.Extensions;
-using BaseSolution.Infrastructure.validation;
 using FluentValidation;
-using FluentValidation.AspNetCore;
-using System;
+using static BaseSolution.Application.DataTransferObjects.Account.request.LoginInputRequest;
+using static BaseSolution.Application.DataTransferObjects.RoomType.Request.RoomTypeCreateRequest;
+using static BaseSolution.Application.DataTransferObjects.RoomType.Request.RoomTypeDeleteRequest;
+using static BaseSolution.Application.DataTransferObjects.RoomType.Request.RoomTypeUpdateRequest;
+using static BaseSolution.Application.DataTransferObjects.ServiceOrder.Request.ServiceOrderCreateRequest;
+using static BaseSolution.Application.DataTransferObjects.ServiceOrder.Request.ServiceOrderDeleteRequest;
+using static BaseSolution.Application.DataTransferObjects.ServiceOrder.Request.ServiceOrderUpdateRequest;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +20,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddApplication();
 builder.Services.AddScoped<IValidator<LoginInputRequest>, LoginValication>();
+builder.Services.AddScoped<IValidator<RoomTypeUpdateRequest>, RoomTypeValication>();
+builder.Services.AddScoped<IValidator<RoomTypeCreateRequest>, RoomTypeCreateValication>();
+builder.Services.AddScoped<IValidator<RoomTypeDeleteRequest>, RoomTypeDeleteValication>();
+builder.Services.AddScoped<IValidator<ServiceOrderCreateRequest>, ServiceOrderValication>();
+builder.Services.AddScoped<IValidator<ServiceOrderUpdateRequest>, ServiceOrderUpdateValication>();
+builder.Services.AddScoped<IValidator<ServiceOrderDeleteRequest>, ServiceOrderDeleteValication>();
 
 builder.Services.AddValidatorsFromAssemblyContaining<LoginValication>(); // khai báo để nó valiate hết tất cả mọi đối tượng có cùng project với LoginValication
 

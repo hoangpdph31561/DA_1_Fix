@@ -26,17 +26,32 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             _localizationService = localizationService;
         }
 
-        public async Task<RequestResult<List<ServiceOrderDTO>>> GetServiceOrderByIdCustomerAsync(Guid idCustomer, CancellationToken cancellationToken)
+        public async Task<RequestResult<List<ServiceOrderForRoomBookingDTO>>> GetServiceOrderByIdRoomBookingAsync(Guid idRoombooking, CancellationToken cancellationToken)
         {
             try
             {
-                var getList = _appReadOnlyDbContext.ServiceOrders.AsNoTracking().ProjectTo<ServiceOrderDTO>(_mapper.ConfigurationProvider);
-                var listByType = await getList.Where(c => c.CustomerId == idCustomer).ToListAsync();
-                return RequestResult<List<ServiceOrderDTO>>.Succeed(listByType);
+                var getList = _appReadOnlyDbContext.ServiceOrders.AsNoTracking().ProjectTo<ServiceOrderForRoomBookingDTO>(_mapper.ConfigurationProvider);
+                var listByType = await getList.Where(c => c.RoomBookingDetailId == idRoombooking).ToListAsync();
+                List<ServiceOrderForRoomBookingDTO> lstTepRests = null;
+                lstTepRests = listByType.GroupBy(c => new
+                {
+                    c.ServiceName,
+                    c.ServiceId,
+                    c.RoomBookingDetailId,
+                    c.CustomerId,
+                }).Select(grb => new ServiceOrderForRoomBookingDTO()
+                {
+                    ServiceName = grb.Key.ServiceName,
+                    ServiceId = grb.Key.ServiceId,
+                    Quantity = grb.Count(),
+                    RoomBookingDetailId = grb.Key.RoomBookingDetailId,
+                    CustomerId = grb.Key.CustomerId
+                }).ToList();
+                return RequestResult<List<ServiceOrderForRoomBookingDTO>>.Succeed(lstTepRests);
             }
             catch (Exception e)
             {
-                return RequestResult<List<ServiceOrderDTO>>.Fail(_localizationService["ServiceOrder is not found"], new[]
+                return RequestResult<List<ServiceOrderForRoomBookingDTO>>.Fail(_localizationService["ServiceOrder is not found"], new[]
                 {
                     new ErrorItem
                     {
@@ -53,6 +68,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             {
                 var serviceOrder = await _appReadOnlyDbContext.ServiceOrders.AsNoTracking().Where(c => c.Id == id && !c.Deleted).ProjectTo<ServiceOrderDTO>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(cancellationToken);
+
 
                 return RequestResult<ServiceOrderDTO?>.Succeed(serviceOrder);
             }
@@ -73,7 +89,6 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-
                 var query = _appReadOnlyDbContext.ServiceOrders.AsNoTracking().ProjectTo<ServiceOrderDTO>(_mapper.ConfigurationProvider);
 
                 if (!string.IsNullOrWhiteSpace(request.SearchString))
@@ -81,17 +96,36 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                     query = query.Where(x => x.CustomerName.Contains(request.SearchString!));
                 }
                 var result = await query.PaginateAsync(request, cancellationToken);
-
-                foreach (var item in result.Data!)
+                List<ServiceOrderDTO> lstTepRests = null;
+                lstTepRests = result.Data!.GroupBy(c => new
                 {
-                    item.TotalAmount = (float)item.Price * item.Quantity;
-                }
+                    c.Price,
+                    c.ServiceName,
+                    c.CustomerName,
+                    c.CustomerId,
+                    c.ServiceId,
+                    c.Status,
+                    c.RoomBookingDetailId,
+                }).Select(grb => new ServiceOrderDTO()
+                {
+                    Price = grb.Key.Price,
+                    ServiceName = grb.Key.ServiceName,
+                    CustomerName = grb.Key.CustomerName,
+                    CustomerId = grb.Key.CustomerId,
+                    ServiceId = grb.Key.ServiceId,
+                    Quantity = grb.Count(),
+                    TotalAmount = grb.Key.Price * grb.Count(),
+                    Status = grb.Key.Status,
+                    Id = result.Data!.Where(x => x.CustomerId == grb.Key.CustomerId).Select(x => x.Id).FirstOrDefault(),
+                    CreatedTime = result.Data!.Where(x => x.CustomerId == grb.Key.CustomerId).Select(x => x.CreatedTime).FirstOrDefault(),
+                    RoomBookingDetailId = grb.Key.RoomBookingDetailId
+                }).ToList();
                 return RequestResult<PaginationResponse<ServiceOrderDTO>>.Succeed(new PaginationResponse<ServiceOrderDTO>()
                 {
                     PageNumber = request.PageNumber,
                     PageSize = request.PageSize,
                     HasNext = result.HasNext,
-                    Data = result.Data
+                    Data = lstTepRests
                 });
             }
             catch (Exception e)
@@ -110,7 +144,6 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-
                 var query = _appReadOnlyDbContext.ServiceOrders.AsNoTracking().ProjectTo<ServiceOrderDTO>(_mapper.ConfigurationProvider).Where(x => x.Status != EntityStatus.Deleted);
 
                 if (!string.IsNullOrWhiteSpace(request.SearchString))
@@ -119,16 +152,37 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 }
                     var result = await query.PaginateAsync(request, cancellationToken);
 
-                foreach (var item in result.Data!)
+                List<ServiceOrderDTO> lstTepRests = null;
+                lstTepRests = result.Data!.GroupBy(c => new
                 {
-                    item.TotalAmount = (float)item.Price * item.Quantity;
-                }
+                    c.Price,
+                    c.ServiceName,
+                    c.CustomerName,
+                    c.CustomerId,
+                    c.ServiceId,
+                    c.Status,
+                    c.RoomBookingDetailId
+                }).Select(grb => new ServiceOrderDTO()
+                {
+                    Price = grb.Key.Price,
+                    ServiceName = grb.Key.ServiceName,
+                    CustomerName = grb.Key.CustomerName,
+                    CustomerId = grb.Key.CustomerId,
+                    ServiceId = grb.Key.ServiceId,
+                    Quantity = grb.Count(),
+                    TotalAmount = grb.Key.Price * grb.Count(),
+                    Status = grb.Key.Status,
+                    RoomBookingDetailId = grb.Key.RoomBookingDetailId,
+                    Id = result.Data!.Where(x => x.CustomerId == grb.Key.CustomerId).Select(x => x.Id).FirstOrDefault(),
+                    CreatedTime = result.Data!.Where(x => x.CustomerId == grb.Key.CustomerId).Select(x => x.CreatedTime).FirstOrDefault(),
+
+                }).ToList();
                 return RequestResult<PaginationResponse<ServiceOrderDTO>>.Succeed(new PaginationResponse<ServiceOrderDTO>()
                 {
                     PageNumber = request.PageNumber,
                     PageSize = request.PageSize,
                     HasNext = result.HasNext,
-                    Data = result.Data
+                    Data = lstTepRests
                 });
             }
             catch (Exception e)

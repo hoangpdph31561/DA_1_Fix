@@ -1,4 +1,5 @@
 ﻿using BaseSolution.Domain.Enums;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +14,13 @@ namespace BaseSolution.Application.DataTransferObjects.Building.Request
         public string Name { get; set; } = null!;
         public EntityStatus Status { get; set; }
         public Guid? ModifiedBy { get; set; }
+        public class BuildingValication : AbstractValidator<BuildingUpdateRequest>
+        {
+            public BuildingValication()
+            {
+                RuleFor(x => x.Name)
+             .NotEmpty().WithMessage("Name cannot be empty.");
+            }
+        }
     }
 }

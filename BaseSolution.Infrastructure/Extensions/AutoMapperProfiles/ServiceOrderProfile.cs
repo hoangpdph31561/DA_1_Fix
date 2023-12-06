@@ -15,9 +15,13 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
                 .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.Customer.Id))
                 .ForMember(dest => dest.ServiceId, opt => opt.MapFrom(src => src.ServiceOrderDetails.Select(x => x.Service.Id).FirstOrDefault()))
                 .ForMember(dest => dest.ServiceName, opt => opt.MapFrom(src => src.ServiceOrderDetails.Select(x => x.Service.Name).FirstOrDefault()))
-                .ForMember(des => des.Price, opt => opt.MapFrom(src => src.ServiceOrderDetails.Select(x => x.Service.Price).FirstOrDefault()))
-                .ForMember(des => des.Quantity, opt => opt.MapFrom(src => src.ServiceOrderDetails.Select(x => x.ServiceId).Count()))
-                 ;
+                .ForMember(des => des.Price, opt => opt.MapFrom(src => src.ServiceOrderDetails.Select(x => x.Service.Price).FirstOrDefault()));
+
+            CreateMap<ServiceOrderEntity, ServiceOrderForRoomBookingDTO>()
+                .ForMember(dest => dest.ServiceId, opt => opt.MapFrom(src => src.ServiceOrderDetails.Select(x => x.Service.Id).FirstOrDefault()))
+               .ForMember(dest => dest.ServiceName, opt => opt.MapFrom(src => src.ServiceOrderDetails.Select(x => x.Service.Name).FirstOrDefault()))
+               .ForMember(dest => dest.RoomBookingDetailId, opt => opt.MapFrom(src => src.RoomBookingDetailId))
+               .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.RoomBookingDetail.RoomBooking.CustomerId));
 
             CreateMap<ServiceOrderCreateRequest, ServiceOrderEntity>()
                   .ForPath(des => des.ServiceOrderDetails, opt => opt.MapFrom(src =>
@@ -30,8 +34,21 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
                 }))
                 .ForMember(des => des.CustomerId, opt => opt.MapFrom(src => src.CustomerId))
                 ;
-            ;
+
             CreateMap<ServiceOrderUpdateRequest, ServiceOrderEntity>();
+
+
+            CreateMap<ServiceOrderCreateForRoomBookingRequest, ServiceOrderEntity>()
+                .ForMember(des => des.RoomBookingDetailId, opt => opt.MapFrom(src => src.RoomBookingDetailId))
+                .ForPath(des => des.ServiceOrderDetails, opt => opt.MapFrom(src =>
+                 new List<ServiceOrderDetailEntity>
+                {
+                     new ServiceOrderDetailEntity
+                     {
+                         ServiceId = src.ServiceId,
+                     }
+                }))
+                ;
         }
     }
 }

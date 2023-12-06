@@ -64,19 +64,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                   RoomAmount = gcs.Key.RoomAmount,
                   TotalAmountForMonth = (int)gcs.Sum(x => x.TotalAmount),
               }).OrderBy(x => x.Month).ToList();
-                    //.GroupBy(x => x.Month)
-                    //.Select(g => new BillStatisticDto()
-                    //{
-                    //    Month = g.Key,
-                    //    RoomPrice = g.Sum(x => x.RoomPrice),
-                    //    ServicePrice = g.Sum(x => x.ServicePrice),
-                    //    TotalService = g.Sum(x => x.TotalService),
-                    //    TotalRoom = g.Sum(x => x.TotalRoom),
-                    //    ServiceAmount = g.Sum(x => x.ServiceAmount),
-                    //    TotalAmount = g.Sum(x => x.TotalAmount),
-                    //    RoomAmount = g.Sum(x => x.RoomAmount),
-                    //    TotalAmountForMonth = g.Sum(x => x.TotalAmountForMonth),
-                    //})
+                
 
                      totalAmountForMonth = lstTepRests.GroupBy(x => x.Month)
                                     .Select(g => new BillStatisticDto

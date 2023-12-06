@@ -132,6 +132,37 @@
             try
             {
 
+                if (checkIn > checkOut)
+                {
+                    _snackbar.Add
+                   (
+                       "Giờ ra không hợp lệ!",
+                        Severity.Error
+                   );
+                    return;
+                }
+
+                if (checkIn < DateTime.Now || checkOut < DateTime.Now)
+                {
+                    _snackbar.Add
+                   (
+                       "Giờ không hợp lệ!",
+                        Severity.Error
+                   );
+                    return;
+                }
+
+                if (roomBookingCreateRequest.RoomDetailId == Guid.Empty || roomBookingCreateRequest.CustomerId == Guid.Empty || checkOut == null || checkIn == null)
+                {
+
+                    _snackbar.Add
+                   (
+                       "Vui lòng nhập đủ dữ liệu!",
+                        Severity.Error
+                   );
+                    return;
+                }
+
                 roomBookingCreateRequest.RoomDetailId = Guid.Parse(roomDetailId);
                 roomBookingCreateRequest.CustomerId = Guid.Parse(customerId);
                 roomBookingCreateRequest.BookingType = BookingType.Offline;

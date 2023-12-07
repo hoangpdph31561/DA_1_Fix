@@ -48,7 +48,6 @@
     <MudNavLink Href="/service" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý dịch vụ</MudNavLink>
     </AuthorizeView>
     <MudNavLink Href="/roombooking" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý đặt phòng</MudNavLink>
-    <MudNavLink Href="/bill" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý Bill</MudNavLink>
     <MudNavLink Href="/serviceOrder" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý dịch vụ đã đặt</MudNavLink>
     <AuthorizeView Roles="Admin">
     <MudNavLink Href="/roomtype" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý loại phòng</MudNavLink>
@@ -56,6 +55,15 @@
     <AuthorizeView Roles="Admin">
     <MudNavLink Href="/roomdetail" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý phòng chi tiết</MudNavLink>
     </AuthorizeView>
+
+
+    <MudNavMenu>
+        <MudNavGroup Icon="@Icons.Material.Filled.Article" Title="Quản lí hóa đơn">
+            <MudNavLink Href="/bill/room">Hóa đơn cho phòng</MudNavLink>
+            <MudNavLink Href="/bill/service">Hóa đơn cho dịch vụ</MudNavLink>
+        </MudNavGroup>
+    </MudNavMenu>
+
     <MudNavMenu>
         <MudNavGroup Icon="@Icons.Material.Filled.PeopleOutline" Title="Khách hàng">
             <MudNavLink Href="/customer/customerList">Thông tin khách hàng</MudNavLink>
@@ -64,6 +72,9 @@
             <MudNavLink Href="/customer/customerRoomBookingHistory">Lịch sử đặt phòng</MudNavLink>
             <MudNavLink Href="/customer/customerBill">Xem hóa đơn</MudNavLink>
         </MudNavGroup></MudNavMenu>
+
+
+
 
     <MudNavMenu>
         <MudNavGroup Icon="@Icons.Material.Filled.SignalCellularAlt" Title="Thống kê">

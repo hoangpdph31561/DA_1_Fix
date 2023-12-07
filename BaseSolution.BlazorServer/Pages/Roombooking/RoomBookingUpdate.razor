@@ -16,20 +16,23 @@
         <MudForm Model="_roomBookingDetail" @ref="@_form" @bind-IsValid="@_formIsValid">
             <MudPaper Width="100%" Elevation="0">
                 <MudGrid>
-                    <MudItem xs="12" sm="6">
-                        <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="checkIn" Label="Giờ vào" DateFormat="dd/MM/yyyy hh:mm" />
-                     </MudItem>
 
-                    <MudItem xs="12" sm="6">
-                        <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="checkOut" Label="Giờ ra" DateFormat="dd/MM/yyyy hh:mm" />
-                     </MudItem>
+                    <MudItem>
+                        <MudTextField T="DateTime?" Format="s" @bind-Value="checkIn" Label="Giờ vào"  InputType="InputType.DateTimeLocal" />
+                    </MudItem>
 
-                    <MudItem xs="12" sm="6">
-                        <MudDatePicker PickerVariant="PickerVariant.Dialog"  @bind-Date="checkIn"  Label="Giờ vào thực tế" Disabled="true" DateFormat="dd/MM/yyyy hh:mm" />
-                      </MudItem>
+                    <MudItem>
+                        <MudTextField T="DateTime?" Format="s" @bind-Value="checkOut" Label="Giờ ra" InputType="InputType.DateTimeLocal" />
 
-                    <MudItem xs="12" sm="6">
-                        <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="checkOut" Label="Giờ ra thực tế" Disabled="true" DateFormat="dd/MM/yyyy hh:mm" />
+                    </MudItem>
+
+                    <MudItem>
+                        <MudTextField T="DateTime?" Format="s"  @bind-Value="checkIn" Label="Giờ vào thực tế" InputType="InputType.DateTimeLocal" Disabled="true" />
+                    </MudItem>
+
+                    <MudItem>
+                        <MudTextField T="DateTime?" Format="s" @bind-Value="checkOut" Label="Giờ ra thực tế" InputType="InputType.DateTimeLocal" Disabled="true" />
+
                     </MudItem>
                     <MudItem xs="12" sm="6">
                         <MudChip @onclick="async() => await UpdateService()" Color="Color.Primary">Cập nhập</MudChip>
@@ -74,6 +77,7 @@
     #region Code xử lý
     protected async override Task OnInitializedAsync()
     {
+     
         await LoadData();
         roomBookingDetailVM = await roomBookingDetailRepo.GetRoomBookingDetailAsync(getRoombookingrequest);
         _lstRoomBookingdetail = (List<RoomBookingDetailDTO>)roomBookingDetailVM.Data!;
@@ -152,6 +156,5 @@
             _snackbar.Add("Yêu cầu được hủy bỏ", Severity.Error);
         }
     }
-
     #endregion
 }

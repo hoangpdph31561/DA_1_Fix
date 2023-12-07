@@ -59,7 +59,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 {
                     query = query.Where(x => x.NameCustomer.Contains(request.SearchString!));
                 }
-                var result = await query.PaginateAsync(request, cancellationToken);
+                var result = await query.Where(x => x.StatusRoom == RoomStatus.Reserved && x.Status != EntityStatus.InActive).PaginateAsync(request, cancellationToken);
                 foreach (var item in result.Data!)
                 {
                     item.ServiceAmount = item.TotalService * item.ServicePrice;
@@ -98,7 +98,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 {
                     query = query.Where(x => x.NameCustomer.Contains(request.SearchString!));
                 }
-                var result = await query.PaginateAsync(request, cancellationToken);
+                var result = await query.Where(x => x.StatusRoom == RoomStatus.Reserved && x.Status != EntityStatus.InActive).PaginateAsync(request, cancellationToken);
 
                 foreach (var item in result.Data!)
                 {

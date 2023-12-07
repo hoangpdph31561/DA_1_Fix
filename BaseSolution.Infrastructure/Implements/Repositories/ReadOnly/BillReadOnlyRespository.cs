@@ -8,10 +8,10 @@ using BaseSolution.Application.ValueObjects.Common;
 using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Application.ValueObjects.Response;
 using BaseSolution.Domain.Entities;
+using BaseSolution.Domain.Enums;
 using BaseSolution.Infrastructure.Database.AppDbContext;
 using BaseSolution.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
-
 
 namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
 {
@@ -39,6 +39,51 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             catch (Exception e)
             {
                 return RequestResult<BillDTO?>.Fail(_localizationService["Bill is not found"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "Bill"
+                    }
+                });
+            }
+        }
+
+        public async Task<RequestResult<BillDtoForRoom?>> GetBillByIdForRoomAsync(Guid id, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var bill = await _appReadOnlyDbContext.Bills.AsNoTracking().Where(c => c.Id == id && !c.Deleted).ProjectTo<BillDtoForRoom>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(cancellationToken);
+                bill.ServiceAmount = bill.TotalService * bill.ServicePrice;
+                bill.TotalAmount = bill.ServiceAmount + UtilityExtensions.TinhTien(bill.CheckInReality, bill.CheckOutReality, bill.RoomPrice, bill.PrePaid);
+                return RequestResult<BillDtoForRoom?>.Succeed(bill);
+            }
+            catch (Exception e)
+            {
+                return RequestResult<BillDtoForRoom?>.Fail(_localizationService["Bill is not found"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "Bill"
+                    }
+                });
+            }
+        }
+
+        public async Task<RequestResult<BillDtoForService?>> GetBillByIdForServiceAsync(Guid id, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var bill = await _appReadOnlyDbContext.Bills.AsNoTracking().Where(c => c.Id == id && !c.Deleted).ProjectTo<BillDtoForService>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(cancellationToken);
+                bill.ServiceAmount = bill.TotalService * bill.ServicePrice;
+                return RequestResult<BillDtoForService?>.Succeed(bill);
+            }
+            catch (Exception e)
+            {
+                return RequestResult<BillDtoForService?>.Fail(_localizationService["Bill is not found"], new[]
                 {
                     new ErrorItem
                     {
@@ -98,7 +143,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
 
                 if (!string.IsNullOrWhiteSpace(request.SearchString))
                 {
-                    query = query.Where(x => x.CreatedTime == request.CreatedTime);
+                    query = query.Where(x => x.CustomerName == request.SearchString);
                 }
                  var result = await query.PaginateAsync(request, cancellationToken);
 
@@ -129,6 +174,78 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                     {
                         Error = e.Message,
                         FieldName = LocalizationString.Common.FailedToGet + "list of bill"
+                    }
+                });
+            }
+        }
+        public async Task<RequestResult<PaginationResponse<BillDtoForRoom>>> GetBillsByOtherForRoom(ViewBillWithPaginationRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _appReadOnlyDbContext.Bills.AsNoTracking().Where(x => !x.Deleted).ProjectTo<BillDtoForRoom>(_mapper.ConfigurationProvider);
+                 
+                if (!string.IsNullOrWhiteSpace(request.SearchString))
+                {
+                    query = query.Where(x => x.CustomerName == request.SearchString);
+                }
+                var result = await query.Where(x => x.StatusRoomBooking == EntityStatus.InActive).PaginateAsync(request, cancellationToken);
+                foreach (var item in result.Data!)
+                {
+                    item.ServiceAmount = item.TotalService * item.ServicePrice;
+                    item.RoomAmount = UtilityExtensions.TinhTien(item.CheckInReality, item.CheckOutReality, item.RoomPrice, item.PrePaid);
+                    item.TotalAmount = item.ServiceAmount + item.RoomAmount;
+                }
+                return RequestResult<PaginationResponse<BillDtoForRoom>>.Succeed(new PaginationResponse<BillDtoForRoom>()
+                {
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize,
+                    HasNext = result.HasNext,
+                    Data = result.Data
+                });
+            }
+            catch (Exception e)
+            {
+                return RequestResult<PaginationResponse<BillDtoForRoom>>.Fail(_localizationService["List of billForRoom are not found"], new[]
+               {
+                    new ErrorItem
+                    {
+                        Error= e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "list of billForRoom"
+                    }
+                });
+            }
+        }
+
+        public async Task<RequestResult<PaginationResponse<BillDtoForService>>> GetBillsByOtherForService(ViewBillWithPaginationRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _appReadOnlyDbContext.Bills.AsNoTracking().Where(x => !x.Deleted).ProjectTo<BillDtoForService>(_mapper.ConfigurationProvider);
+                if (!string.IsNullOrWhiteSpace(request.SearchString))
+                {
+                    query = query.Where(x => x.CustomerName == request.SearchString);
+                }
+                var result = await query.Where(x => x.StatusServicrOrder == EntityStatus.InActive).PaginateAsync(request, cancellationToken);
+                foreach (var item in result.Data!)
+                {
+                    item.ServiceAmount = item.TotalService * item.ServicePrice;
+                }
+                return RequestResult<PaginationResponse<BillDtoForService>>.Succeed(new PaginationResponse<BillDtoForService>()
+                {
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize,
+                    HasNext = result.HasNext,
+                    Data = result.Data
+                });
+            }
+            catch (Exception e)
+            {
+                return RequestResult<PaginationResponse<BillDtoForService>>.Fail(_localizationService["List of billService are not found"], new[]
+               {
+                    new ErrorItem
+                    {
+                        Error= e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "list of billService"
                     }
                 });
             }

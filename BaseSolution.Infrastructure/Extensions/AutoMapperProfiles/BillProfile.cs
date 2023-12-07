@@ -15,15 +15,42 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
         public BillProfile()
         {
             CreateMap<BillEntity, BillDTO>()
-                // lấy ra tổng số lượng dịch vụ của khách hàng đó
-                .ForMember(des => des.TotalService, opt => opt.MapFrom(src => src.Customer.ServiceOrders.Select(x => x.ServiceOrderDetails).Count()))
-                // lấy ra giá của từng dịch vụ mà khách hàng đó sử dụng 
-                .ForMember(des => des.ServicePrice, opt => opt.MapFrom(src => src.Customer.ServiceOrders.SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Price).FirstOrDefault()))
+                // lấy ra tổng số lượng dịch vụ của phòng đó
+                .ForMember(des => des.TotalService, opt => opt.MapFrom(src => src.RoomBooking.RoomBookingDetails.Select(x => x.ServiceOrders).Count()))
+                // lấy ra giá của từng dịch vụ mà phòng đó sử dụng 
+                .ForMember(des => des.ServicePrice, opt => opt.MapFrom(src => src.RoomBooking.RoomBookingDetails.SelectMany(x => x.ServiceOrders).SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Price).FirstOrDefault()))
                 // lấy ra giá phòng của khách hàng đó 
                 .ForMember(des => des.RoomPrice, opt => opt.MapFrom(src => src.Customer.RoomBookings.SelectMany(x => x.RoomBookingDetails).Select(x => x.RoomDetail.Price).FirstOrDefault()))
-                .ForMember(des => des.CustomerName, opt => opt.MapFrom(src => src.Customer.Name));
+                .ForMember(des => des.RoomName, opt => opt.MapFrom(x => x.RoomBooking.RoomBookingDetails.Select(x => x.RoomDetail.Name).FirstOrDefault()))
+                .ForMember(des => des.NameService, otp => otp.MapFrom(src => src.RoomBooking.RoomBookingDetails.SelectMany(x => x.ServiceOrders).SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Name).FirstOrDefault()))
+                .ForMember(des => des.CustomerName, opt => opt.MapFrom(src => src.Customer.Name))
+                ;
+
             CreateMap<BillCreateRequest, BillEntity>();
             CreateMap<BillUpdateRequest, BillEntity>();
+
+            CreateMap<BillEntity, BillDtoForRoom>()
+                .ForMember(des => des.CustomerName, opt => opt.MapFrom(x => x.Customer.Name))
+                .ForMember(des => des.RoomName, opt => opt.MapFrom(x => x.RoomBooking.RoomBookingDetails.Select(x => x.RoomDetail.Name).FirstOrDefault()))
+                .ForMember(des => des.StatusRoom, opt => opt.MapFrom(x => x.RoomBooking.RoomBookingDetails.Select(x => x.RoomDetail.Status).FirstOrDefault()))
+                .ForMember(des => des.StatusRoomBooking, opt => opt.MapFrom(x => x.RoomBooking.Status))
+                .ForMember(des => des.RoomPrice, opt => opt.MapFrom(x => x.RoomBooking.RoomBookingDetails.Select(x => x.RoomDetail.Price).FirstOrDefault()))
+                .ForMember(des => des.PrePaid, otp => otp.MapFrom(src => src.RoomBooking.RoomBookingDetails.Select(x => x.PrePaid).FirstOrDefault()))
+                .ForMember(des => des.CheckInReality, otp => otp.MapFrom(src => src.RoomBooking.RoomBookingDetails.Select(x => x.CheckInReality).FirstOrDefault()))
+                .ForMember(des => des.CheckOutReality, otp => otp.MapFrom(src => src.RoomBooking.RoomBookingDetails.Select(x => x.CheckOutReality).FirstOrDefault()))
+                // service
+                .ForMember(des => des.TotalService, otp => otp.MapFrom(src => src.RoomBooking.RoomBookingDetails.SelectMany(x => x.ServiceOrders).SelectMany(x => x.ServiceOrderDetails).Select(x => x.ServiceId).Count())) 
+                .ForMember(des => des.ServicePrice, otp => otp.MapFrom(src => src.RoomBooking.RoomBookingDetails.SelectMany(x => x.ServiceOrders).SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Price).FirstOrDefault()))
+                .ForMember(des => des.NameService, otp => otp.MapFrom(src => src.RoomBooking.RoomBookingDetails.SelectMany(x => x.ServiceOrders).SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Name).FirstOrDefault()))
+            ;
+
+            CreateMap<BillEntity, BillDtoForService>()
+                 .ForMember(des => des.CustomerName, opt => opt.MapFrom(x => x.Customer.Name))
+                 .ForMember(des => des.TotalService,opt => opt.MapFrom(src => src.ServiceOrder.ServiceOrderDetails.Count()))
+                 .ForMember(des => des.ServicePrice, opt => opt.MapFrom(src => src.ServiceOrder.ServiceOrderDetails.Select(x => x.Service.Price).FirstOrDefault()))
+                 .ForMember(des => des.NameService, opt => opt.MapFrom(src => src.ServiceOrder.ServiceOrderDetails.Select(x => x.Service.Name).FirstOrDefault()))
+                 .ForMember(des => des.StatusServicrOrder, opt => opt.MapFrom(src => src.ServiceOrder.Status))
+                ;
         }
     }
 }

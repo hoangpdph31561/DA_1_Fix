@@ -19,30 +19,32 @@
         {
             <MudForm Model="@roomBookingCreateRequest" @ref="_form">
                 <MudPaper Elevation="0" >
+                    <MudTextField Label="Tìm kiếm khách hàng" @bind-Value="searchMDD" TextChanged="OnTextChanged" />
                     <MudSelect T="string" Label="Khách hàng" Class="mb-2"
-                               AnchorOrigin="Origin.BottomCenter" @bind-Value="@customerId" For="@(() => customerId)">
-                        @foreach (var item in lstCustomer)
+                               AnchorOrigin="Origin.BottomCenter" @bind-Value="@customerId" For="@(() => customerId)" C>
+                        @foreach (var item in lstCustomeerFillter)
                         {
                             <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
                         }
                     </MudSelect>
                     <MudChip Icon="@Icons.Material.Filled.Add" @onclick="async() => await OpenAdd()" Color="Color.Primary">Thêm khách hàng mới</MudChip>
+                    <MudItem>
+                        <MudTextField T="DateTime?" Format="s" @bind-Value="checkIn" Label="Giờ vào" InputType="InputType.DateTimeLocal" />
+                    </MudItem>
 
-                    <MudSelect T="string" Label="Phòng còn trống" Class="mb-2"
+                    <MudItem>
+                        <MudTextField T="DateTime?" Format="s" @bind-Value="checkOut" Label="Giờ ra" InputType="InputType.DateTimeLocal" />
+                    </MudItem>
+                 
+                    <MudChip Icon="@Icons.Material.Filled.Search" @onclick="async() => await LoadCombobox()" Color="Color.Primary">Tìm kiếm phòng trống</MudChip>
+                    <MudSelect  T="string" Label="Phòng còn trống" Class="mb-2"
                                AnchorOrigin="Origin.BottomCenter" @bind-Value="@roomDetailId" For="@(() => roomDetailId)">
                         @foreach (var item in lstRoomDetails)
                         {
-                            <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
+                            <MudSelectItem Value="@item.Id.ToString()">@item.Name: Số lượng người ở: @item.MaxPeopleStay</MudSelectItem>
                         }
                     </MudSelect>
-    
-                    <MudItem>
-                        <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="checkIn" Label="Giờ vào" DateFormat="dd/MM/yyyy" />
-                    </MudItem>
-
-                    <MudItem>
-                        <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="checkOut" Label="Giờ ra" DateFormat="dd/MM/yyyy " />
-                    </MudItem>
+                  
             </MudPaper>
             </MudForm>
         }
@@ -73,7 +75,7 @@
     [Inject]
     public ISnackbar _snackbar { get; set; }
 
-    private ViewRoomDetailWithPaginationRequest roomDetailRequest = new();
+    // private ViewRoomDetailByCheckInCheckOutRequest roomDetailRequest = new();
 
     private ViewCustomerWithPaginationRequest customer = new();
 
@@ -82,13 +84,15 @@
 
     List<RoomDetailDTO> lstRoomDetails = new();
     List<CustomerDTO> lstCustomer = new();
+    List<CustomerDTO> lstCustomeerFillter = new();
     private RoombookingCreateRequest roomBookingCreateRequest = new();
 
     private string roomDetailId;
     private string customerId;
+    private string searchMDD;
 
-    DateTime? checkIn;
-    DateTime? checkOut;
+    DateTime? checkIn = DateTime.Now;
+    DateTime? checkOut = DateTime.Now;
 
     private bool _isLoadingList = true;
     MudForm _form;
@@ -100,14 +104,31 @@
     }
     private async Task LoadData()
     {
-        roomDetailVM = await roomDetailRespo.GetAllRoomDetailsByStatus(roomDetailRequest);
-        lstRoomDetails = roomDetailVM.Data!.ToList();
-
+       
         CustomerVM = await cumtomerRespo.GetCustomer(customer);
         lstCustomer = CustomerVM.Data!.ToList();
 
         _isLoadingList = false;
     }
+    private async Task LoadCombobox()
+    {
+        var roomDetail = new ViewRoomDetailByCheckInCheckOutRequest
+            {
+                CheckInBooking = (DateTimeOffset)checkIn!,
+                CheckOutBooking = (DateTimeOffset)checkOut!,
+            };
+        roomDetailVM = await roomDetailRespo.GetAllRoomDetailsByStatus(roomDetail);
+        lstRoomDetails = roomDetailVM.Data!.ToList();
+       
+        StateHasChanged();
+    }
+
+    private void OnTextChanged(string value)
+    {
+        searchMDD = value;
+     lstCustomeerFillter = lstCustomer.Where(x => x.IdentificationNumber == searchMDD).ToList();
+    }
+
     private void OnClickCancel()
     {
         MudDialog.Cancel();
@@ -142,7 +163,7 @@
                     return;
                 }
 
-                if (checkIn < DateTime.Now || checkOut < DateTime.Now)
+                if ( checkOut < DateTime.Now)
                 {
                     _snackbar.Add
                    (
@@ -152,16 +173,6 @@
                     return;
                 }
 
-                if (roomBookingCreateRequest.RoomDetailId == Guid.Empty || roomBookingCreateRequest.CustomerId == Guid.Empty || checkOut == null || checkIn == null)
-                {
-
-                    _snackbar.Add
-                   (
-                       "Vui lòng nhập đủ dữ liệu!",
-                        Severity.Error
-                   );
-                    return;
-                }
 
                 roomBookingCreateRequest.RoomDetailId = Guid.Parse(roomDetailId);
                 roomBookingCreateRequest.CustomerId = Guid.Parse(customerId);
@@ -169,6 +180,16 @@
                 roomBookingCreateRequest.CodeBooking = UtilityExtentions.GenerateRandomString(6);
                  roomBookingCreateRequest.CheckOutBooking = (DateTimeOffset)checkOut;
                 roomBookingCreateRequest.CheckInBooking = (DateTimeOffset)checkIn;
+
+                if (roomBookingCreateRequest.RoomDetailId == Guid.Empty || roomBookingCreateRequest.CustomerId == Guid.Empty || checkOut == null || checkIn == null)
+                {
+                    _snackbar.Add
+                   (
+                       "Vui lòng nhập đủ dữ liệu!",
+                        Severity.Error
+                   );
+                    return;
+                }
 
                 var result = await roomBookingRespo.CreateNewRoomBooking(roomBookingCreateRequest);
                 if (result == true)

@@ -5,11 +5,13 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking
     public class RoomBookingDto
     {
         public Guid Id { get; set; }
-        public RoomStatus Status { get; set; }
+        public RoomStatus StatusRoom { get; set; }
+        public EntityStatus Status { get; set; }
         public BookingType BookingType { get; set; }
 
         // Base on
         public Guid CustomerId { get; set; }
+        public Guid ServiceOrderId { get; set; }
         public Guid RoomDetailId { get; set; }
         public string NameCustomer { get; set; }  // Tên khách hàng
         public string StaffName { get; set; } // tên nhân viên 

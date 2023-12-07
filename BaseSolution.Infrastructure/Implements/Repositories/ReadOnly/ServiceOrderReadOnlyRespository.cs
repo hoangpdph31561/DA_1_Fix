@@ -144,7 +144,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                var query = _appReadOnlyDbContext.ServiceOrders.AsNoTracking().ProjectTo<ServiceOrderDTO>(_mapper.ConfigurationProvider).Where(x => x.Status != EntityStatus.Deleted);
+                var query = _appReadOnlyDbContext.ServiceOrders.AsNoTracking().ProjectTo<ServiceOrderDTO>(_mapper.ConfigurationProvider).Where(x => x.Status != EntityStatus.Deleted && x.Status != EntityStatus.InActive);
 
                 if (!string.IsNullOrWhiteSpace(request.SearchString))
                 {

@@ -39,7 +39,41 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             var result = await _httpClient.GetFromJsonAsync<BillDTO>($"/api/Bills/{id}");
             return result;
         }
+        public async Task<BillDtoForService> GetBillByIdForService(Guid id)
+        {
+            var result = await _httpClient.GetFromJsonAsync<BillDtoForService>($"/api/Bills/GetBillByIdForService{id}");
+            return result;
+        }
 
+        public async Task<BillDtoForRoom> GetBillByIdForRoom(Guid id)
+        {
+            var result = await _httpClient.GetFromJsonAsync<BillDtoForRoom>($"/api/Bills/GetBillByIdForRoom{id}");
+            return result;
+        }
+
+        public async Task<PaginationResponse<BillDtoForRoom>> GetBillForRoom(ViewBillWithPaginationRequest request)
+        {
+            var url = $"/api/Bills/getBillsByOtherForRoom?PageNumber={request.PageNumber}&PageSize={request.PageSize}";
+
+            if (!String.IsNullOrEmpty(request.Search))
+            {
+                url = $"/api/Bills/getBillsByOtherForRoom?SearchString={request.Search}&PageNumber={request.PageNumber}&PageSize={request.PageSize}";
+            }
+            var result = await _httpClient.GetFromJsonAsync<PaginationResponse<BillDtoForRoom>>(url);
+            return result;
+        }
+
+        public async Task<PaginationResponse<BillDtoForService>> GetBillForService(ViewBillWithPaginationRequest request)
+        {
+            var url = $"/api/Bills/getBillsByOtherForService?PageNumber={request.PageNumber}&PageSize={request.PageSize}";
+
+            if (!String.IsNullOrEmpty(request.Search))
+            {
+                url = $"/api/Bills/getBillsByOtherForService?SearchString={request.Search}&PageNumber={request.PageNumber}&PageSize={request.PageSize}";
+            }
+            var result = await _httpClient.GetFromJsonAsync<PaginationResponse<BillDtoForService>>(url);
+            return result;
+        }
         public async Task<bool> UpdateBill(BillUpdateRequest request)
         {
             var result = await _httpClient.PutAsJsonAsync("/api/Bills", request);

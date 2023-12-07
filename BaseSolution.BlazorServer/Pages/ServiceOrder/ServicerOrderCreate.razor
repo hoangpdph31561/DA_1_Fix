@@ -1,6 +1,8 @@
 ﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Bill.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Service;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Service.Request;
@@ -59,12 +61,18 @@
     public ICustomerRepo cumtomerRespo { get; set; }
     [Inject]
     public IServiceOrderRepo ServiceOderRepo { get; set; }
+    [Inject]
+    public IRoomBookingRespo roomBookingRespo { get; set; }
+    private ViewRoombookingPaginationRequest roomBookingRequest = new();
+    private List<RoomBookingDto> lstRoomBooking;
+    private PaginationResponse<RoomBookingDto> roomBookingVM;
 
     DateTime? ngayđat;
     private ServiceOrderCreateRequest serviceOderRequest = new();
     private ViewServiceWithPaginationRequest serviceViewRequest = new();
     private PaginationResponse<CustomerDTO> CustomerVM;
     List<CustomerDTO> lstCustomer = new();
+    List<CustomerDTO> lstCustomerNotRoomBooking = new();
     private List<ServiceDTO> lstService;
     private string customerId;
     private string serviceId;
@@ -86,12 +94,14 @@
     }
     private async Task LoadData()
     {
-
+        roomBookingVM = await roomBookingRespo.GetAllRoomBooking(roomBookingRequest);
+        lstRoomBooking = roomBookingVM.Data!.ToList();
         CustomerVM = await cumtomerRespo.GetCustomer(customer);
         lstCustomer = CustomerVM.Data!.ToList();
         lstService = await serviceRespo.GetServices(serviceViewRequest);
         _isLoadingList = false;
     }
+   
     private void OnClickCancel()
     {
         MudDialog.Cancel();

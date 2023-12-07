@@ -1,9 +1,13 @@
 ﻿using BaseSolution.Application.DataTransferObjects.Account.request;
+using BaseSolution.Application.DataTransferObjects.AmenityRoomDetail.Request;
 using BaseSolution.Application.DataTransferObjects.RoomType.Request;
 using BaseSolution.Application.DataTransferObjects.ServiceOrder.Request;
 using BaseSolution.Infrastructure.Extensions;
 using FluentValidation;
 using static BaseSolution.Application.DataTransferObjects.Account.request.LoginInputRequest;
+using static BaseSolution.Application.DataTransferObjects.AmenityRoomDetail.Request.AmenityCreateUpdateDeleteRequest;
+using static BaseSolution.Application.DataTransferObjects.AmenityRoomDetail.Request.AmenityRoomDetailCreateRequest;
+using static BaseSolution.Application.DataTransferObjects.AmenityRoomDetail.Request.AmenityRoomDetailUpdateRequest;
 using static BaseSolution.Application.DataTransferObjects.RoomType.Request.RoomTypeCreateRequest;
 using static BaseSolution.Application.DataTransferObjects.RoomType.Request.RoomTypeDeleteRequest;
 using static BaseSolution.Application.DataTransferObjects.RoomType.Request.RoomTypeUpdateRequest;
@@ -26,6 +30,11 @@ builder.Services.AddScoped<IValidator<RoomTypeDeleteRequest>, RoomTypeDeleteVali
 builder.Services.AddScoped<IValidator<ServiceOrderCreateRequest>, ServiceOrderValication>();
 builder.Services.AddScoped<IValidator<ServiceOrderUpdateRequest>, ServiceOrderUpdateValication>();
 builder.Services.AddScoped<IValidator<ServiceOrderDeleteRequest>, ServiceOrderDeleteValication>();
+
+builder.Services.AddScoped<IValidator<AmenityCreateUpdateDeleteRequest>, AmenityRoomValication>();
+builder.Services.AddScoped<IValidator<AmenityRoomDetailCreateRequest>, AmenityRoomCreateValication>();
+builder.Services.AddScoped<IValidator<AmenityRoomDetailUpdateRequest>, AmenityRoomUpdateValication>();
+
 
 builder.Services.AddValidatorsFromAssemblyContaining<LoginValication>(); // khai báo để nó valiate hết tất cả mọi đối tượng có cùng project với LoginValication
 

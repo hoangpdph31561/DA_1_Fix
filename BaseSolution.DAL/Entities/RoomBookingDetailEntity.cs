@@ -26,5 +26,7 @@ namespace BaseSolution.Domain.Entities
         public RoomDetailEntity RoomDetail { get; set; }
         public RoomBookingEntity RoomBooking { get; set; }
         public List<ServiceOrderEntity> ServiceOrders { get; set; }
+
+     
     }
 }

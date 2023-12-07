@@ -12,7 +12,7 @@ namespace BaseSolution.Application.Interfaces.Repositories.ReadOnly
         Task<RequestResult<PaginationResponse<RoomDetailDto>>> GetRoomDetailWithPaginationByAdminAsync(
             ViewRoomDetailWithPaginationRequest request, CancellationToken cancellationToken);
          Task<RequestResult<PaginationResponse<RoomDetailDto>>> GetRoomDetailWithPaginationByStatusAsync(
-            ViewRoomDetailWithPaginationRequest request, CancellationToken cancellationToken);
+            ViewRoomDetailByCheckInCheckOutRequest request, CancellationToken cancellationToken);
         Task<RequestResult<List<RoomDetailDto>>> GetRoomDetailByIdRoomTypeAsync(Guid idRoomType, CancellationToken cancellationToken);
 
     }

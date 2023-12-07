@@ -13,9 +13,9 @@ namespace BaseSolution.Application.DataTransferObjects.AmenityRoomDetail.Request
         public Guid? CreatedBy { get; set; }
 
 
-        public class AmenityRoomValication : AbstractValidator<AmenityRoomDetailCreateRequest>
+        public class AmenityRoomCreateValication : AbstractValidator<AmenityRoomDetailCreateRequest>
         {
-            public AmenityRoomValication()
+            public AmenityRoomCreateValication()
             {
                 RuleFor(x => x.RoomTypeId)
              .NotEmpty().WithMessage("RoomTypeId cannot be empty.")

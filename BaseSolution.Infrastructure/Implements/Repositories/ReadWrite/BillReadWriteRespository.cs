@@ -7,6 +7,7 @@ using BaseSolution.Domain.Entities;
 using BaseSolution.Domain.Enums;
 using BaseSolution.Infrastructure.Database.AppDbContext;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Pqc.Crypto.Frodo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,9 +29,68 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
         {
             try
             {
-                entity.CreatedTime = DateTimeOffset.UtcNow;
-                entity.CustomerId = entity.CustomerId;
+                // lấy ra roomBookingDetail để lấy ra giờ check in check out 
+                if(entity.RoomBookingId != null)
+                {
+                    var lstRoomBookingDetail = _appReadWriteDbContext.RoomBookingDetails.Where(x => x.RoomBookingId == entity.RoomBookingId).ToList();
 
+                    var lstRoomDetail = _appReadWriteDbContext.RoomDetails.ToList();
+                    foreach (var roomBookingDetail in lstRoomBookingDetail)
+                    {
+                        foreach (var roomDetail in lstRoomDetail)
+                        {
+                            if (roomBookingDetail.RoomDetailId == roomDetail.Id)
+                            {
+                                roomDetail.Status = RoomStatus.Dirty;
+                                _appReadWriteDbContext.RoomDetails.Update(roomDetail);
+                            }
+                        }
+                    }
+
+                    var roomBooking = _appReadWriteDbContext.RoomBookings.Where(x => x.Id == entity.RoomBookingId).FirstOrDefault();
+                    if(roomBooking != null)
+                    {
+                        roomBooking.Status = EntityStatus.InActive;
+                        _appReadWriteDbContext.RoomBookings.Update(roomBooking);
+                    }
+
+                    var ServiceOrder = _appReadWriteDbContext.ServiceOrders.FirstOrDefault(x => x.Id == entity.ServiceOrderId);
+                    if (ServiceOrder != null)
+                    {
+                        ServiceOrder.Status = EntityStatus.InActive;
+                        _appReadWriteDbContext.ServiceOrders.Update(ServiceOrder);
+                    }
+                    await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
+                }
+                if (entity.ServiceOrderId != Guid.Empty)
+                {
+                    var ServiceOrder = _appReadWriteDbContext.ServiceOrders.FirstOrDefault(x => x.Id == entity.ServiceOrderId);
+                    if (ServiceOrder != null)
+                    {
+                        ServiceOrder.Status = EntityStatus.InActive;
+                        _appReadWriteDbContext.ServiceOrders.Update(ServiceOrder);
+                        await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
+                    }
+                }
+
+                //// lấy ra giờ check Out của roombooking cụ thể. 
+
+                //var checkOut = roomBookingDetail.Select(x => x.CheckOutReality).FirstOrDefault();
+                //foreach (var item in roomBookingDetail)
+                //{
+                //    if (item.CheckInBooking >= checkOut)
+                //    {
+                //        item.RoomDetail.Status = RoomStatus.CheckIn;
+                //    }
+                //    else
+                //    {
+                //        item.RoomDetail.Status = RoomStatus.Vacant;
+                //    }
+                //}
+                entity.CreatedTime = entity.CreatedTime;
+                entity.CustomerId = entity.CustomerId;
+                entity.RoomBookingId = entity.RoomBookingId;
+                entity.ServiceOrderId = entity.ServiceOrderId;
                 await _appReadWriteDbContext.Bills.AddAsync(entity);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
 
@@ -48,7 +108,6 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 });
             }
         }
-
         public async Task<RequestResult<int>> DeleteBill(BillDeleteRequest request, CancellationToken cancellationToken)
         {
             try

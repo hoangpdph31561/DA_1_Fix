@@ -23,11 +23,9 @@ namespace BaseSolution.API.Controllers
         private readonly ILocalizationService _localizationService;
         private readonly IValidator<AmenityRoomDetailCreateRequest> _validator;
         private readonly IValidator<AmenityRoomDetailUpdateRequest> _validatorUpdate;
-        private readonly IValidator<AmenityRoomDetailDeleteRequest> _validatorDetete;
 
         public AmenityRoomDetailsController(IAmenityRoomDetailReadOnlyRepository AmenityRoomDetailReadOnlyRepository, IAmenityRoomDetailReadWriteRepository AmenityRoomDetailReadWriteRepository, IMapper mapper, ILocalizationService localizationService,
-            IValidator<AmenityRoomDetailCreateRequest> validator, IValidator<AmenityRoomDetailUpdateRequest> validatorUpdate,
-            IValidator<AmenityRoomDetailDeleteRequest> validatorDetete
+            IValidator<AmenityRoomDetailCreateRequest> validator, IValidator<AmenityRoomDetailUpdateRequest> validatorUpdate
             )
         {
             _AmenityRoomDetailReadOnlyRespository = AmenityRoomDetailReadOnlyRepository;
@@ -36,7 +34,6 @@ namespace BaseSolution.API.Controllers
             _localizationService = localizationService;
             _validator = validator;
             _validatorUpdate = validatorUpdate;
-            _validatorDetete = validatorDetete;
         }
         [HttpGet]
         public async Task<IActionResult> GetListAmenityRoomDetailByAdmin([FromQuery] ViewAmenityRoomDetailWithPaginationRequest request, CancellationToken cancellationToken)
@@ -100,12 +97,6 @@ namespace BaseSolution.API.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteAmenityRoomDetail(AmenityRoomDetailDeleteRequest request, CancellationToken cancellationToken)
         {
-            ValidationResult validate = await _validatorDetete.ValidateAsync(request);
-            if (!validate.IsValid)
-            {
-                validate.AddToModelState(this.ModelState);
-                return BadRequest(ModelState);
-            }
             AmenityRoomDetailDeleteViewModel vm = new(_AmenityRoomDetailReadWriteRespository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);

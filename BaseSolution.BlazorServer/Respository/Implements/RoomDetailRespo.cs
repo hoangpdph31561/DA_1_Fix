@@ -3,6 +3,8 @@ using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request;
 using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType;
 using BaseSolution.BlazorServer.Data.ValueObjects.Pagination;
 using BaseSolution.BlazorServer.Respository.Interfaces;
+using System.Web;
+using System;
 
 namespace BaseSolution.BlazorServer.Respository.Implements
 {
@@ -89,11 +91,19 @@ namespace BaseSolution.BlazorServer.Respository.Implements
         }
 
 
-        public async Task<PaginationResponse<RoomDetailDTO>> GetAllRoomDetailsByStatus(ViewRoomDetailWithPaginationRequest request)
+        public async Task<PaginationResponse<RoomDetailDTO>> GetAllRoomDetailsByStatus(ViewRoomDetailByCheckInCheckOutRequest request)
         {
-            string url = $"/api/RoomDetails/getRoomBookingDetailByStatus?PageNumber={request.PageNumber}&PageSize={request.PageSize}";
-            var result = await _httpClient.GetFromJsonAsync<PaginationResponse<RoomDetailDTO>>(url);
-            return result;
+            try
+            {
+                string url = $"/api/RoomDetails/getRoomBookingDetailByStatus?CheckInBooking={HttpUtility.UrlEncode(request.CheckInBooking.ToString("o"))}&CheckOutBooking={HttpUtility.UrlEncode(request.CheckOutBooking.ToString("o"))}";
+                var result = await _httpClient.GetFromJsonAsync<PaginationResponse<RoomDetailDTO>>(url);
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+         
            
         }
         public async Task<RoomDetailDTO> GetRoomDetailById(Guid id)

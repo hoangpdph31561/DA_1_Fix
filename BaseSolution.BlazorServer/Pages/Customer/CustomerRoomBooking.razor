@@ -40,10 +40,12 @@
                             <MudTd>@(_lstRoomBooking.IndexOf(context) + 1)</MudTd>
                                 <MudTd>@context.CreatedTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
                                 <MudTd>@context.NameRoomType</MudTd>
-                                <MudTd>@context.BookingType</MudTd>
-                                <MudTd>@context.PrePaid</MudTd>
-                                <MudTd>@context.RoomPrice</MudTd>
-                                <MudTd><BadgeRoomStatus Status="@context.Status"></BadgeRoomStatus></MudTd>
+
+                                <MudTh>@context.BookingType</MudTh>
+                                <MudTh>@context.PrePaid</MudTh>
+                                <MudTh>@context.RoomPrice</MudTh>
+                                <MudTd><BadgeRoomStatus Status="@context.StatusRoom"></BadgeRoomStatus></MudTd>
+
                             </RowTemplate>
                         </MudTable>
                         <MudDivider />

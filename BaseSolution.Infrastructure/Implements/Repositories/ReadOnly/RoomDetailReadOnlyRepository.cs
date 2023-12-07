@@ -125,13 +125,15 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             }
         }
 
-        public async Task<RequestResult<PaginationResponse<RoomDetailDto>>> GetRoomDetailWithPaginationByStatusAsync(ViewRoomDetailWithPaginationRequest request, CancellationToken cancellationToken)
+        public async Task<RequestResult<PaginationResponse<RoomDetailDto>>> GetRoomDetailWithPaginationByStatusAsync(ViewRoomDetailByCheckInCheckOutRequest request, CancellationToken cancellationToken)
         {
             try
             {
-
-                var result = await _dbContext.RoomDetails.AsNoTracking().Where(x => x.Status == RoomStatus.Vacant && !x.Deleted)
-                .PaginateAsync<RoomDetailEntity, RoomDetailDto>(request, _mapper, cancellationToken);
+                var queryable = _dbContext.RoomDetails.AsNoTracking().AsQueryable().Where(x => !x.Deleted).ProjectTo<RoomDetailDto>(_mapper.ConfigurationProvider)
+                    .Where(x => x.CheckInBooking <= request.CheckInBooking && x.CheckOutBooking < request.CheckOutBooking && x.CheckOutBooking < request.CheckInBooking
+                    && x.Status == RoomStatus.Vacant);
+        
+                var result = await queryable.PaginateAsync(request, cancellationToken);
                 return RequestResult<PaginationResponse<RoomDetailDto>>.Succeed(new PaginationResponse<RoomDetailDto>()
                 {
                     PageNumber = request.PageNumber,

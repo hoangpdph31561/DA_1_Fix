@@ -11,9 +11,9 @@ namespace BaseSolution.Application.DataTransferObjects.AmenityRoomDetail.Request
         public int Amount { get; set; }
         public EntityStatus Status { get; set; } 
         public Guid? ModifiedBy { get; set; }
-        public class AmenityRoomValication : AbstractValidator<AmenityRoomDetailUpdateRequest>
+        public class AmenityRoomUpdateValication : AbstractValidator<AmenityRoomDetailUpdateRequest>
         {
-            public AmenityRoomValication()
+            public AmenityRoomUpdateValication()
             {
                 RuleFor(x => x.RoomTypeId)
              .NotEmpty().WithMessage("RoomTypeId cannot be empty.")

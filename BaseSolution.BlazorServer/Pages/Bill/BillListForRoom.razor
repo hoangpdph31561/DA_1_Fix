@@ -1,4 +1,4 @@
-﻿@page "/bill"
+﻿@page "/bill/room"
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Amenity;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Amenity.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Bill;
@@ -9,7 +9,7 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
 <PageTitle>Quản lý tiện ích khách sạn</PageTitle>
-<CustomListDisplayP2 Label="@("Danh sách các bill đã đặt ")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
+<CustomListDisplayP2 Label="@("Danh sách các bill của phòng ")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>
     </HeaderContent>
     <BodyContent>
@@ -30,18 +30,14 @@
                             <MudTh>STT</MudTh>
                             <MudTh>Mã hóa đơn</MudTh>
                             <MudTh>Ngày xuất</MudTh>
-                            <MudTh>Loại bill</MudTh>
                             <MudTh>Tổng tiền</MudTh>
-                            <MudTh>Trạng thái</MudTh>
+                            <MudTh>Hành động</MudTh>
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd>@(lstBill.IndexOf(context) + 1)</MudTd>
                                 <MudTd>@context.Id</MudTd>
                                 <MudTd>@context.CreatedTime.DateTime</MudTd>
-                                <MudTh>@context.BillType</MudTh>
                                 <MudTh>@context.TotalAmount</MudTh>
-                                <MudTd><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTd>
-
                                 <MudTd>
                                     <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@(() => OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
                                 </MudTd>
@@ -60,13 +56,14 @@
     public IBillRespo billRepo { get; set; }
     [Inject]
     public IDialogService _dialogService { get; set; }
+    [Inject]
     public ISnackbar _snackbar { get; set; }
-    private PaginationResponse<BillDTO> billVM;
+    private PaginationResponse<BillDtoForRoom> billVM;
     private bool _isLoadingAll = true;
     private bool _isLoadingList = true;
     private bool _isDisableControls = false;
     private ViewBillWithPaginationRequest request = new();
-    private List<BillDTO> lstBill;
+    private List<BillDtoForRoom> lstBill;
     #endregion
     #region Code xử lý
     protected override async Task OnInitializedAsync()
@@ -75,7 +72,7 @@
     }
     private async Task LoadData()
     {
-        billVM = await billRepo.GetAllBill(request);
+        billVM = await billRepo.GetBillForRoom(request);
         lstBill = billVM.Data!.ToList();
         _isLoadingList = false;
         _isLoadingAll = false;
@@ -97,9 +94,9 @@
     }
     private async Task OpenDetail(Guid idBill)
     {
-        var parameters = new DialogParameters<BillUpdate>();
+        var parameters = new DialogParameters<BillDetailForRoom>();
         parameters.Add(x => x.idBill, idBill);
-        var dialog = await _dialogService.ShowAsync<BillUpdate>("Chi tiết bill", parameters);
+        var dialog = await _dialogService.ShowAsync<BillDetailForRoom>("Chi tiết hóa đơn", parameters);
         var result = await dialog.Result;
         if (!result.Canceled)
         {

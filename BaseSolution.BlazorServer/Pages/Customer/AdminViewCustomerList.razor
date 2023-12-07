@@ -2,7 +2,7 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
 @using BaseSolution.BlazorServer.Respository.Interfaces
 
- @page "/customer/customerList"
+ @page "/admin/customerList"
 <CustomListDisplayP2 Label="@("Danh sách khách hàng")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="OnSearch">
     <HeaderContent>
         <MudChip Icon="@Icons.Material.Filled.Add" OnClick="@(async() => await OpenAdd())" Color="Color.Primary">Thêm</MudChip>

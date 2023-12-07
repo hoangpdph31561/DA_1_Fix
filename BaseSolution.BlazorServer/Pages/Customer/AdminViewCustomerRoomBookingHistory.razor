@@ -1,9 +1,7 @@
-﻿@page "/customer/RoomBookingHistory"
-@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
+﻿@page "/admin/customerRoomBookingHistory"
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request
 @using BaseSolution.BlazorServer.Respository.Interfaces
-@inject IdCustomer idCustomer
 
 <CustomListDisplay Label="Lịch sử đặt phòng" IsLoading="@(_isLoadingAll)" OnSearch="@OnSearch">
     <HeaderContent>
@@ -32,7 +30,7 @@
                         <RowTemplate>
                             <MudTd>@(_lstRoomBooking.IndexOf(context) + 1)</MudTd>
                             <MudTd>@context.NameCustomer</MudTd>
-                                <MudTd>@context.NameBuilding - @context.NameFloor - @context.NameRoom</MudTd>
+                            <MudTd>@context.NameBuilding - @context.NameFloor - @context.NameRoom</MudTd>
                                 <MudTd>@context.CheckInBooking.ToString("dd/MM/yyyy")</MudTd>
                                 <MudTh>@context.CheckOutBooking.ToString("dd/MM/yyyy")</MudTh>
                                 <MudTh>@context.PrePaid</MudTh>
@@ -49,8 +47,6 @@
 
 
 @code {
-    [Parameter]
-    public Guid customerId { get; set; }
     [Inject]
     public IRoomBookingRespo roomBookingRespo { get; set; }
     [Inject]
@@ -60,29 +56,18 @@
     private bool _isLoadingAll = true;
     private bool _isLoadingList = true;
     private bool _isDisableControls = false;
-    private ViewRoombookingPaginationRequest roomBookingRequest = new();
+    private ViewRoombookingPaginationRequest _roomBookingRequest = new();
     private List<RoomBookingDto> _lstRoomBooking;
 
     protected override async Task OnInitializedAsync()
     {
-        customerId = IdCustomer.Instance.Id;
+        _roomBookingVM = new PaginationResponse<RoomBookingDto>();
         await LoadData();
     }
     private async Task LoadData()
     {
-        _roomBookingVM = new PaginationResponse<RoomBookingDto>
-            {
-                Data = new List<RoomBookingDto>()
-            };
-
-        var roomBookings = await roomBookingRespo.GetRoomBookingByIdCustomerAsync(customerId);
-        foreach (var roomBooking in roomBookings)
-        {
-            if (roomBooking.Status == RoomStatus.Vacant)
-            {
-                _roomBookingVM.Data.Add(roomBooking);
-            }
-        }
+        var roomBookings = await roomBookingRespo.GetAllRoomBooking(_roomBookingRequest);
+        _roomBookingVM.Data = roomBookings.Data.Where(x => x.Status == RoomStatus.Vacant).ToList();
         _lstRoomBooking = _roomBookingVM.Data!.ToList();
         _isLoadingList = false;
         _isLoadingAll = false;
@@ -91,15 +76,15 @@
     {
         if (_isDisableControls) return;
         _isLoadingList = true;
-        roomBookingRequest.PageNumber = pageNumber;
+        _roomBookingRequest.PageNumber = pageNumber;
         await LoadData();
     }
 
     private async Task OnSearch(string? searchString)
     {
         _isLoadingList = true;
-        roomBookingRequest.PageNumber = 1;
-        roomBookingRequest.SearchString = searchString;
+        _roomBookingRequest.PageNumber = 1;
+        _roomBookingRequest.SearchString = searchString;
         await LoadData();
 
     }

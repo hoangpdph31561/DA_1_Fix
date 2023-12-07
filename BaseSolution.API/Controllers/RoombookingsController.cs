@@ -87,7 +87,25 @@ public class RoombookingsController : ControllerBase
         }
        
     }
-
+    [HttpGet("{idCustomer}/details")]
+    public async Task<IActionResult> GetRoomBookingDetailByIdCustomer(Guid idCustomer, CancellationToken cancellationToken)
+    {
+        try
+        {
+            RoomBookingByCustomerIdViewModel vm = new(_roombookingrReadOnlyRespository, _localizationService);
+            await vm.HandleAsync(idCustomer, cancellationToken);
+            if (vm.Success)
+            {
+                List<RoombookingDTO> result = (List<RoombookingDTO>)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
     [HttpPost]
     public async Task<IActionResult> Post(RoombookingCreateRequest request, CancellationToken cancellationToken)
     {
@@ -98,6 +116,20 @@ public class RoombookingsController : ControllerBase
             return BadRequest(ModelState);
         }
         RoombookingCreateViewModel vm = new(_roombookingrReadOnlyRespository, _roombookingReadWriteRespository, _mapper, _localizationService);
+        await vm.HandleAsync(request, cancellationToken);
+
+        return Ok(vm.Data);
+    }
+    [HttpPost("postByCustomer")]
+    public async Task<IActionResult> PostByCustomer(RoombookingCreateRequest request, CancellationToken cancellationToken)
+    {
+        ValidationResult validate = await _validator.ValidateAsync(request);
+        if (!validate.IsValid)
+        {
+            validate.AddToModelState(this.ModelState);
+            return BadRequest(ModelState);
+        }
+        RoomBookingCreateByCustomerViewModel vm = new(_roombookingrReadOnlyRespository, _roombookingReadWriteRespository, _mapper, _localizationService);
         await vm.HandleAsync(request, cancellationToken);
 
         return Ok(vm.Data);

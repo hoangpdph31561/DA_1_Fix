@@ -32,7 +32,7 @@ namespace BaseSolution.BlazorServer.Respository.Implements
 
         public async Task<Guid> CreateRoomBooking(RoombookingCreateRequest request)
         {
-            var result = await _httpClient.PostAsJsonAsync("/api/Roombookings", request);
+            var result = await _httpClient.PostAsJsonAsync("/api/Roombookings/postByCustomer", request);
 
             if (result.IsSuccessStatusCode)
             {
@@ -76,6 +76,12 @@ namespace BaseSolution.BlazorServer.Respository.Implements
                 throw;
             }
            
+        }
+
+        public async Task<List<RoomBookingDto>> GetRoomBookingByIdCustomerAsync(Guid idCustomer)
+        {
+            var result = await _httpClient.GetFromJsonAsync<List<RoomBookingDto>>($"/api/Roombookings/{idCustomer}/details");
+            return result;
         }
 
         public async Task<bool> UpdateRoomBooking(RoombookingUpdateRequest request)

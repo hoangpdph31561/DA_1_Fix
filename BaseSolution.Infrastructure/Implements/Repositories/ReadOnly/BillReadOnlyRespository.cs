@@ -7,8 +7,10 @@ using BaseSolution.Application.Interfaces.Services;
 using BaseSolution.Application.ValueObjects.Common;
 using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Application.ValueObjects.Response;
+
 using BaseSolution.Domain.Entities;
 using BaseSolution.Domain.Enums;
+
 using BaseSolution.Infrastructure.Database.AppDbContext;
 using BaseSolution.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -49,6 +51,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             }
         }
 
+
         public async Task<RequestResult<BillDtoForRoom?>> GetBillByIdForRoomAsync(Guid id, CancellationToken cancellationToken)
         {
             try
@@ -62,6 +65,22 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             catch (Exception e)
             {
                 return RequestResult<BillDtoForRoom?>.Fail(_localizationService["Bill is not found"], new[]
+
+        public async Task<RequestResult<List<BillDTO>>> GetBillByIdCustomerAsync(Guid idCustomer, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var bills = await _appReadOnlyDbContext.Bills.AsNoTracking()
+                    .Where(c => c.CustomerId == idCustomer && !c.Deleted)
+                    .ProjectTo<BillDTO>(_mapper.ConfigurationProvider)
+                    .ToListAsync(cancellationToken);
+               
+                return RequestResult<List<BillDTO>>.Succeed(bills);
+            }
+            catch (Exception e)
+            {
+                return RequestResult<List<BillDTO>>.Fail(_localizationService["Bill is not found"], new[]
+
                 {
                     new ErrorItem
                     {
@@ -71,6 +90,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 });
             }
         }
+
 
         public async Task<RequestResult<BillDtoForService?>> GetBillByIdForServiceAsync(Guid id, CancellationToken cancellationToken)
         {
@@ -93,6 +113,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 });
             }
         }
+
         public async Task<RequestResult<PaginationResponse<BillDTO>>> GetBillsByAdminAsync(ViewBillWithPaginationRequest request, CancellationToken cancellationToken)
         {
             try

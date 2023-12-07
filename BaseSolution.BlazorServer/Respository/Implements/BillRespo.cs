@@ -67,6 +67,7 @@ namespace BaseSolution.BlazorServer.Respository.Implements
         {
             var url = $"/api/Bills/getBillsByOtherForService?PageNumber={request.PageNumber}&PageSize={request.PageSize}";
 
+
             if (!String.IsNullOrEmpty(request.Search))
             {
                 url = $"/api/Bills/getBillsByOtherForService?SearchString={request.Search}&PageNumber={request.PageNumber}&PageSize={request.PageSize}";
@@ -74,6 +75,14 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             var result = await _httpClient.GetFromJsonAsync<PaginationResponse<BillDtoForService>>(url);
             return result;
         }
+
+        public async Task<List<BillDTO>> GetBillByIdCustomer(Guid idCustomer)
+        {
+            var result = await _httpClient.GetFromJsonAsync<List<BillDTO>>($"/api/Bills/{idCustomer}/details");
+            return result;
+        }
+
+
         public async Task<bool> UpdateBill(BillUpdateRequest request)
         {
             var result = await _httpClient.PutAsJsonAsync("/api/Bills", request);

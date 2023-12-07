@@ -1,12 +1,9 @@
-﻿@page "/customer/RoomBooking"
-@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
+﻿@page "/admin/customerRoomBooking"
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request
 @using BaseSolution.BlazorServer.Respository.Interfaces
-@inject IdCustomer idCustomer
-@inject NavigationManager navigation
 
 <CustomListDisplay Label="@("Thông tin đặt phòng")" IsLoading="@(_isLoadingAll)" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>
@@ -29,6 +26,7 @@
                     <MudTable Items="@_roomBookingVM.Data">
                         <HeaderContent>
                             <MudTh>STT</MudTh>
+                            <MudTh>Tên khách hàng</MudTh>
                             <MudTh>Thời gian đặt</MudTh>
                             <MudTh>Loại phòng</MudTh>
                             <MudTh>Kiểu đặt phòng</MudTh>
@@ -38,14 +36,13 @@
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd>@(_lstRoomBooking.IndexOf(context) + 1)</MudTd>
+                            <MudTd>@context.NameCustomer</MudTd>
                                 <MudTd>@context.CreatedTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
                                 <MudTd>@context.NameRoomType</MudTd>
-
                                 <MudTh>@context.BookingType</MudTh>
                                 <MudTh>@context.PrePaid</MudTh>
                                 <MudTh>@context.RoomPrice</MudTh>
-                                <MudTd><BadgeRoomStatus Status="@context.StatusRoom"></BadgeRoomStatus></MudTd>
-
+                                <MudTh><BadgeRoomStatus Status="@context.Status"></BadgeRoomStatus></MudTh>
                             </RowTemplate>
                         </MudTable>
                         <MudDivider />
@@ -60,8 +57,6 @@
 
 
 @code {
-    [Parameter]
-    public Guid customerId { get; set; }
     [Inject]
     public IRoomBookingRespo _roomBookingRepo { get; set; }
     [Inject]
@@ -69,7 +64,7 @@
     [Inject]
     public ISnackbar _snackbar { get; set; }
     private Guid _idRoomDetail = Guid.Empty;
-    #region
+    #region 
     private PaginationResponse<RoomBookingDto> _roomBookingVM;
     private List<RoomBookingDto> _lstRoomBooking;
     private ViewRoombookingPaginationRequest _roomBookingRequest = new();
@@ -77,28 +72,19 @@
     #region
     private bool _isLoadingList = true;
     private bool _isLoadingAll = true;
+    private bool closeAdd = true;
+    private bool closeDetail = true;
     private bool _isDisableControls = false;
     #endregion
     protected override async Task OnInitializedAsync()
     {
-        customerId = IdCustomer.Instance.Id;
+        _roomBookingVM = new PaginationResponse<RoomBookingDto>();
         await LoadData();
     }
     private async Task LoadData()
     {
-        _roomBookingVM = new PaginationResponse<RoomBookingDto>
-            {
-                Data = new List<RoomBookingDto>()
-            };
-
-        var roomBookings = await _roomBookingRepo.GetRoomBookingByIdCustomerAsync(customerId);
-        foreach (var roomBooking in roomBookings)
-        {
-            if (roomBooking.Status == RoomStatus.Occupied || roomBooking.Status == RoomStatus.AwaitingConfirmation)
-            {
-                _roomBookingVM.Data.Add(roomBooking);
-            }
-        }
+        var roomBookings = await _roomBookingRepo.GetAllRoomBooking(_roomBookingRequest);
+        _roomBookingVM.Data = roomBookings.Data.Where(x => x.Status == RoomStatus.Occupied || x.Status == RoomStatus.AwaitingConfirmation).ToList();
         _lstRoomBooking = _roomBookingVM.Data!.ToList();
         _isLoadingAll = false;
         _isLoadingList = false;
@@ -119,6 +105,6 @@
         await LoadData();
     }
     #endregion
-
-
+    
+   
 }

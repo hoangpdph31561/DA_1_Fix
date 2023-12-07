@@ -4,6 +4,7 @@ using BaseSolution.BlazorServer.Data.ValueObjects.Pagination;
 using BaseSolution.BlazorServer.Respository.Interfaces;
 using System.Text.Json;
 using System.Text;
+using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request;
 
 namespace BaseSolution.BlazorServer.Respository.Implements
 {
@@ -52,7 +53,6 @@ namespace BaseSolution.BlazorServer.Respository.Implements
         public async Task<CustomerDTO> GetCustomerById(Guid id)
         {
             var result = await _httpClient.GetFromJsonAsync<CustomerDTO>($"/api/Customers/{id}");
-
             return result;
         }
 
@@ -83,6 +83,12 @@ namespace BaseSolution.BlazorServer.Respository.Implements
         {
             var result = await _httpClient.PostAsJsonAsync($"/api/Customers/verifyCustomerBooking/{id}/{Identification}/{code}", "");
             var convert = result.Content.ReadAsStringAsync();
+            return result.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> UpdateDetailCustomer(CustomerDetailUpdateRequest request)
+        {
+            var result = await _httpClient.PutAsJsonAsync($"/api/Customers/putByCustomer", request);
             return result.IsSuccessStatusCode;
         }
     }

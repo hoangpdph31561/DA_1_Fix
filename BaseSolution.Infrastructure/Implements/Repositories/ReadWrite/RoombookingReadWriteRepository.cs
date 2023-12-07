@@ -6,7 +6,6 @@ using BaseSolution.Application.ValueObjects.Response;
 using BaseSolution.Domain.Entities;
 using BaseSolution.Domain.Enums;
 using BaseSolution.Infrastructure.Database.AppDbContext;
-using BaseSolution.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
@@ -58,6 +57,31 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
             }
         }
 
+        public async Task<RequestResult<Guid>> AddRoomBookingByCustomerAsync(RoomBookingEntity entity, CancellationToken cancellationToken)
+        {
+            try
+            {
+                entity.Status = EntityStatus.PendingForConfirmation;
+                entity.CustomerId = entity.CustomerId;
+                entity.CreatedBy = entity.CreatedBy;
+                entity.CreatedTime = DateTimeOffset.Now;
+                await _appReadWriteDbContext.RoomBookings.AddAsync(entity);
+                await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
+                return RequestResult<Guid>.Succeed(entity.Id);
+            }
+            catch (Exception e)
+            {
+
+                return RequestResult<Guid>.Fail(_localizationService["Unable to create RoomBooking"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToCreate + "RoomBookin"
+                    }
+                });
+            }
+        }
         public async Task<RequestResult<int>> DeleteRoomBookingAsync(RoombookingDeleteRequest request, CancellationToken cancellationToken)
         {
             try

@@ -116,7 +116,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
             {
                 var roomBookingDetail = await GetRoomBookingDetailByIdAsync(request.Id, cancellationToken);
 
-                roomBookingDetail.Price = request.Price;
+                roomBookingDetail!.Price = request.Price;
                 roomBookingDetail.PrePaid = request.PrePaid;
                 roomBookingDetail.RoomDetailId = request.RoomDetailId;
                 roomBookingDetail.RoomBookingId = request.RoomBookingId;

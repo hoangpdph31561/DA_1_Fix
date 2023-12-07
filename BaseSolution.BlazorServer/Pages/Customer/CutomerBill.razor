@@ -1,0 +1,98 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Bill
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Bill.Request
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
+@using BaseSolution.BlazorServer.Respository.Implements
+@using BaseSolution.BlazorServer.Respository.Interfaces
+@page "/customer/Bill"
+@inject IdCustomer idCustomer
+<CustomListDisplayP2 Label="Xem hóa đơn" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
+    <HeaderContent>
+
+    </HeaderContent>
+
+    <BodyContent>
+        <MudPaper Elevation="0">
+            @if (_isLoadingList)
+            {
+                <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="m-3" />
+            }
+            else
+            {
+                <MudTable Items="@_billVM.Data" Style="position: relative;" Elevation="0">
+                    <HeaderContent>
+                        <MudTh>STT</MudTh>
+                        <MudTh>Ngày xuất</MudTh>
+                        <MudTh>Loại hóa đơn</MudTh>
+                        <MudTh>Tổng tiền</MudTh>
+                        <MudTh>Trạng thái</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>@(_lstBill.IndexOf(context) + 1)</MudTd>
+                            <MudTd>@context.CreatedTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
+                            <MudTd>@context.BillType</MudTd>
+                            <MudTd>@context.TotalAmount </MudTd>
+                            <MudTh><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTh>
+                        </RowTemplate>
+                    </MudTable>
+                <CustomPagination Class="my-1" HasNext="@_billVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="@_billVM.PageNumber"></CustomPagination>
+            }
+        </MudPaper>
+    </BodyContent>
+</CustomListDisplayP2>
+@code {
+    #region Khai báo
+    [Parameter]
+    public Guid customerId { get; set; }
+    [Inject]
+    public IBillRespo billRepo { get; set; }
+    [Inject]
+    public IDialogService dialogService { get; set; }
+    [Inject]
+    public ISnackbar snackbar { get; set; }
+    private ViewBillWithPaginationRequest billRequest = new();
+    private List<BillDTO> _lstBill;
+    private PaginationResponse<BillDTO> _billVM;
+    private Guid _idBill = Guid.Empty;
+    private bool _isLoadingAll = true;
+    private bool _isLoadingList = true;
+    private bool _isDisableControls = false;
+    #endregion
+    protected override async Task OnInitializedAsync()
+    {
+        customerId = IdCustomer.Instance.Id;
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        _billVM = new PaginationResponse<BillDTO>
+            {
+                Data = new List<BillDTO>()
+            };
+
+        var bills = await billRepo.GetBillByIdCustomer(customerId);
+        foreach (var bill in bills)
+        {
+            _billVM.Data.Add(bill);
+        }
+        _lstBill = _billVM.Data.ToList();
+        _isLoadingAll = false;
+        _isLoadingList = false;
+    }
+
+    private async Task OnPaginationButtonClick(int pageNumber)
+    {
+        if (_isDisableControls) return;
+        _isLoadingAll = true;
+        billRequest.PageNumber = pageNumber;
+        await LoadData();
+    }
+    private async Task OnSearch(string? searchString)
+    {
+        if (_isDisableControls) return;
+        _isLoadingList = true;
+        billRequest.PageNumber = 1;
+        billRequest.Search = searchString;
+        await LoadData();
+    }
+}

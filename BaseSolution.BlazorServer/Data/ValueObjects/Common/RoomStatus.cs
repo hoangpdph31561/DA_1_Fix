@@ -12,6 +12,7 @@
         Inspected = 8,
         DoNotDisturb = 9,
         CheckIn = 10,
-        CheckOut = 11
+        CheckOut = 11,
+        AwaitingConfirmation = 12
     }
 }

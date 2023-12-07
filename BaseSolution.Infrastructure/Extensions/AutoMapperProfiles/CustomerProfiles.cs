@@ -18,7 +18,7 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
             CreateMap<CustomerCreateRequest, CustomerEntity>();
             CreateMap<CustomerUpdateRequest, CustomerEntity>();
             CreateMap<CustomerDeleteRequest, CustomerEntity>();
-            
+            CreateMap<CustomerDetailUpdateRequest, CustomerEntity>();
         }
     }
 }

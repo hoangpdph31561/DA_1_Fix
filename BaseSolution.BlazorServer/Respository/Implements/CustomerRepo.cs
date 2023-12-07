@@ -85,5 +85,11 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             var convert = result.Content.ReadAsStringAsync();
             return result.IsSuccessStatusCode;
         }
+
+        public async Task<bool> UpdateDetailCustomer(CustomerDetailUpdateRequest request)
+        {
+            var result = await _httpClient.PutAsJsonAsync($"/api/Customers/putByCustomer", request);
+            return result.IsSuccessStatusCode;
+        }
     }
 }

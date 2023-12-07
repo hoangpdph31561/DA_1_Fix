@@ -115,7 +115,7 @@
     public async Task OpenAdd(Guid idRoomDetail)
     {
         var getStatus = await roomDetailRespo.GetRoomDetailById(idRoomDetail);
-        if (getStatus.Status != RoomStatus.Occupied)
+        if (getStatus.Status == RoomStatus.Vacant)
         {
             var parameters = new DialogParameters<RoomBookingCreate>();
             parameters.Add(x => x.idRoomDetail, idRoomDetail);
@@ -128,7 +128,7 @@
         }
         else
         {
-            _snackbar.Add("Phòng đã được thuê", Severity.Error);
+            _snackbar.Add("Phòng không thể thuê!", Severity.Info);
         }
 
 

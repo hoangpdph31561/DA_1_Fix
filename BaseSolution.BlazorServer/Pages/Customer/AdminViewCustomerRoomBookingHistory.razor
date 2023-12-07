@@ -56,16 +56,18 @@
     private bool _isLoadingAll = true;
     private bool _isLoadingList = true;
     private bool _isDisableControls = false;
-    private ViewRoombookingPaginationRequest roomBookingRequest = new();
+    private ViewRoombookingPaginationRequest _roomBookingRequest = new();
     private List<RoomBookingDto> _lstRoomBooking;
 
     protected override async Task OnInitializedAsync()
     {
+        _roomBookingVM = new PaginationResponse<RoomBookingDto>();
         await LoadData();
     }
     private async Task LoadData()
     {
-        _roomBookingVM = await roomBookingRespo.GetAllRoomBooking(roomBookingRequest);
+        var roomBookings = await roomBookingRespo.GetAllRoomBooking(_roomBookingRequest);
+        _roomBookingVM.Data = roomBookings.Data.Where(x => x.Status == RoomStatus.Vacant).ToList();
         _lstRoomBooking = _roomBookingVM.Data!.ToList();
         _isLoadingList = false;
         _isLoadingAll = false;
@@ -74,15 +76,15 @@
     {
         if (_isDisableControls) return;
         _isLoadingList = true;
-        roomBookingRequest.PageNumber = pageNumber;
+        _roomBookingRequest.PageNumber = pageNumber;
         await LoadData();
     }
 
     private async Task OnSearch(string? searchString)
     {
         _isLoadingList = true;
-        roomBookingRequest.PageNumber = 1;
-        roomBookingRequest.SearchString = searchString;
+        _roomBookingRequest.PageNumber = 1;
+        _roomBookingRequest.SearchString = searchString;
         await LoadData();
 
     }

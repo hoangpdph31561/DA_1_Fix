@@ -42,7 +42,7 @@
                                 <MudTh>@context.BookingType</MudTh>
                                 <MudTh>@context.PrePaid</MudTh>
                                 <MudTh>@context.RoomPrice</MudTh>
-                                <MudTh><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTh>
+                                <MudTh><BadgeRoomStatus Status="@context.Status"></BadgeRoomStatus></MudTh>
                             </RowTemplate>
                         </MudTable>
                         <MudDivider />
@@ -78,11 +78,13 @@
     #endregion
     protected override async Task OnInitializedAsync()
     {
+        _roomBookingVM = new PaginationResponse<RoomBookingDto>();
         await LoadData();
     }
     private async Task LoadData()
     {
-        _roomBookingVM = await _roomBookingRepo.GetAllRoomBooking(_roomBookingRequest);
+        var roomBookings = await _roomBookingRepo.GetAllRoomBooking(_roomBookingRequest);
+        _roomBookingVM.Data = roomBookings.Data.Where(x => x.Status == RoomStatus.Occupied || x.Status == RoomStatus.AwaitingConfirmation).ToList();
         _lstRoomBooking = _roomBookingVM.Data!.ToList();
         _isLoadingAll = false;
         _isLoadingList = false;

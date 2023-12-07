@@ -29,10 +29,11 @@ namespace BaseSolution.API.Controllers
         private readonly IMapper _mapper;
         private readonly IValidator<CustomerCreateRequest> _validator;
         private readonly IValidator<CustomerUpdateRequest> _validatorUpdate;
+        private readonly IValidator<CustomerDetailUpdateRequest> _validatorDetailUpdate;
         private string _verifyCode = string.Empty;
 
         public CustomersController(ICustomerReadOnlyRepository CustomerReadOnlyRepository, ICustomerReadWriteRepository CustomerReadWriteRepository, ILocalizationService localizationService, IMapper mapper,
-            IValidator<CustomerCreateRequest> validator, IValidator<CustomerUpdateRequest> validatorUpdate
+            IValidator<CustomerCreateRequest> validator, IValidator<CustomerUpdateRequest> validatorUpdate, IValidator<CustomerDetailUpdateRequest> validatorDetailUpdate
             )
         {
             _CustomerReadOnlyRepository = CustomerReadOnlyRepository;
@@ -41,6 +42,7 @@ namespace BaseSolution.API.Controllers
             _mapper = mapper;
             _validator = validator;
             _validatorUpdate = validatorUpdate;
+            _validatorDetailUpdate = validatorDetailUpdate;
         }
 
         // GET api/<CustomerController>/5
@@ -191,6 +193,7 @@ namespace BaseSolution.API.Controllers
                         ModifiedTime = DateTime.Now,
                         ApprovedCodeExpiredTime = DateTime.Now.AddMinutes(5),
                         Status = Domain.Enums.EntityStatus.PendingForConfirmation,
+                        CustomerType = Domain.Enums.CustomerType.Customer
                     };
                     await _CustomerReadWriteRepository.UpdateCustomerAsync(newCustomers, cancellationToken);
                     return Ok("Mã đã được gửi, vui lòng kiểm tra email!");
@@ -210,6 +213,7 @@ namespace BaseSolution.API.Controllers
                         IdentificationNumber = customerCreateRequest.IdentificationNumber,
                         ApprovedCodeExpiredTime = DateTime.Now.AddMinutes(5),
                         Status = Domain.Enums.EntityStatus.PendingForConfirmation,
+                        CustomerType = Domain.Enums.CustomerType.Customer
                     };
                     await _CustomerReadWriteRepository.UpdateCustomerAsync(newCustomers, cancellationToken);
                     return Ok("Mã đã được gửi, vui lòng kiểm tra email!");
@@ -229,6 +233,7 @@ namespace BaseSolution.API.Controllers
                         IdentificationNumber = customerCreateRequest.IdentificationNumber,
                         ApprovedCodeExpiredTime = DateTime.Now.AddMinutes(5),
                         Status = Domain.Enums.EntityStatus.PendingForConfirmation,
+                        CustomerType = Domain.Enums.CustomerType.Customer
                     };
                     await _CustomerReadWriteRepository.UpdateCustomerAsync(newCustomers, cancellationToken);
                     return Ok("Mã đã được gửi, vui lòng kiểm tra email!");
@@ -269,6 +274,24 @@ namespace BaseSolution.API.Controllers
                 return BadRequest(ModelState);
             }
             CustomerUpdateViewModel vm = new(_CustomerReadWriteRepository, _localizationService, _mapper);
+
+            await vm.HandleAsync(request, cancellationToken);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
+        }
+        [HttpPut("putByCustomer")]
+        public async Task<IActionResult> PutByCustomer(CustomerDetailUpdateRequest request, CancellationToken cancellationToken)
+        {
+            ValidationResult validate = await _validatorDetailUpdate.ValidateAsync(request);
+            if (!validate.IsValid)
+            {
+                validate.AddToModelState(this.ModelState);
+                return BadRequest(ModelState);
+            }
+            CustomerDetailUpdateViewModel vm = new(_CustomerReadWriteRepository, _localizationService, _mapper);
 
             await vm.HandleAsync(request, cancellationToken);
             if (vm.Success)

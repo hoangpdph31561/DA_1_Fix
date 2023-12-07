@@ -7,6 +7,7 @@ namespace BaseSolution.Application.Interfaces.Repositories.ReadWrite
     public interface IRoombookingReadWriteRepository
     {
         Task<RequestResult<Guid>> AddRoomBookingAsync(RoomBookingEntity entity, CancellationToken cancellationToken);
+        Task<RequestResult<Guid>> AddRoomBookingByCustomerAsync(RoomBookingEntity entity, CancellationToken cancellationToken);
         Task<RequestResult<int>> UpdateRoomBookingAsync(RoomBookingEntity entity, CancellationToken cancellationToken);
         Task<RequestResult<int>> DeleteRoomBookingAsync(RoombookingDeleteRequest request, CancellationToken cancellationToken);
     }

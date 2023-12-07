@@ -32,7 +32,7 @@ namespace BaseSolution.BlazorServer.Respository.Implements
 
         public async Task<Guid> CreateRoomBooking(RoombookingCreateRequest request)
         {
-            var result = await _httpClient.PostAsJsonAsync("/api/Roombookings", request);
+            var result = await _httpClient.PostAsJsonAsync("/api/Roombookings/postByCustomer", request);
 
             if (result.IsSuccessStatusCode)
             {

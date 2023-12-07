@@ -7,7 +7,7 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
     public interface IBillRespo
     {
         Task<PaginationResponse<BillDTO>> GetAllBill(ViewBillWithPaginationRequest request);
-        Task<BillDTO> GetBillByIdCustomer(Guid idCustomer);
+        Task<List<BillDTO>> GetBillByIdCustomer(Guid idCustomer);
         Task<bool> CreateNewBill(BillCreateRequest request);
         Task<BillDTO> GetBillById(Guid id);
         Task<bool> UpdateBill(BillUpdateRequest request);

@@ -48,8 +48,6 @@
     public ISnackbar _snackbar { get; set; }
     [Inject]
     public ISendMailService sendMailService { get; set; }
-    [Inject]
-    public ICustomerId CustomerId { get; set; }
     public CustomerCreateRequest createRequest = new CustomerCreateRequest();
 
 
@@ -97,7 +95,7 @@
                         _snackbar.Add("Đăng nhập thành công", Severity.Success);
 
                         IdCustomer.Instance.Id = result.Id;
-                        navigationManager.NavigateTo($"/customer/customerRoomType");
+                        navigationManager.NavigateTo($"/customer/RoomType");
                         
                         var activeCustomer = await customerRepo.UpdateStatusCustomer(result.Id);
                     }

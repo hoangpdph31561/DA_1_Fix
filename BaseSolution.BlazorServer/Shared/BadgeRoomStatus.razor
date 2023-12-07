@@ -39,6 +39,9 @@
     case RoomStatus.CheckOut:
         <MudChip Style="@($"color:{Colors.Orange.Accent1};")">Đang check out</MudChip>
         break;
+    case RoomStatus.AwaitingConfirmation:
+        <MudChip Style="@($"color:{Colors.Lime.Darken4};")">Đang chờ xác nhận</MudChip>
+        break;
 }
 
 @code {
@@ -54,8 +57,9 @@
     Dirty = 7,
     Inspected = 8,
     DoNotDisturb = 9,
-    CheckIn = 10,
-     CheckOut = 11
+     CheckIn = 10,
+     CheckOut = 11,
+     AwaitingConfirmation = 12
     */
     
 }

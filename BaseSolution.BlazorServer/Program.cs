@@ -46,7 +46,6 @@ builder.Services.AddTransient<IRoleRespo, RoleRespo>();
 builder.Services.AddTransient<IRoomBookingDetailRepo, RoomBookingDetailRepo>();
 builder.Services.AddTransient<IStatistic, Statistic>();
 builder.Services.AddTransient<ILogin, LoginRepo>();
-builder.Services.AddTransient<ICustomerId, CustomerId>();
 builder.Services.AddSingleton<CustomerCreateRequest>();
 builder.Services.AddSingleton<IdCustomer>();
 builder.Services.AddBlazoredSessionStorage();

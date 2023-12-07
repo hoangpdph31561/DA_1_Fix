@@ -1,0 +1,92 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
+@using BaseSolution.BlazorServer.Respository.Interfaces
+@page "/customer/PersonalInformation"
+@inject IdCustomer idCustomer
+
+<CustomListDisplayP2 Label="@("Thông tin cá nhân")" IsLoading="_isLoadingAll">
+    <HeaderContent>
+        
+    </HeaderContent>
+    <BodyContent>
+        <MudPaper Elevation="0" Class="custom-list-display-border">
+            @if (_isLoadingList)
+            {
+                <MudProgressLinear Color="Color.Primary" Indeterminate="true"></MudProgressLinear>
+            }
+            else
+            {
+                <MudCard Class="p-3" Elevation="0">
+                    <MudTable Items="@_lstCustomers">
+                        <HeaderContent>
+                            <MudTh>Tên</MudTh>
+                            <MudTh>Mã định danh</MudTh>
+                            <MudTh>Email</MudTh>
+                            <MudTh>Số điện thoại</MudTh>
+                            <MudTh>Hành động</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd>@context.Name</MudTd>
+                            <MudTd>@context.IdentificationNumber</MudTd>
+                            <MudTd>@context.Email</MudTd>
+                            <MudTd>@context.PhoneNumber</MudTd>
+                                <MudTd>
+                                    <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@( async() => await OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
+                                </MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                        <MudDivider />
+                    </MudCard>
+            }
+        </MudPaper>
+    </BodyContent>
+</CustomListDisplayP2>
+@code {
+    [Parameter]
+    public Guid customerId { get; set; }
+    [Inject]
+    public ICustomerRepo customerRepo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    private CustomerDTO customerVM;
+    private List<CustomerDTO> _lstCustomers;
+    private bool _isLoadingAll = true;
+    private bool _isLoadingList = true;
+    private bool _isDisableControls = false;
+    private bool closeDetail = true;
+    private ViewCustomerWithPaginationRequest customerRequest = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        customerId = IdCustomer.Instance.Id;
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        try
+        {
+
+            customerVM = await customerRepo.GetCustomerById(customerId);
+            _lstCustomers = new List<CustomerDTO> { customerVM };
+            _isLoadingList = false;
+            _isLoadingAll = false;
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add("Không có thông tin cá nhân", Severity.Error);
+        }
+    }
+    private async Task OpenDetail(Guid idCustomer)
+    {
+        var parameters = new DialogParameters<PersonalInfomationDetail>();
+        parameters.Add(x => x.idCustomer, idCustomer);
+        var dialog = await _dialogService.ShowAsync<PersonalInfomationDetail>("Thông tin cá nhân chi tiết", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
+    }
+}

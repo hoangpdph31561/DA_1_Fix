@@ -48,18 +48,20 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             }
         }
 
-        public async Task<RequestResult<BillDTO?>> GetBillByIdCustomerAsync(Guid idCustomer, CancellationToken cancellationToken)
+        public async Task<RequestResult<List<BillDTO>>> GetBillByIdCustomerAsync(Guid idCustomer, CancellationToken cancellationToken)
         {
             try
             {
-                var bill = await _appReadOnlyDbContext.Bills.AsNoTracking().Where(c => c.CustomerId == idCustomer && !c.Deleted).ProjectTo<BillDTO>(_mapper.ConfigurationProvider)
-                .FirstOrDefaultAsync(cancellationToken);
+                var bills = await _appReadOnlyDbContext.Bills.AsNoTracking()
+                    .Where(c => c.CustomerId == idCustomer && !c.Deleted)
+                    .ProjectTo<BillDTO>(_mapper.ConfigurationProvider)
+                    .ToListAsync(cancellationToken);
                
-                return RequestResult<BillDTO?>.Succeed(bill);
+                return RequestResult<List<BillDTO>>.Succeed(bills);
             }
             catch (Exception e)
             {
-                return RequestResult<BillDTO?>.Fail(_localizationService["Bill is not found"], new[]
+                return RequestResult<List<BillDTO>>.Fail(_localizationService["Bill is not found"], new[]
                 {
                     new ErrorItem
                     {

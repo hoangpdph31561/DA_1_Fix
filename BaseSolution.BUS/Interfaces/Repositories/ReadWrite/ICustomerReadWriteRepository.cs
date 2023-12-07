@@ -13,7 +13,7 @@ namespace BaseSolution.Application.Interfaces.Repositories.ReadWrite
     {
         Task<RequestResult<Guid>> AddCustomerAsync(CustomerEntity entity, CancellationToken cancellationToken);
         Task<RequestResult<int>> UpdateCustomerAsync(CustomerEntity entity, CancellationToken cancellationToken);
-
+        Task<RequestResult<int>> UpdateCustomerDetailAsync(CustomerEntity entity, CancellationToken cancellationToken);
         Task<RequestResult<int>> DeleteCustomerAsync(CustomerDeleteRequest request, CancellationToken cancellationToken);
         Task<RequestResult<int>> UpdateStatusCustomerAsync(Guid id, CancellationToken cancellationToken);
     }

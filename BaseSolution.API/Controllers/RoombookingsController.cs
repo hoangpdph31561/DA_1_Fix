@@ -120,6 +120,20 @@ public class RoombookingsController : ControllerBase
 
         return Ok(vm.Data);
     }
+    [HttpPost("postByCustomer")]
+    public async Task<IActionResult> PostByCustomer(RoombookingCreateRequest request, CancellationToken cancellationToken)
+    {
+        ValidationResult validate = await _validator.ValidateAsync(request);
+        if (!validate.IsValid)
+        {
+            validate.AddToModelState(this.ModelState);
+            return BadRequest(ModelState);
+        }
+        RoomBookingCreateByCustomerViewModel vm = new(_roombookingrReadOnlyRespository, _roombookingReadWriteRespository, _mapper, _localizationService);
+        await vm.HandleAsync(request, cancellationToken);
+
+        return Ok(vm.Data);
+    }
 
     [HttpPut]
     public async Task<IActionResult> Put(RoombookingUpdateRequest request, CancellationToken cancellationToken)

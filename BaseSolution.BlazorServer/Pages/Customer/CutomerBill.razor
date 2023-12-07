@@ -1,11 +1,10 @@
-﻿@page "/customer/bill"
-@using BaseSolution.BlazorServer.Data.DataTransferObjects.Bill
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Bill
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Bill.Request
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
 @using BaseSolution.BlazorServer.Respository.Implements
 @using BaseSolution.BlazorServer.Respository.Interfaces
-@page "/customerbill"
+@page "/customer/Bill"
 @inject IdCustomer idCustomer
 <CustomListDisplayP2 Label="Xem hóa đơn" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>
@@ -20,25 +19,23 @@
             }
             else
             {
-                <MudTable Items="@billPagination.Data" Style="position: relative;" Elevation="0">
+                <MudTable Items="@_billVM.Data" Style="position: relative;" Elevation="0">
                     <HeaderContent>
                         <MudTh>STT</MudTh>
-                        <MudTh>Tên khách</MudTh>
                         <MudTh>Ngày xuất</MudTh>
                         <MudTh>Loại hóa đơn</MudTh>
                         <MudTh>Tổng tiền</MudTh>
                         <MudTh>Trạng thái</MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd>@(lstBill.IndexOf(context) + 1)</MudTd>
-                        <MudTd>@context.CustomerName</MudTd>
+                        <MudTd>@(_lstBill.IndexOf(context) + 1)</MudTd>
                             <MudTd>@context.CreatedTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
                             <MudTd>@context.BillType</MudTd>
                             <MudTd>@context.TotalAmount </MudTd>
                             <MudTh><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTh>
                         </RowTemplate>
                     </MudTable>
-                <CustomPagination Class="my-1" HasNext="@billPagination.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="@billPagination.PageNumber"></CustomPagination>
+                <CustomPagination Class="my-1" HasNext="@_billVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="@_billVM.PageNumber"></CustomPagination>
             }
         </MudPaper>
     </BodyContent>
@@ -53,11 +50,9 @@
     public IDialogService dialogService { get; set; }
     [Inject]
     public ISnackbar snackbar { get; set; }
-    [Inject]
-    public ICustomerId CustomerId { get; set; }
     private ViewBillWithPaginationRequest billRequest = new();
-    private List<BillDTO> lstBill;
-    private PaginationResponse<BillDTO> billPagination;
+    private List<BillDTO> _lstBill;
+    private PaginationResponse<BillDTO> _billVM;
     private Guid _idBill = Guid.Empty;
     private bool _isLoadingAll = true;
     private bool _isLoadingList = true;
@@ -70,11 +65,17 @@
     }
     private async Task LoadData()
     {
-        billPagination = new PaginationResponse<BillDTO>
+        _billVM = new PaginationResponse<BillDTO>
             {
-                Data = new List<BillDTO> { await billRepo.GetBillByIdCustomer(customerId) }
+                Data = new List<BillDTO>()
             };
-        lstBill = billPagination.Data.ToList();
+
+        var bills = await billRepo.GetBillByIdCustomer(customerId);
+        foreach (var bill in bills)
+        {
+            _billVM.Data.Add(bill);
+        }
+        _lstBill = _billVM.Data.ToList();
         _isLoadingAll = false;
         _isLoadingList = false;
     }

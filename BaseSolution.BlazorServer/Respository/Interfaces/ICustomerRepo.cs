@@ -12,6 +12,7 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
         Task<bool> UpdateDetailCustomer(CustomerDetailUpdateRequest request);
         Task<bool> DeleteCustomer(CustomerDeleteRequest request);
         Task<CustomerDTO> GetIdentificationNumber(string identification);
+        Task<CustomerDTO> GetEmailAsync(string email);
         Task<bool> SignUpOrSignIn(CustomerCreateRequest customerCreateRequest);
         Task<bool> VerifyCode(string code, string idCard);  
         Task<CustomerDTO> GetCustomerById(Guid id);

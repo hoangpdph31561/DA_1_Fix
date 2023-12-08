@@ -128,7 +128,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 // Update value to existed roomDetail
 
                 roomDetail!.Status = request.Status;
-                roomDetail.ModifiedBy = request.ModifiedBy;
+                roomDetail.ModifiedBy = (request.ModifiedBy == Guid.Empty) ? roomDetail.ModifiedBy : request.ModifiedBy;
                 roomDetail.ModifiedTime = DateTimeOffset.Now;
 
                 _dbContext.RoomDetails.Update(roomDetail);

@@ -28,6 +28,29 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             _mapper = mapper;
             _localizationService = localizationService;
         }
+
+        public async Task<RequestResult<CustomerDto?>> GetCustomerByEmailAsync(string Email, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var Customer = await _dbContext.Customers.AsNoTracking().Where(c => c.Email == Email && !c.Deleted).ProjectTo<CustomerDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(cancellationToken);
+
+                return RequestResult<CustomerDto?>.Succeed(Customer);
+            }
+            catch (Exception e)
+            {
+                return RequestResult<CustomerDto?>.Fail(_localizationService["Customer is not found"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "Customer"
+                    }
+                });
+            }
+        }
+
         public async Task<RequestResult<CustomerDto?>> GetCustomerByIdAsync(Guid idCustomer, CancellationToken cancellationToken)
         {
 

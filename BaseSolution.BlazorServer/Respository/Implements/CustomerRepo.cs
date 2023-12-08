@@ -28,8 +28,15 @@ namespace BaseSolution.BlazorServer.Respository.Implements
         public async Task<bool> SignUpOrSignIn(CustomerCreateRequest request)
         {
             var result = await _httpClient.PostAsJsonAsync("/api/Customers/SignUpOrSignIn", request);
-            var convert = result.Content.ReadAsStringAsync();
-            return result.IsSuccessStatusCode;
+            if (result.IsSuccessStatusCode)
+            {
+                var convert = result.Content.ReadAsStringAsync();
+                return result.IsSuccessStatusCode;
+            }
+            else
+            {
+                throw new Exception("Kiểm tra thông tin đăng nhập!(Mã định danh, Email phải của cá nhân)");
+            }
         }
         public async Task<bool> VerifyCode(string code, string idCard)
         {
@@ -90,6 +97,13 @@ namespace BaseSolution.BlazorServer.Respository.Implements
         {
             var result = await _httpClient.PutAsJsonAsync($"/api/Customers/putByCustomer", request);
             return result.IsSuccessStatusCode;
+        }
+
+        public async Task<CustomerDTO> GetEmailAsync(string email)
+        {
+            var existingEmail = await _httpClient.GetFromJsonAsync<CustomerDTO>($"/api/Customers/checkEmailExist?email={email}");
+
+            return existingEmail;
         }
     }
 }

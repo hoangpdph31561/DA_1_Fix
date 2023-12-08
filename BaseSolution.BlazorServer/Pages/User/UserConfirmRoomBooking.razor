@@ -1,14 +1,13 @@
-﻿@page "/customer/RoomBooking"
+﻿@page "/staff/RoomBooking"
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request
 @using BaseSolution.BlazorServer.Respository.Interfaces
-@inject IdCustomer idCustomer
-@inject NavigationManager navigation
 
-<CustomListDisplay Label="@("Thông tin đặt phòng")" IsLoading="@(_isLoadingAll)" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
+
+<CustomListDisplay Label="@("Thông tin đặt phòng chờ duyệt")" IsLoading="@(_isLoadingAll)" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>
 
     </HeaderContent>
@@ -29,6 +28,7 @@
                     <MudTable Items="@_roomBookingVM.Data">
                         <HeaderContent>
                             <MudTh>STT</MudTh>
+                            <MudTh>Khách hàng</MudTh>
                             <MudTh>Thời gian đặt</MudTh>
                             <MudTh>Loại phòng</MudTh>
                             <MudTh>Kiểu đặt phòng</MudTh>
@@ -39,44 +39,34 @@
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd>@(_lstRoomBooking.IndexOf(context) + 1)</MudTd>
+                            <MudTd>@context.NameCustomer</MudTd>
                             <MudTd>@context.CreatedTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
                                 <MudTd>@context.NameRoomType</MudTd>
                                 <MudTd>@context.BookingType</MudTd>
                                 <MudTd>@context.PrePaid</MudTd>
                                 <MudTd>@context.RoomPrice</MudTd>
                                 <MudTd><BadgeRoomStatus Status="@context.Status"></BadgeRoomStatus></MudTd>
-                                @if (context.Status == RoomStatus.AwaitingConfirmation)
-                            {
                                 <MudTd>
-                                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="(async () => await CancelBooking(context.Id))">Hủy</MudButton>
+                                    <MudChip Icon="@Icons.Material.Filled.Add" Color="Color.Success" OnClick="@(() => ConfirmRoomBooking(context.Id))">Duyệt</MudChip>
+                                    <MudChip Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RefuseRoomBooking(context.Id))">Huỷ</MudChip>
                                 </MudTd>
-                            }
-                            else
-                            {
-                                <MudTd></MudTd>
-                            }
-                        </RowTemplate>
-                    </MudTable>
-                    <MudDivider />
-                    <CustomPagination Class="my-1" HasNext="@_roomBookingVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="_roomBookingVM.PageNumber"></CustomPagination>
-                </MudCard>
+                            </RowTemplate>
+                        </MudTable>
+                        <MudDivider />
+                        <CustomPagination Class="my-1" HasNext="@_roomBookingVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="_roomBookingVM.PageNumber"></CustomPagination>
+                    </MudCard>
             }
         </MudPaper>
     </BodyContent>
 </CustomListDisplay>
 
-
-
-
 @code {
-    [Parameter]
-    public Guid customerId { get; set; }
     [Inject]
     public IRoomBookingRespo _roomBookingRepo { get; set; }
     [Inject]
-    public IRoomBookingDetailRepo _roomBookingDetailRepo { get; set; }
-    [Inject]
     public IRoomDetailRespo _roomDetailRepo { get; set; }
+    [Inject]
+    public IRoomBookingDetailRepo _roomBookingDetailRepo { get; set; }
     [Inject]
     public IDialogService _dialogService { get; set; }
     [Inject]
@@ -86,8 +76,9 @@
     private PaginationResponse<RoomBookingDto> _roomBookingVM;
     private List<RoomBookingDto> _lstRoomBooking;
     private ViewRoombookingPaginationRequest _roomBookingRequest = new();
-    private RoomBookingDeleteRequest _roomBookingDelete = new();
+    private RoomBookingUpdateStatusRequest _updateStatusRequest = new();
     private RoomDetailUpdateStatusRequest _updateRoomDetailStatus = new();
+    private RoomBookingDeleteRequest _deleteRoomBooking = new();
     #endregion
     #region
     private bool _isLoadingList = true;
@@ -96,24 +87,13 @@
     #endregion
     protected override async Task OnInitializedAsync()
     {
-        customerId = IdCustomer.Instance.Id;
+        _roomBookingVM = new PaginationResponse<RoomBookingDto>();
         await LoadData();
     }
     private async Task LoadData()
     {
-        _roomBookingVM = new PaginationResponse<RoomBookingDto>
-            {
-                Data = new List<RoomBookingDto>()
-            };
-
-        var roomBookings = await _roomBookingRepo.GetRoomBookingByIdCustomerAsync(customerId);
-        foreach (var roomBooking in roomBookings)
-        {
-            if (roomBooking.Status == RoomStatus.Occupied || roomBooking.Status == RoomStatus.AwaitingConfirmation)
-            {
-                _roomBookingVM.Data.Add(roomBooking);
-            }
-        }
+        var roomBookings = await _roomBookingRepo.GetAllRoomBooking(_roomBookingRequest);   
+        _roomBookingVM.Data = roomBookings.Data.Where(x => x.Status == RoomStatus.AwaitingConfirmation).ToList();
         _lstRoomBooking = _roomBookingVM.Data!.ToList();
         _isLoadingAll = false;
         _isLoadingList = false;
@@ -133,19 +113,41 @@
         _roomBookingRequest.SearchString = searchString;
         await LoadData();
     }
-    private async Task CancelBooking(Guid idRoomBooking)
+    #endregion
+    private async Task ConfirmRoomBooking(Guid idRoomBooking)
     {
         var confirm = await _dialogService.ShowMessageBox
-      (
-          "Thông báo",
-          "Xác nhận hủy?",
-          "Xác nhận",
-          cancelText: "Hủy"
-      );
+        (
+            "Thông báo",
+            "Xác nhận duyệt?",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
         if (confirm == true)
         {
-            _roomBookingDelete.Id = idRoomBooking;
-            var deleteRoomBooking = await _roomBookingRepo.DeleteRoomBooking(_roomBookingDelete);
+            _updateStatusRequest.Id = idRoomBooking;
+            _updateStatusRequest.Status = EntityStatus.Active;
+            var updateRoomBooking = await _roomBookingRepo.UpdateStatusRoomBooking(_updateStatusRequest);
+            var getRoomBookingDetail = await _roomBookingDetailRepo.GetRoomBookingDetailByRoomBookingId(idRoomBooking);
+            _updateRoomDetailStatus.Id = getRoomBookingDetail.RoomDetailId;
+            _updateRoomDetailStatus.Status = RoomStatus.Occupied;
+            var updateRoomDetail = await _roomDetailRepo.UpdateRoomDetailStatus(_updateRoomDetailStatus);
+            _snackbar.Add("Đã duyệt đặt phòng cho khách!", Severity.Success);
+        }
+    }
+    private async Task RefuseRoomBooking(Guid idRoomBooking)
+    {
+        var confirm = await _dialogService.ShowMessageBox
+       (
+           "Thông báo",
+           "Xác nhận hủy?",
+           "Xác nhận",
+           cancelText: "Hủy"
+       );
+        if (confirm == true)
+        {
+            _deleteRoomBooking.Id = idRoomBooking;
+            var deleteRoomBooking = await _roomBookingRepo.DeleteRoomBooking(_deleteRoomBooking);
             var getRoomBookingDetail = await _roomBookingDetailRepo.GetRoomBookingDetailByRoomBookingId(idRoomBooking);
             _updateRoomDetailStatus.Id = getRoomBookingDetail.RoomDetailId;
             _updateRoomDetailStatus.Status = RoomStatus.Vacant;
@@ -153,7 +155,4 @@
             _snackbar.Add("Đã huỷ đặt phòng!", Severity.Success);
         }
     }
-    #endregion
-
-
 }

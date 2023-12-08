@@ -4,7 +4,7 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
 {
     public class CustomerCreateRequest
     {
-        [RegularExpression(@"^[a-zA-Z\s]{5,}$", ErrorMessage = "Chỉ được nhập chữ và khoảng trắng, ít nhất 5 ký tự!")]
+        [RegularExpression(@"^[\p{L}\s]{5,}$", ErrorMessage = "Vui lòng nhập tên có ít nhất 5 ký tự")]
         public string Name { get; set; } = string.Empty;
         [RegularExpression(@"^\d{12}$", ErrorMessage = "Mã định danh phải có đúng 12 chữ số.")]
         public string IdentificationNumber { get; set; } = string.Empty;

@@ -104,7 +104,7 @@
 
                     <MudGrid>
                         <MudItem xs="12">
-                            <MudTextField @bind-Value="createRoomDetailRequest.Description" T="string" For="@(() => createRoomDetailRequest.Description)" Label="Mô tả phòng" Lines="3"></MudTextField>
+                            <MudTextField Variant="Variant.Outlined" @bind-Value="createRoomDetailRequest.Description" T="string" For="@(() => createRoomDetailRequest.Description)" Label="Mô tả phòng" Lines="3"></MudTextField>
                         </MudItem>
                     </MudGrid>
                 </MudForm>
@@ -168,7 +168,7 @@
     {
         floorRequest.BuildingId = idBuilding;
         floorVM = await floorRespo.GetAllFloors(floorRequest);
-        lstFloor = floorVM.Data!.ToList();
+        lstFloor = floorVM.Data!.Where(x => x.Status == EntityStatus.Active).ToList();
         if(lstFloor != null)
         {
             if (lstFloor.Any())
@@ -185,9 +185,9 @@
     protected override async Task OnInitializedAsync()
     {
         buildingVM = await buildingRespo.GetAllBuilding(buildingRequest);
-        lstBuilding = buildingVM.Data!.ToList();
+        lstBuilding = buildingVM.Data!.Where(x => x.Status == EntityStatus.Active).ToList();
         roomTypeVM = await roomTypeRespo.GetAllRoomTypes(roomTypeRequest);
-        lstRoomType = roomTypeVM.Data!.ToList();
+        lstRoomType = roomTypeVM.Data!.Where(x => x.Status == EntityStatus.Active).ToList();
         if(lstRoomType != null)
         {
             if (lstRoomType.Any())

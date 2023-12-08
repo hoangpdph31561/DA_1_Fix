@@ -3,37 +3,47 @@
 @inject NavigationManager _navManager;
 
 <MudNavMenu Color="Color.Primary">
-    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+  
 
 
     @*  <MudNavLink Href="/login" Icon="@Icons.Material.Filled.MapsHomeWork">Login</MudNavLink> *@
+    <AuthorizeView Roles="Admin,Nhân viên">
+        <MudNavMenu>
+            <MudNavGroup Icon="@Icons.Material.Filled.SignalCellularAlt" Title="Thống kê">
+                <MudNavLink Href="/statistic/roombookingstatistic">Thống kê phòng</MudNavLink>
+                <MudNavLink Href="/statistic/serviceOrderStatistic">Thống kê dịch vụ</MudNavLink>
+                <MudNavLink Href="/statistic/billstatistic">Thống kê doanh số </MudNavLink>
+            </MudNavGroup>
+        </MudNavMenu>
+    </AuthorizeView>
     <AuthorizeView Roles="Admin">
-        <MudNavLink Href="/roleService" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý chức vụ</MudNavLink>
+        <MudNavLink Href="/roleService" Icon="fa-solid fa-circle-user">Quản lý chức vụ</MudNavLink>
     </AuthorizeView>
     <AuthorizeView Roles="Admin">
         <MudNavLink Href="/building" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý tòa nhà</MudNavLink>
     </AuthorizeView>
     <AuthorizeView Roles="Admin">
-        <MudNavLink Href="/amenity" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý tiện ích khách sạn</MudNavLink>
+        <MudNavLink Href="/floorlistp2" Icon="fa-solid fa-house-flood-water">Quản lý tầng tòa nhà</MudNavLink>
     </AuthorizeView>
     <AuthorizeView Roles="Admin">
-        <MudNavLink Href="/floorlistp2" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý tầng tòa nhà</MudNavLink>
+        <MudNavLink Href="/amenity" Icon="fa-solid fa-menorah">Quản lý tiện ích khách sạn</MudNavLink>
     </AuthorizeView>
     <AuthorizeView Roles="Admin">
-        <MudNavLink Href="/servicetype" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý loại dịch vụ</MudNavLink>
+        <MudNavLink Href="/roomtype" Icon="@Icons.Material.Filled.MeetingRoom">Quản lý loại phòng</MudNavLink>
     </AuthorizeView>
     <AuthorizeView Roles="Admin">
-        <MudNavLink Href="/service" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý dịch vụ</MudNavLink>
+        <MudNavLink Href="/roomdetail" Icon="@Icons.Material.Filled.BedroomParent">Quản lý phòng chi tiết</MudNavLink>
+    </AuthorizeView>
+    <AuthorizeView Roles="Admin">
+        <MudNavLink Href="/servicetype" Icon="fa-brands fa-servicestack">Quản lý loại dịch vụ</MudNavLink>
+    </AuthorizeView>
+    <AuthorizeView Roles="Admin">
+        <MudNavLink Href="/service" Icon="@Icons.Material.Filled.RoomService">Quản lý dịch vụ</MudNavLink>
     </AuthorizeView>
     <AuthorizeView Roles="Admin,Nhân viên">
-        <MudNavLink Href="/roombooking" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý đặt phòng</MudNavLink>
-        <MudNavLink Href="/serviceOrder" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý dịch vụ đã đặt</MudNavLink>
-    </AuthorizeView>
-    <AuthorizeView Roles="Admin">
-        <MudNavLink Href="/roomtype" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý loại phòng</MudNavLink>
-    </AuthorizeView>
-    <AuthorizeView Roles="Admin">
-        <MudNavLink Href="/roomdetail" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý phòng chi tiết</MudNavLink>
+        
+        <MudNavLink Href="/roombooking" Icon="fa-solid fa-building-user">Quản lý đặt phòng</MudNavLink>
+        <MudNavLink Href="/serviceOrder" Icon="fa-brands fa-usps">Quản lý dịch vụ đã đặt</MudNavLink>
     </AuthorizeView>
     <AuthorizeView Roles="Admin,Nhân viên">
         <MudNavMenu>
@@ -45,7 +55,7 @@
     </AuthorizeView>
     <AuthorizeView Roles="Admin,Nhân viên">
         <MudNavMenu>
-            <MudNavGroup Icon="@Icons.Material.Filled.PeopleOutline" Title="Quản lý khách hàng">
+            <MudNavGroup Icon="fa-solid fa-people-group" Title="Quản lý khách hàng">
                 <MudNavLink Href="/admin/customerList">Thông tin khách hàng</MudNavLink>
                 <MudNavLink Href="/admin/customerRoomBooking">Thông tin đặt phòng</MudNavLink>
                 <MudNavLink Href="/staff/RoomBooking">Danh sách chờ duyệt</MudNavLink>
@@ -65,15 +75,7 @@
             </MudNavGroup>
         </MudNavMenu>
     }
-    <AuthorizeView Roles="Admin,Nhân viên">
-        <MudNavMenu>
-            <MudNavGroup Icon="@Icons.Material.Filled.SignalCellularAlt" Title="Thống kê">
-                <MudNavLink Href="/statistic/roombookingstatistic">Thống kê phòng</MudNavLink>
-             <MudNavLink Href="/statistic/serviceOrderStatistic">Thống kê dịch vụ</MudNavLink>
-                <MudNavLink Href="/statistic/billstatistic">Thống kê doanh số </MudNavLink>
-            </MudNavGroup>
-        </MudNavMenu>
-    </AuthorizeView>
+    
 
     <AuthorizeView Roles="Admin,Nhân viên">
 

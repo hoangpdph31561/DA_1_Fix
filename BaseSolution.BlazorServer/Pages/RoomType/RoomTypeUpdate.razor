@@ -102,7 +102,7 @@
                     RoomTypeId = id
                 });
             lstRoomDetail = roomDetailVM.Data!.ToList();
-            if (lstRoomDetail.Any(x => x.Status == RoomStatus.Occupied))
+            if (lstRoomDetail.Any(x => x.Status == RoomStatus.Occupied || x.Status == RoomStatus.Reserved || x.Status == RoomStatus.AwaitingConfirmation || x.Status == RoomStatus.DoNotDisturb))
             {
                 MudDialog.Close(DialogResult.Ok(true));
                 snackbar.Add("Có phòng đang được thuê tại loại phòng này, không sửa được", Severity.Error);

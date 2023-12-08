@@ -107,8 +107,10 @@
                                 <MudSelectItem Value="RoomStatus.OutOfOrder">Không sử dụng</MudSelectItem>
                                 <MudSelectItem Value="RoomStatus.Cleaned">Đã dọn phòng</MudSelectItem>
                                 <MudSelectItem Value="RoomStatus.Dirty">Phòng bẩn</MudSelectItem>
-                                <MudSelectItem Value="RoomStatus.Inspected">Đã kiểm tra</MudSelectItem>
-
+                                <MudSelectItem  Value="RoomStatus.Inspected">Đã kiểm tra</MudSelectItem>
+                                <MudSelectItem Disabled Value="RoomStatus.Occupied">Đang thuê</MudSelectItem>
+                                <MudSelectItem Disabled Value="RoomStatus.Reserved">Đã đặt</MudSelectItem>
+                                <MudSelectItem Disabled Value="RoomStatus.AwaitingConfirmation">Chờ xác nhận</MudSelectItem>
                             </MudSelect>
                         </MudItem>
                     </MudGrid>
@@ -185,7 +187,7 @@
     {
         floorRequest.BuildingId = idBuilding;
         floorVM = await floorRespo.GetAllFloors(floorRequest);
-        lstFloor = floorVM.Data!.ToList();
+        lstFloor = floorVM.Data!.Where(x => x.Status == EntityStatus.Active).ToList();
         if(!lstFloor.Any())
         {
             idFloor = Guid.Empty;
@@ -216,9 +218,9 @@
         roomDetailInfo = await roomDetailRespo.GetRoomDetailById(idRoomDetail);
         idBuilding = roomDetailInfo.BuildingId;
         buildingVM = await buildingRespo.GetAllBuilding(buildingRequest);
-        lstBuilding = buildingVM.Data!.ToList();
+        lstBuilding = buildingVM.Data!.Where(x => x.Status == EntityStatus.Active).ToList();
         roomTypeVM = await roomTypeRespo.GetAllRoomTypes(roomTypeRequest);
-        lstRoomType = roomTypeVM.Data!.ToList();
+        lstRoomType = roomTypeVM.Data!.Where(x => x.Status == EntityStatus.Active).ToList();
         idFloor = roomDetailInfo.FloorId;
         await LoadData();
     }
@@ -257,6 +259,12 @@
         );
         if (confirm == true)
         {
+            if (roomDetailInfo!.Status == RoomStatus.Occupied || roomDetailInfo.Status == RoomStatus.Reserved || roomDetailInfo.Status == RoomStatus.AwaitingConfirmation || roomDetailInfo.Status == RoomStatus.DoNotDisturb)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Phòng đang được thuê, không sửa được", Severity.Error);
+                return;
+            }
             roomDetailUpdateRequest.Images.Clear();
             roomDetailUpdateRequest.Images.Add(imageURL);
             roomDetailUpdateRequest.FloorId = idFloor;

@@ -165,7 +165,7 @@
                     FloorId = id
                 });
             lstRoomDetail = roomDetailVM.Data!.ToList();
-            if (lstRoomDetail.Any(x => x.Status == RoomStatus.Occupied))
+            if (lstRoomDetail.Any(x => x.Status == RoomStatus.Occupied || x.Status == RoomStatus.Reserved || x.Status == RoomStatus.AwaitingConfirmation || x.Status == RoomStatus.DoNotDisturb))
             {
                 snackbar.Add("Có phòng đang được thuê tại tầng này, không xóa được", Severity.Error);
             }

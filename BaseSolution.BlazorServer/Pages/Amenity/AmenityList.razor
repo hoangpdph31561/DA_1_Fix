@@ -67,7 +67,10 @@
     private bool _isLoadingList = true;
     private bool _isDisableControls = false;
     private ViewAmenityWithPaginationRequest amenityRequest = new();
-    private ViewRoomDetailWithPaginationRequest roomDetailRequest = new();
+    private ViewRoomDetailWithPaginationRequest roomDetailRequest = new()
+    {
+        PageSize = int.MaxValue - 1
+    };
     private ViewAmenityRoomDetailWithPaginationRequestAndAmenityId amenityRoomDetailRequest = new()
     {
         PageSize = int.MaxValue - 1

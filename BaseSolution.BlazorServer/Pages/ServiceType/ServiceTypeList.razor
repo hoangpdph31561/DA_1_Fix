@@ -87,7 +87,7 @@
         var confirm = await _dialogService.ShowMessageBox
         (
             "Thông báo",
-            "Xác nhận xóa tiện ích?",
+            "Xác nhận xóa loại dịch vụ?",
             "Xác nhận",
             cancelText: "Hủy"
         );
@@ -127,7 +127,7 @@
     }
     private async Task OpenAdd()
     {
-        var dialog = await _dialogService.ShowAsync<ServiceTypeCreate>("Thêm tiện ích cho khách sạn");
+        var dialog = await _dialogService.ShowAsync<ServiceTypeCreate>("Thêm loại dịch vụ cho khách sạn");
         var result = await dialog.Result;
         if (!result.Canceled)
         {

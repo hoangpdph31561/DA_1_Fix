@@ -64,10 +64,12 @@
     public ISnackbar _snackbar { get; set; }
 
     private ViewRoomDetailWithPaginationRequest _roomDetailPaginationRequest = new();
-
+    private PaginationResponse<CustomerDTO> _customerVM;
     private ViewCustomerWithPaginationRequest customer = new();
 
+    private PaginationResponse<RoomDetailDTO> _roomDetailVM;
     List<RoomDetailDTO> lstRoomDetails = new();
+    List<CustomerDTO> lstCustomer = new();
     private RoombookingCreateRequest _roomBookingCreateRequest = new();
     private RoomBookingDetailUpdate2Request _roomBookingDetailUpdateRequest = new();
     private RoomDetailUpdateStatusRequest _roomDetailUpdateStatusRequest = new();
@@ -82,7 +84,7 @@
     {
         customerId = IdCustomer.Instance.Id;
         await LoadData();
-        await LoadCombobox();
+        // await LoadCombobox();
     }
     private async Task LoadData()
     {
@@ -96,17 +98,23 @@
     {
         MudDialog.Cancel();
     }
-    private async Task LoadCombobox()
-    {
-        var roomDetail = new ViewRoomDetailByCheckInCheckOutRequest
-            {
-                CheckInBooking = (DateTimeOffset)checkIn,
-                CheckOutBooking = (DateTimeOffset)checkOut,
-            };
-        _roomDetailVM = await roomDetailRespo.GetAllRoomDetailsByStatus(roomDetail);
-        lstRoomDetails = _roomDetailVM.Data!.ToList();
-        
-    }
+    // private async Task LoadCombobox()
+    // {
+    //     var roomDetail = new ViewRoomDetailByCheckInCheckOutRequest
+    //         {
+    //             CheckInBooking = (DateTimeOffset)checkIn,
+    //             CheckOutBooking = (DateTimeOffset)checkOut,
+    //         };
+    //     _roomDetailVM = await roomDetailRespo.GetAllRoomDetailsByStatus(roomDetail);
+    //     if (_roomDetailVM.Data != null && _roomDetailVM.Data.Count > 0)
+    //     {
+    //         lstRoomDetails = _roomDetailVM.Data.ToList();
+    //     }
+    //     else
+    //     {
+    //         _snackbar.Add("Không có phòng nào!", Severity.Info);
+    //     }
+    // }
 
     private void Reset()
     {

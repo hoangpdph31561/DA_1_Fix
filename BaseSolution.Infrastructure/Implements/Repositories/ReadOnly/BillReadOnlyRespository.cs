@@ -65,6 +65,15 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             catch (Exception e)
             {
                 return RequestResult<BillDtoForRoom?>.Fail(_localizationService["Bill is not found"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "Bill"
+                    }
+                });
+            }
+        }
 
         public async Task<RequestResult<List<BillDTO>>> GetBillByIdCustomerAsync(Guid idCustomer, CancellationToken cancellationToken)
         {

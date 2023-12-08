@@ -25,8 +25,7 @@ namespace BaseSolution.Application.DataTransferObjects.Roombooking.Request
                 RuleFor(x => x.CodeBooking).NotEmpty().WithMessage("CodeBooking cannot be empty.");
 
                 RuleFor(x => x.CheckInBooking).NotEmpty().WithMessage("CheckInBooking cannot be empty.")
-                                              .LessThan(x => x.CheckOutBooking).WithMessage("CheckIn must be less than checkOut")
-                                              .Must(BeGreaterThanCurrentTime).WithMessage("CheckInBooking must be greater than the current time.");
+                                              .LessThan(x => x.CheckOutBooking).WithMessage("CheckIn must be less than checkOut");
 
                 RuleFor(x => x.CheckOutBooking).NotEmpty().WithMessage("CheckOutBooking property cannot be empty.")
                                                             .Must(BeGreaterThanCurrentTime).WithMessage("CheckOutBooking must be greater than the current time.");

@@ -7,12 +7,6 @@ using BaseSolution.Domain.Entities;
 using BaseSolution.Domain.Enums;
 using BaseSolution.Infrastructure.Database.AppDbContext;
 using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Pqc.Crypto.Frodo;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
 {
@@ -43,6 +37,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                             {
                                 roomDetail.Status = RoomStatus.Dirty;
                                 _appReadWriteDbContext.RoomDetails.Update(roomDetail);
+                                await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
                             }
                         }
                     }
@@ -52,17 +47,10 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                     {
                         roomBooking.Status = EntityStatus.InActive;
                         _appReadWriteDbContext.RoomBookings.Update(roomBooking);
+                        await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
                     }
-
-                    var ServiceOrder = _appReadWriteDbContext.ServiceOrders.FirstOrDefault(x => x.Id == entity.ServiceOrderId);
-                    if (ServiceOrder != null)
-                    {
-                        ServiceOrder.Status = EntityStatus.InActive;
-                        _appReadWriteDbContext.ServiceOrders.Update(ServiceOrder);
-                    }
-                    await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
                 }
-                if (entity.ServiceOrderId != Guid.Empty)
+                if (entity.ServiceOrderId != null)
                 {
                     var ServiceOrder = _appReadWriteDbContext.ServiceOrders.FirstOrDefault(x => x.Id == entity.ServiceOrderId);
                     if (ServiceOrder != null)
@@ -72,22 +60,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                         await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
                     }
                 }
-
-                //// lấy ra giờ check Out của roombooking cụ thể. 
-
-                //var checkOut = roomBookingDetail.Select(x => x.CheckOutReality).FirstOrDefault();
-                //foreach (var item in roomBookingDetail)
-                //{
-                //    if (item.CheckInBooking >= checkOut)
-                //    {
-                //        item.RoomDetail.Status = RoomStatus.CheckIn;
-                //    }
-                //    else
-                //    {
-                //        item.RoomDetail.Status = RoomStatus.Vacant;
-                //    }
-                //}
-                entity.CreatedTime = entity.CreatedTime;
+                entity.CreatedTime = DateTimeOffset.UtcNow;
                 entity.CustomerId = entity.CustomerId;
                 entity.RoomBookingId = entity.RoomBookingId;
                 entity.ServiceOrderId = entity.ServiceOrderId;

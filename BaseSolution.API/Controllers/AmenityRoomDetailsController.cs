@@ -48,6 +48,19 @@ namespace BaseSolution.API.Controllers
             }
             return BadRequest(vm);
         }
+        [HttpGet("getAmenityRoomDetailByAmenityId")]
+        public async Task<IActionResult> GetListAmenityRoomDetailByAmenityId([FromQuery] ViewAmenityRoomDetailWithPaginationRequestAndAmenityId request, CancellationToken cancellationToken)
+        {
+            AmenityRoomDetailListWithPaginationAndAmenityIdViewModel vm = new(_AmenityRoomDetailReadOnlyRespository, _localizationService);
+            await vm.HandleAsync(request, cancellationToken);
+            if (vm.Success)
+            {
+                PaginationResponse<AmenityRoomDetailDTO> result = new();
+                result = (PaginationResponse<AmenityRoomDetailDTO>)vm.Data;
+                return Ok(result);
+            }
+            return BadRequest(vm);
+        }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAmenityRoomDetailById(Guid id, CancellationToken cancellationToken)
         {

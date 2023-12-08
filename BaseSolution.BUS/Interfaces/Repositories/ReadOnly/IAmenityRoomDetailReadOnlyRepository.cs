@@ -9,5 +9,6 @@ namespace BaseSolution.Application.Interfaces.Repositories.ReadOnly
     {
         Task<RequestResult<AmenityRoomDetailDTO?>> GetAmenityRoomDetailByIdAsync(Guid idAmenityRoomDetail, CancellationToken cancellationToken);
         Task<RequestResult<PaginationResponse<AmenityRoomDetailDTO>>> GetAmenityRoomDetailWithPaginationByAdminAsync(ViewAmenityRoomDetailWithPaginationRequest request, CancellationToken cancellationToken);
+        Task<RequestResult<PaginationResponse<AmenityRoomDetailDTO>>> GetAmenityByAmenityId(ViewAmenityRoomDetailWithPaginationRequestAndAmenityId request, CancellationToken cancellationToken);
     }
 }

@@ -1,6 +1,8 @@
 ﻿@page "/amenity"
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Amenity;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Amenity.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.AmenityRoomDetail
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.AmenityRoomDetail.Request
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
@@ -52,6 +54,8 @@
     [Inject]
     public IAmenityRespo amenityRespo { get; set; }
     [Inject]
+    public IAmenityRoomDetailRespo amenityRoomDetailRespo { get; set; }
+    [Inject]
     public IRoomDetailRespo roomDetailRespo { get; set; }
     [Inject]
     public IDialogService _dialogService { get; set; }
@@ -64,8 +68,14 @@
     private bool _isDisableControls = false;
     private ViewAmenityWithPaginationRequest amenityRequest = new();
     private ViewRoomDetailWithPaginationRequest roomDetailRequest = new();
+    private ViewAmenityRoomDetailWithPaginationRequestAndAmenityId amenityRoomDetailRequest = new()
+    {
+        PageSize = int.MaxValue - 1
+    };
     private List<AmenityDTO> lstAmenity;
     private List<RoomDetailDTO> lstRoomDetail;
+    private PaginationResponse<AmenityRoomDetailDTO> amenityRoomDetailVM;
+    private List<AmenityRoomDetailDTO> lstAmenityRoomDetail;
     public int TotalRoomInHotel { get; set; }
     private DeleteAmenityRequest requestDelete = new();
     #endregion
@@ -102,16 +112,27 @@
         );
         if (confirm == true)
         {
-            requestDelete.Id = deleteId;
-            var removeConfirm = await amenityRespo.DeleteAmenity(requestDelete);
-            if (removeConfirm)
+            amenityRoomDetailRequest.AmenityId = deleteId;
+            amenityRoomDetailVM = await amenityRoomDetailRespo.GetAmenityRoomDetailByAmenityId(amenityRoomDetailRequest);
+            lstAmenityRoomDetail = amenityRoomDetailVM.Data.ToList();
+            if (lstAmenityRoomDetail.Any())
             {
-                _snackbar.Add("Xóa thành công", Severity.Success);
+                _snackbar.Add("Xóa thất bại vì tiện ích đang được sử dụng trong phòng", Severity.Error);
             }
             else
             {
-                _snackbar.Add("Xóa thất bại", Severity.Error);
+                requestDelete.Id = deleteId;
+                var removeConfirm = await amenityRespo.DeleteAmenity(requestDelete);
+                if (removeConfirm)
+                {
+                    _snackbar.Add("Xóa thành công", Severity.Success);
+                }
+                else
+                {
+                    _snackbar.Add("Xóa thất bại", Severity.Error);
+                }
             }
+            
             await LoadData();
         }
     }

@@ -26,6 +26,33 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             _localizationService = localizationService;
         }
 
+        public async Task<RequestResult<PaginationResponse<AmenityRoomDetailDTO>>> GetAmenityByAmenityId(ViewAmenityRoomDetailWithPaginationRequestAndAmenityId request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _dbContext.AmenityRoomDetails.AsNoTracking().Where(x => !x.Deleted && x.AmenityId == request.AmenityId && !x.RoomType.Deleted).PaginateAsync<AmenityRoomDetailEntity, AmenityRoomDetailDTO>(request, _mapper, cancellationToken);
+                return RequestResult<PaginationResponse<AmenityRoomDetailDTO>>.Succeed(new PaginationResponse<AmenityRoomDetailDTO>
+                {
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize,
+                    HasNext = result.HasNext,
+                    Data = result.Data
+                });
+            }
+            catch (Exception e)
+            {
+
+                return RequestResult<PaginationResponse<AmenityRoomDetailDTO>>.Fail(_localizationService["List of AmenityRoomDetail are not found"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error= e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "list of AmenityRoomDetail"
+                    }
+                });
+            }
+        }
+
         public async Task<RequestResult<AmenityRoomDetailDTO?>> GetAmenityRoomDetailByIdAsync(Guid idAmenityRoomDetail, CancellationToken cancellationToken)
         {
             try

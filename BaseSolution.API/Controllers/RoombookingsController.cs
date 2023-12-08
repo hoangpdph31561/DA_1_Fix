@@ -2,6 +2,7 @@
 using BaseSolution.Application.DataTransferObjects.Role.Request;
 using BaseSolution.Application.DataTransferObjects.Roombooking;
 using BaseSolution.Application.DataTransferObjects.Roombooking.Request;
+using BaseSolution.Application.DataTransferObjects.RoomBooking.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
@@ -149,7 +150,14 @@ public class RoombookingsController : ControllerBase
 
         return Ok(vm);
     }
+    [HttpPut("updateStatus")]
+    public async Task<IActionResult> UpdateStatusRoomBooking(RoomBookingUpdateStatusRequest request, CancellationToken cancellationToken)
+    {
+        RoomBookingUpdateStatusViewModel vm = new(_roombookingReadWriteRespository, _mapper, _localizationService);
+        await vm.HandleAsync(request, cancellationToken);
 
+        return Ok(vm.Data);
+    }
     [HttpDelete]
     public async Task<IActionResult> Delete(RoombookingDeleteRequest request, CancellationToken cancellationToken)
     {

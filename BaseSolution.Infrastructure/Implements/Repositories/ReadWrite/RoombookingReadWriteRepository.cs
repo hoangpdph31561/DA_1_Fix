@@ -1,4 +1,5 @@
 ﻿using BaseSolution.Application.DataTransferObjects.Roombooking.Request;
+using BaseSolution.Application.DataTransferObjects.RoomBooking.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
 using BaseSolution.Application.ValueObjects.Common;
@@ -135,6 +136,35 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                     {
                         Error = e.Message,
                         FieldName = LocalizationString.Common.FailedToUpdate + "RoomBooking"
+                    }
+                });
+            }
+        }
+
+        public async Task<RequestResult<int>> UpdateStatusRoomBookingAsync(RoomBookingUpdateStatusRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                // Get existed RoomBooking
+                var roomBooking = await GetRoomBookingByIdAsync(request.Id, cancellationToken);
+
+                // Update value to existed RoomBooking
+                roomBooking!.Status = request.Status;
+                roomBooking.ModifiedTime = DateTimeOffset.UtcNow;
+
+                _appReadWriteDbContext.RoomBookings.Update(roomBooking);
+                await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
+
+                return RequestResult<int>.Succeed(1);
+            }
+            catch (Exception e)
+            {
+                return RequestResult<int>.Fail(_localizationService["Unable to update RoomBooking"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToUpdate + "roomBooking"
                     }
                 });
             }

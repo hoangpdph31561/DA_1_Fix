@@ -81,7 +81,20 @@ namespace BaseSolution.API.Controllers
             CustomerIdentificationViewModel vm = new(_CustomerReadOnlyRepository, _localizationService);
 
             await vm.HandleAsync(identification, cancellationToken);
-            if (vm.Success)
+            if (vm.Data != null)
+            {
+                CustomerDto result = (CustomerDto)vm.Data;
+                return Ok(result);
+            }
+            return Ok(vm);
+        }
+        [HttpGet("checkEmailExist")]
+        public async Task<IActionResult> GetEmail(string email, CancellationToken cancellationToken)
+        {
+            CustomerEmailViewModel vm = new(_CustomerReadOnlyRepository, _localizationService);
+
+            await vm.HandleAsync(email, cancellationToken);
+            if (vm.Data != null)
             {
                 CustomerDto result = (CustomerDto)vm.Data;
                 return Ok(result);
@@ -152,99 +165,59 @@ namespace BaseSolution.API.Controllers
                 return BadRequest("Xác nhận mã thất bại");
             }
         }
-        [HttpPost("SignUpOrSignIn")]
-        public async Task<IActionResult> SignUpOrSignIn(CustomerCreateRequest customerCreateRequest, CancellationToken cancellationToken)
-        {
-            var checkExsits = await _CustomerReadOnlyRepository.GetCustomerByIdentificationAsync(customerCreateRequest.IdentificationNumber, cancellationToken);
-            if (checkExsits.Data == null)
+            [HttpPost("SignUpOrSignIn")]
+            public async Task<IActionResult> SignUpOrSignIn(CustomerCreateRequest customerCreateRequest, CancellationToken cancellationToken)
             {
-                await SendGmailAsync(customerCreateRequest.Email);
-                customerCreateRequest.ApprovedCode = _verifyCode;
-                var newCustomers = new CustomerEntity()
+                var checkExsits = await _CustomerReadOnlyRepository.GetCustomerByIdentificationAsync(customerCreateRequest.IdentificationNumber, cancellationToken);
+                if (checkExsits.Data == null)
                 {
-                    Email = customerCreateRequest.Email,
-                    IdentificationNumber = customerCreateRequest.IdentificationNumber,
-                    PhoneNumber = customerCreateRequest.PhoneNumber,
-                    Name = customerCreateRequest.Name,
-                    ApprovedCode = customerCreateRequest.ApprovedCode,
-                    CreatedTime = DateTime.Now,
-                    ApprovedCodeExpiredTime = DateTime.Now.AddMinutes(5),
-                    Status = Domain.Enums.EntityStatus.PendingForConfirmation,
-                    CustomerType = Domain.Enums.CustomerType.Customer
-                };
-                var id = _CustomerReadWriteRepository.AddCustomerAsync(newCustomers, cancellationToken);
+                    await SendGmailAsync(customerCreateRequest.Email);
+                    customerCreateRequest.ApprovedCode = _verifyCode;
+                    var newCustomers = new CustomerEntity()
+                    {
+                        Email = customerCreateRequest.Email,
+                        IdentificationNumber = customerCreateRequest.IdentificationNumber,
+                        PhoneNumber = customerCreateRequest.PhoneNumber,
+                        Name = customerCreateRequest.Name,
+                        ApprovedCode = customerCreateRequest.ApprovedCode,
+                        CreatedTime = DateTime.Now,
+                        ApprovedCodeExpiredTime = DateTime.Now.AddMinutes(5),
+                        Status = Domain.Enums.EntityStatus.PendingForConfirmation,
+                        CustomerType = Domain.Enums.CustomerType.Customer
+                    };
+                    var id = _CustomerReadWriteRepository.AddCustomerAsync(newCustomers, cancellationToken);
                 
-                return Ok("Gửi mã thành công!");
-            }
-            else if (checkExsits.Data != null)
-            {
-                var detailCustomer = await _CustomerReadOnlyRepository.GetCustomerByIdentificationAsync(customerCreateRequest.IdentificationNumber, cancellationToken);
-                if (detailCustomer.Data?.ApprovedCodeExpiredTime < DateTime.Now)
-                {
-                    await SendGmailAsync(customerCreateRequest.Email);
-                    customerCreateRequest.ApprovedCode = _verifyCode;
-                    var newCustomers = new CustomerEntity()
-                    {
-                        Id = detailCustomer.Data.Id,
-                        Email = customerCreateRequest.Email,
-                        PhoneNumber = customerCreateRequest.PhoneNumber,
-                        Name = customerCreateRequest.Name,
-                        ApprovedCode = customerCreateRequest.ApprovedCode,
-                        ModifiedTime = DateTime.Now,
-                        ApprovedCodeExpiredTime = DateTime.Now.AddMinutes(5),
-                        Status = Domain.Enums.EntityStatus.PendingForConfirmation,
-                        CustomerType = Domain.Enums.CustomerType.Customer
-                    };
-                    await _CustomerReadWriteRepository.UpdateCustomerAsync(newCustomers, cancellationToken);
-                    return Ok("Mã đã được gửi, vui lòng kiểm tra email!");
+                    return Ok("Gửi mã thành công!");
                 }
-                else if (detailCustomer.Data!.Email != customerCreateRequest.Email)
+                else if (checkExsits.Data != null)
                 {
-                    await SendGmailAsync(customerCreateRequest.Email);
-                    customerCreateRequest.ApprovedCode = _verifyCode;
-                    var newCustomers = new CustomerEntity()
+                    var detailCustomer = await _CustomerReadOnlyRepository.GetCustomerByIdentificationAsync(customerCreateRequest.IdentificationNumber, cancellationToken);
+                    if (detailCustomer.Data?.ApprovedCodeExpiredTime < DateTime.Now && detailCustomer.Data!.Email == customerCreateRequest.Email
+                    || detailCustomer.Data?.ApprovedCode == null && detailCustomer.Data?.ApprovedCodeExpiredTime == null)
                     {
-                        Id = detailCustomer.Data.Id,
-                        Email = customerCreateRequest.Email,
-                        PhoneNumber = customerCreateRequest.PhoneNumber,
-                        Name = customerCreateRequest.Name,
-                        ApprovedCode = customerCreateRequest.ApprovedCode,
-                        ModifiedTime = DateTime.Now,
-                        IdentificationNumber = customerCreateRequest.IdentificationNumber,
-                        ApprovedCodeExpiredTime = DateTime.Now.AddMinutes(5),
-                        Status = Domain.Enums.EntityStatus.PendingForConfirmation,
-                        CustomerType = Domain.Enums.CustomerType.Customer
-                    };
-                    await _CustomerReadWriteRepository.UpdateCustomerAsync(newCustomers, cancellationToken);
-                    return Ok("Mã đã được gửi, vui lòng kiểm tra email!");
+                        await SendGmailAsync(customerCreateRequest.Email);
+                        customerCreateRequest.ApprovedCode = _verifyCode;
+                        var newCustomers = new CustomerEntity()
+                        {
+                            Id = detailCustomer.Data.Id,
+                            PhoneNumber = customerCreateRequest.PhoneNumber,
+                            Name = customerCreateRequest.Name,
+                            ApprovedCode = customerCreateRequest.ApprovedCode,
+                            ModifiedTime = DateTime.Now,
+                            ApprovedCodeExpiredTime = DateTime.Now.AddMinutes(5),
+                            Status = Domain.Enums.EntityStatus.PendingForConfirmation,
+                            CustomerType = Domain.Enums.CustomerType.Customer
+                        };
+                        await _CustomerReadWriteRepository.UpdateCustomerAsync(newCustomers, cancellationToken);
+                        return Ok("Mã đã được gửi, vui lòng kiểm tra email!");
+                    }
                 }
-                else if (detailCustomer.Data?.ApprovedCode == null && detailCustomer.Data?.ApprovedCodeExpiredTime == null)
+                else
                 {
-                    await SendGmailAsync(customerCreateRequest.Email);
-                    customerCreateRequest.ApprovedCode = _verifyCode;
-                    var newCustomers = new CustomerEntity()
-                    {
-                        Id = detailCustomer.Data!.Id,
-                        Email = customerCreateRequest.Email,
-                        PhoneNumber = customerCreateRequest.PhoneNumber,
-                        Name = customerCreateRequest.Name,
-                        ApprovedCode = customerCreateRequest.ApprovedCode,
-                        ModifiedTime = DateTime.Now,
-                        IdentificationNumber = customerCreateRequest.IdentificationNumber,
-                        ApprovedCodeExpiredTime = DateTime.Now.AddMinutes(5),
-                        Status = Domain.Enums.EntityStatus.PendingForConfirmation,
-                        CustomerType = Domain.Enums.CustomerType.Customer
-                    };
-                    await _CustomerReadWriteRepository.UpdateCustomerAsync(newCustomers, cancellationToken);
-                    return Ok("Mã đã được gửi, vui lòng kiểm tra email!");
+                    return Ok("Không thể gửi mã!");
                 }
+                return Ok();
             }
-            else
-            {
-                return Ok("Không thể gửi mãs!");
-            }
-            return Ok();
-        }
         [HttpPost]
         public async Task<IActionResult> Post(CustomerCreateRequest request, CancellationToken cancellationToken)
         {

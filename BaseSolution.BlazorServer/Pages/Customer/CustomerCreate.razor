@@ -55,11 +55,26 @@
     {
         if (!isCodeSent)
         {
-            var idCustomer = await customerRepo.SignUpOrSignIn(createRequest);
-
-            _snackbar.Add("Đã gửi mã đến email của bạn! Vui lòng kiểm tra để kích hoạt tài khoản!", Severity.Info);
-            isCodeSent = true;
-            isFormLocked = true;
+            var checkIdenAndEmail = await customerRepo.GetIdentificationNumber(createRequest.IdentificationNumber);
+            var checkEmailExist = await customerRepo.GetEmailAsync(createRequest.Email);
+            if (checkIdenAndEmail.IdentificationNumber == "" && checkEmailExist.Email == "")
+            {
+                var idCustomer = await customerRepo.SignUpOrSignIn(createRequest);
+                _snackbar.Add("Đã gửi mã đến email của bạn! Vui lòng kiểm tra để kích hoạt tài khoản!", Severity.Info);
+                isCodeSent = true;
+                isFormLocked = true;
+            }
+            else if (checkIdenAndEmail.Email == createRequest.Email)
+            {
+                var idCustomer = await customerRepo.SignUpOrSignIn(createRequest);
+                _snackbar.Add("Đã gửi mã đến email của bạn! Vui lòng kiểm tra để đăng nhập!", Severity.Info);
+                isCodeSent = true;
+                isFormLocked = true;
+            }
+            else
+            {
+                _snackbar.Add("Mã định danh và Email là duy nhất của mỗi người. Vui lòng nhập lại!", Severity.Info);
+            }
         }
     }
 

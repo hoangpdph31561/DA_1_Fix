@@ -85,7 +85,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 // Update value to existed Customer
                 Customer!.Name = string.IsNullOrWhiteSpace(entity.Name) ? Customer.Name : entity.Name;
                 Customer.PhoneNumber = entity.PhoneNumber;
-                Customer.Email = entity.Email;
+                Customer.Email = string.IsNullOrWhiteSpace(entity.Email) ? Customer.Email : entity.Email;
                 Customer.Status = entity.Status;
                 Customer.ApprovedCode = entity.ApprovedCode;
                 Customer.ApprovedCodeExpiredTime = entity.ApprovedCodeExpiredTime;

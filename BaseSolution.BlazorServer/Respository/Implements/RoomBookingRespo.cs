@@ -45,6 +45,17 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             }
         }
 
+        public async Task<bool> DeleteRoomBooking(RoomBookingDeleteRequest request)
+        {
+            string url = $"/api/Roombookings?Id={request.Id}";
+            if (request.DeletedBy != null)
+            {
+                url += $"&DeletedBy={request.DeletedBy}";
+            }
+            var result = await _httpClient.DeleteAsync(url);
+            return result.IsSuccessStatusCode;
+        }
+
         public async Task<PaginationResponse<RoomBookingDto>> GetAllRoomBooking(ViewRoombookingPaginationRequest request)
         {
             try
@@ -89,5 +100,12 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             var result = await _httpClient.PutAsJsonAsync("/api/Roombookings", request);
             return result.IsSuccessStatusCode;
         }
+
+        public async Task<bool> UpdateStatusRoomBooking(RoomBookingUpdateStatusRequest request)
+        {
+            var result = await _httpClient.PutAsJsonAsync($"/api/Roombookings/updateStatus", request);
+            return result.IsSuccessStatusCode;
+        }
+
     }
 }

@@ -1,0 +1,39 @@
+﻿@page "/statistic/serviceOrderStatistic"
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Statistic;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Statistic.Request;
+@using BaseSolution.BlazorServer.Respository.Interfaces;
+
+<MudText Color="Color.Dark" Typo="Typo.subtitle1">Thống kê dịch vụ được đặt nhiều nhất theo tháng</MudText>
+<MudPaper Elevation="12">
+    <div id="basic-bar-chart"></div>
+</MudPaper>
+@code {
+    [Inject]
+    private IStatistic statisticRepo { get; set; }
+    [Inject]
+    IJSRuntime jsRuntime { get; set; }
+    private List<ServiceOrderStatisticDto>? _lstServiceOrderStatisticDto { get; set; }
+    ServiceOrderStatisticRequest serviceOrderStatisticRequest = new();
+    private async Task LoadData()
+    {
+        _lstServiceOrderStatisticDto = await statisticRepo.GetServiceOrderStatisticsAsync(serviceOrderStatisticRequest);
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadData().ContinueWith(async (result) => { await LoadChart(); }); // chạy lần luọt
+        }
+    }
+    private async Task LoadChart()
+    {
+        if (_lstServiceOrderStatisticDto != null)
+        {
+            var labels = "số lượng đặt";
+            var s1 = _lstServiceOrderStatisticDto.Select(gs => "Tháng" + " " + gs.Month + " " + gs.NameService).ToList();
+            var s2 = _lstServiceOrderStatisticDto.Select(gs => gs.OrderCount).ToList();
+            await jsRuntime.InvokeVoidAsync("createBasicBarChart", labels, s1, s2);
+            StateHasChanged();
+        }
+    }
+}

@@ -29,6 +29,7 @@
                         <HeaderContent>
                             <MudTh>STT</MudTh>
                             <MudTh>Mã hóa đơn</MudTh>
+                            <MudTh>Tên khách hàng</MudTh>
                             <MudTh>Ngày xuất</MudTh>
                             <MudTh>Tổng tiền</MudTh>
                             <MudTh>Hành động</MudTh>
@@ -36,6 +37,7 @@
                         <RowTemplate>
                             <MudTd>@(lstBill.IndexOf(context) + 1)</MudTd>
                                 <MudTd>@context.Id</MudTd>
+                                <MudTd>@context.CustomerName</MudTd>
                                 <MudTd>@context.CreatedTime.DateTime</MudTd>
                                 <MudTh>@context.TotalAmount</MudTh>
                                 <MudTd>

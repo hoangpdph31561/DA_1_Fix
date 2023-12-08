@@ -129,9 +129,9 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             {
                 var query = _appReadOnlyDbContext.Bills.AsNoTracking().ProjectTo<BillDTO>(_mapper.ConfigurationProvider);
 
-                if (string.IsNullOrWhiteSpace(request.SearchString))
+                if (!string.IsNullOrWhiteSpace(request.SearchString))
                 {
-                    query = query.Where(x => x.CreatedTime == request.CreatedTime);
+                    query = query.Where(x => x.CustomerName == request.SearchString);
                 }
                 var result = await query.PaginateAsync(request, cancellationToken);
 
@@ -171,11 +171,12 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             {
                 var query =  _appReadOnlyDbContext.Bills.AsNoTracking().Where(x => !x.Deleted).ProjectTo<BillDTO>(_mapper.ConfigurationProvider);
 
+
                 if (!string.IsNullOrWhiteSpace(request.SearchString))
                 {
                     query = query.Where(x => x.CustomerName == request.SearchString);
                 }
-                 var result = await query.PaginateAsync(request, cancellationToken);
+                var result = await query.PaginateAsync(request, cancellationToken);
 
                 foreach (var item in result.Data!)
                 {
@@ -213,7 +214,8 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             try
             {
                 var query = _appReadOnlyDbContext.Bills.AsNoTracking().Where(x => !x.Deleted).ProjectTo<BillDtoForRoom>(_mapper.ConfigurationProvider);
-                 
+
+
                 if (!string.IsNullOrWhiteSpace(request.SearchString))
                 {
                     query = query.Where(x => x.CustomerName == request.SearchString);
@@ -251,6 +253,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             try
             {
                 var query = _appReadOnlyDbContext.Bills.AsNoTracking().Where(x => !x.Deleted).ProjectTo<BillDtoForService>(_mapper.ConfigurationProvider);
+
                 if (!string.IsNullOrWhiteSpace(request.SearchString))
                 {
                     query = query.Where(x => x.CustomerName == request.SearchString);

@@ -27,6 +27,19 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             }
         }
 
+        public async Task<List<ServiceOrderStatisticDto>> GetServiceOrderStatisticsAsync(ServiceOrderStatisticRequest request)
+        {
+            try
+            {
+                string url = $"/api/ServiceOrderStatistics?PageNumber={request.PageNumber}&PageSize={request.PageSize}";
+                var result = await _httpClient.GetFromJsonAsync<List<ServiceOrderStatisticDto>>(url);
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
         public async Task<List<RoomBookingStatisticDto>> GetRoomBookingStatisticsAsync(RoomBookingStatisticRequest request)
         {
             try

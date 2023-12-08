@@ -12,13 +12,13 @@
         }
         else
         {
+            <MudChip Icon="@Icons.Material.Filled.Add" @onclick="async() => await OpenAdd()" Color="Color.Primary" Style="float:right">Thêm dịch vụ</MudChip>
             <MudTable Items="_lstServiceOrder.DistinctBy(x => x.ServiceName).ToList()">
                 <RowTemplate>
                     <MudTd>@(_lstServiceOrder.IndexOf(context) + 1)</MudTd>
                         <MudTd>@context.ServiceName</MudTd>
                         <MudTd>@context.Quantity</MudTd>
                         <MudTd>
-                        <MudChip Icon="@Icons.Material.Filled.Add" @onclick="async() => await OpenAdd(context.RoomBookingDetailId,context.CustomerId)" Color="Color.Primary">Thêm dịch vụ</MudChip>
                         </MudTd>
                     </RowTemplate>
                 </MudTable>
@@ -39,7 +39,12 @@
 @code {
     #region
     [Parameter]
-    public Guid idroomBooking { get; set; }
+    public Guid idroomBookingDetail { get; set; }
+
+     [Parameter]
+    public Guid CustomerId { get; set; }
+
+
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
     [Inject]
@@ -68,14 +73,14 @@
     }
     private async Task LoadData()
     {
-        _ServiceOrderlVM.Data = await serviceOrderRepo.GetRoomDetailByIdRoomBooking(idroomBooking);
+        _ServiceOrderlVM.Data = await serviceOrderRepo.GetRoomDetailByIdRoomBooking(idroomBookingDetail);
         _lstServiceOrder = _ServiceOrderlVM.Data!.ToList();
     }
-    public async Task OpenAdd(Guid idRoomBookingDetail, Guid CustomerId)
+    public async Task OpenAdd()
     {
         var parameters = new DialogParameters<ServiceOrderCreateForRoomBooking>();
         parameters.Add(x => x.idCustomer, CustomerId);
-        parameters.Add(x => x.idroomBookingDetail, idRoomBookingDetail);
+        parameters.Add(x => x.idroomBookingDetail, idroomBookingDetail);
         var dialog = await _dialogService.ShowAsync<ServiceOrderCreateForRoomBooking>("Thêm dịch vụ", parameters);
         var result = await dialog.Result;
         if (!result.Canceled)

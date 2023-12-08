@@ -1,4 +1,8 @@
-﻿<MudNavMenu Color="Color.Primary">
+﻿@using System.Security.Claims;
+@inject AuthenticationStateProvider _authProvider;
+@inject NavigationManager _navManager;
+
+<MudNavMenu Color="Color.Primary">
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
 
     <MudNavMenu>
@@ -28,7 +32,7 @@
         </MudNavGroup>
     </MudNavMenu>
 
-    <MudNavLink Href="/login" Icon="@Icons.Material.Filled.MapsHomeWork">Login</MudNavLink>
+    @*  <MudNavLink Href="/login" Icon="@Icons.Material.Filled.MapsHomeWork">Login</MudNavLink> *@
     <AuthorizeView Roles="Admin">
         <MudNavLink Href="/roleService" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý chức vụ</MudNavLink>
     </AuthorizeView>
@@ -47,47 +51,62 @@
     <AuthorizeView Roles="Admin">
         <MudNavLink Href="/service" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý dịch vụ</MudNavLink>
     </AuthorizeView>
-    <MudNavLink Href="/roombooking" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý đặt phòng</MudNavLink>
-    <MudNavLink Href="/serviceOrder" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý dịch vụ đã đặt</MudNavLink>
+    <AuthorizeView Roles="Admin,Nhân viên">
+        <MudNavLink Href="/roombooking" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý đặt phòng</MudNavLink>
+        <MudNavLink Href="/serviceOrder" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý dịch vụ đã đặt</MudNavLink>
+    </AuthorizeView>
     <AuthorizeView Roles="Admin">
         <MudNavLink Href="/roomtype" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý loại phòng</MudNavLink>
     </AuthorizeView>
     <AuthorizeView Roles="Admin">
         <MudNavLink Href="/roomdetail" Icon="@Icons.Material.Filled.MapsHomeWork">Quản lý phòng chi tiết</MudNavLink>
     </AuthorizeView>
+    <AuthorizeView Roles="Admin,Nhân viên">
+        <MudNavMenu>
+            <MudNavGroup Icon="@Icons.Material.Filled.Article" Title="Quản lí hóa đơn">
+                <MudNavLink Href="/bill/room">Hóa đơn cho phòng</MudNavLink>
+                <MudNavLink Href="/bill/service">Hóa đơn cho dịch vụ</MudNavLink>
+            </MudNavGroup>
+        </MudNavMenu>
+    </AuthorizeView>
+    <AuthorizeView Roles="Admin,Nhân viên">
+        <MudNavMenu>
+            <MudNavGroup Icon="@Icons.Material.Filled.PeopleOutline" Title="Quản lý khách hàng">
+                <MudNavLink Href="/admin/customerList">Thông tin khách hàng</MudNavLink>
+                <MudNavLink Href="/admin/customerRoomBooking">Thông tin đặt phòng</MudNavLink>
+                <MudNavLink Href="/staff/RoomBooking">Danh sách chờ duyệt</MudNavLink>
+                <MudNavLink Href="/admin/customerRoomBookingHistory">Lịch sử đặt phòng</MudNavLink>
+            </MudNavGroup>
+        </MudNavMenu>
+    </AuthorizeView>
+    @if (!_lstrole.Any(x => x == "Nhân viên"))
+    {
+        <MudNavMenu>
+            <MudNavGroup Icon="@Icons.Material.Filled.PeopleOutline" Title="Khách hàng">
+                <MudNavLink Href="/customer/PersonalInformation">Thông tin cá nhân</MudNavLink>
+                <MudNavLink Href="/customer/RoomType">Đặt phòng</MudNavLink>
+                <MudNavLink Href="/customer/RoomBooking">Thông tin đặt phòng</MudNavLink>
+                <MudNavLink Href="/customer/RoomBookingHistory">Lịch sử đặt phòng</MudNavLink>
+                <MudNavLink Href="/customer/Bill">Xem hóa đơn</MudNavLink>
+            </MudNavGroup>
+        </MudNavMenu>
+    }
+    <AuthorizeView Roles="Admin,Nhân viên">
+        <MudNavMenu>
+            <MudNavGroup Icon="@Icons.Material.Filled.SignalCellularAlt" Title="Thống kê">
+                <MudNavLink Href="/statistic/roombookingstatistic">Thống kê phòng</MudNavLink>
+             <MudNavLink Href="/statistic/serviceOrderStatistic">Thống kê dịch vụ</MudNavLink>
+                <MudNavLink Href="/statistic/billstatistic">Thống kê doanh số </MudNavLink>
+            </MudNavGroup>
+        </MudNavMenu>
+    </AuthorizeView>
 
+    <AuthorizeView Roles="Admin,Nhân viên">
 
-    <MudNavMenu>
-        <MudNavGroup Icon="@Icons.Material.Filled.Article" Title="Quản lí hóa đơn">
-            <MudNavLink Href="/bill/room">Hóa đơn cho phòng</MudNavLink>
-            <MudNavLink Href="/bill/service">Hóa đơn cho dịch vụ</MudNavLink>
-        </MudNavGroup>
-    </MudNavMenu>
-
-    <MudNavMenu>
-        <MudNavGroup Icon="@Icons.Material.Filled.PeopleOutline" Title="Quản lý khách hàng">
-            <MudNavLink Href="/admin/customerList">Thông tin khách hàng</MudNavLink>
-            <MudNavLink Href="/admin/customerRoomBooking">Thông tin đặt phòng</MudNavLink>
-            <MudNavLink Href="/staff/RoomBooking">Danh sách chờ duyệt</MudNavLink>
-            <MudNavLink Href="/admin/customerRoomBookingHistory">Lịch sử đặt phòng</MudNavLink>
-        </MudNavGroup>
-    </MudNavMenu>
-    <MudNavMenu>
-        <MudNavGroup Icon="@Icons.Material.Filled.PeopleOutline" Title="Khách hàng">
-            <MudNavLink Href="/customer/PersonalInformation">Thông tin cá nhân</MudNavLink>
-            <MudNavLink Href="/customer/RoomType">Đặt phòng</MudNavLink>
-            <MudNavLink Href="/customer/RoomBooking">Thông tin đặt phòng</MudNavLink>
-            <MudNavLink Href="/customer/RoomBookingHistory">Lịch sử đặt phòng</MudNavLink>
-            <MudNavLink Href="/customer/Bill">Xem hóa đơn</MudNavLink>
-        </MudNavGroup>
-    </MudNavMenu>
-
-    <MudNavMenu>
-        <MudNavGroup Icon="@Icons.Material.Filled.SignalCellularAlt" Title="Thống kê">
-            <MudNavLink Href="/statistic/roombookingstatistic">Thống kê phòng</MudNavLink>
-            <MudNavLink Href="/statistic/billstatistic">Thống kê doanh số </MudNavLink>
-        </MudNavGroup>
-    </MudNavMenu>
+        <MudNavLink Icon="@Icons.Material.Filled.ExitToApp" IconColor="Color.Error" @onclick="@(async () => await OnClickLogOut())">
+            Đăng xuất
+        </MudNavLink>
+    </AuthorizeView>
 </MudNavMenu>
 
 @code {
@@ -99,10 +118,28 @@
             }
         };
 
+    private List<string> _lstrole = new();
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await _authProvider.GetAuthenticationStateAsync();
+        var authUser = authState.User;
+        _lstrole = authUser.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
+
+
+    }
     private async Task HandleNavLinkClick()
     {
         // Perform any necessary logic before navigation
         // Prevent the default behavior
         await Task.CompletedTask;
+    }
+
+    private async Task OnClickLogOut()
+    {
+        _navManager.NavigateTo("/login");
+
     }
 }

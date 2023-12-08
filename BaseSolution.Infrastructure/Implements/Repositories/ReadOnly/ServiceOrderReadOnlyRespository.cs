@@ -89,13 +89,14 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                var query = _appReadOnlyDbContext.ServiceOrders.AsNoTracking().ProjectTo<ServiceOrderDTO>(_mapper.ConfigurationProvider);
+                var query = _appReadOnlyDbContext.ServiceOrders.AsNoTracking().Where(x => !x.Deleted).ProjectTo<ServiceOrderDTO>(_mapper.ConfigurationProvider);
 
                 if (!string.IsNullOrWhiteSpace(request.SearchString))
                 {
                     query = query.Where(x => x.CustomerName.Contains(request.SearchString!));
                 }
-                var result = await query.PaginateAsync(request, cancellationToken);
+                var result = await query.Where(x => x.Status != EntityStatus.InActive).PaginateAsync(request, cancellationToken);
+
                 List<ServiceOrderDTO> lstTepRests = null;
                 lstTepRests = result.Data!.GroupBy(c => new
                 {
@@ -144,13 +145,13 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                var query = _appReadOnlyDbContext.ServiceOrders.AsNoTracking().ProjectTo<ServiceOrderDTO>(_mapper.ConfigurationProvider).Where(x => x.Status != EntityStatus.Deleted && x.Status != EntityStatus.InActive);
+                var query = _appReadOnlyDbContext.ServiceOrders.AsNoTracking().Where(x => !x.Deleted).ProjectTo<ServiceOrderDTO>(_mapper.ConfigurationProvider);
 
                 if (!string.IsNullOrWhiteSpace(request.SearchString))
                 {
                     query = query.Where(x => x.CustomerName.Contains(request.SearchString!));
                 }
-                    var result = await query.PaginateAsync(request, cancellationToken);
+                    var result = await query.Where(x => x.Status != EntityStatus.InActive).PaginateAsync(request, cancellationToken);
 
                 List<ServiceOrderDTO> lstTepRests = null;
                 lstTepRests = result.Data!.GroupBy(c => new

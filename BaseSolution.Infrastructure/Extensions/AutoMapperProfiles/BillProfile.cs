@@ -46,7 +46,7 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
 
             CreateMap<BillEntity, BillDtoForService>()
                  .ForMember(des => des.CustomerName, opt => opt.MapFrom(x => x.Customer.Name))
-                 .ForMember(des => des.TotalService,opt => opt.MapFrom(src => src.ServiceOrder.ServiceOrderDetails.Count()))
+                 .ForMember(des => des.TotalService,opt => opt.MapFrom(src => src.ServiceOrder.ServiceOrderDetails.Select(x => x.ServiceId).Count()))
                  .ForMember(des => des.ServicePrice, opt => opt.MapFrom(src => src.ServiceOrder.ServiceOrderDetails.Select(x => x.Service.Price).FirstOrDefault()))
                  .ForMember(des => des.NameService, opt => opt.MapFrom(src => src.ServiceOrder.ServiceOrderDetails.Select(x => x.Service.Name).FirstOrDefault()))
                  .ForMember(des => des.StatusServicrOrder, opt => opt.MapFrom(src => src.ServiceOrder.Status))

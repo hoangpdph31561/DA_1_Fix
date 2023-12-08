@@ -22,7 +22,10 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
                 .ForMember(dest => dest.BuildingName, opt => opt.MapFrom(src => src.Floor.Building.Name))
                 .ForMember(dest => dest.FloorStatus, opt => opt.MapFrom(src => src.Floor.Status))
                 .ForMember(dest => dest.BuildingStatus, opt => opt.MapFrom(src => src.Floor.Building.Status))
-                .ForMember(dest => dest.RoomTypeStatus, opt => opt.MapFrom(src => src.RoomType.Status));
+                .ForMember(dest => dest.RoomTypeStatus, opt => opt.MapFrom(src => src.RoomType.Status))
+                .ForMember(dest => dest.CheckInBooking , opt => opt.MapFrom(src => src.RoomBookingDetails.Select(x => x.CheckInBooking).FirstOrDefault()))
+                .ForMember(dest => dest.CheckOutBooking, opt => opt.MapFrom(src => src.RoomBookingDetails.Select(x => x.CheckOutBooking).FirstOrDefault()));
+
             CreateMap<RoomDetailCreateRequest, RoomDetailEntity>();
             CreateMap<RoomDetailUpdateRequest, RoomDetailEntity>();
             CreateMap<RoomDetailDeleteRequest, RoomDetailEntity>();

@@ -1,0 +1,75 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Bill;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Bill.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Service;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Service.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceOrder.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceType;
+@using BaseSolution.BlazorServer.Pages.Customer;
+@using BaseSolution.BlazorServer.Respository.Interfaces;
+
+<MudForm Model="@bill" @ref="_form">
+    <MudPaper Elevation="0">
+        <MudItem>
+            <MudTextField Label="Tên khách hàng" Value="bill.CustomerName" ReadOnly="true" />
+        </MudItem>
+        <MudItem>
+            <MudTextField Label="Tên phòng" Value="bill.RoomName" ReadOnly="true" />
+        </MudItem>
+        <MudItem>
+            <MudTextField Label="Gía phòng" Value="bill.RoomPrice" ReadOnly="true" />
+        </MudItem>
+        <MudItem>
+            <MudTextField Label="Tên dịch vụ" Value="bill.NameService" ReadOnly="true" />
+        </MudItem>
+           <MudItem>
+            <MudTextField Label="Tông sô dịch vụ" Value="bill.TotalService" ReadOnly="true" />
+        </MudItem>
+        
+         <MudItem>
+            <MudTextField Label="Tổng tiền" Value="bill.TotalAmount" ReadOnly="true" />
+        </MudItem>
+    </MudPaper>
+</MudForm>
+<MudButton OnClick="OnClickCancel">Hủy</MudButton>
+@code {
+    #region Khai báo
+    [Parameter]
+    public Guid idBill { get; set; }
+    MudForm _form;
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    [Inject]
+    public IBillRespo billRepo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    private bool _isLoadingAll = true;
+    private bool _isLoadingList = true;
+    private bool _isDisableControls = false;
+    private ViewBillWithPaginationRequest request = new();
+
+
+    private BillDtoForRoom? bill = new();
+
+    #endregion
+
+    #region Code xử lý
+    protected async override Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        bill = await billRepo.GetBillByIdForRoom(idBill);
+    }
+    private void OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+    #endregion
+}

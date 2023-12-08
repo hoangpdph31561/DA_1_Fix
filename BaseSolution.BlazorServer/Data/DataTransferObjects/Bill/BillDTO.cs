@@ -15,6 +15,8 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.Bill
         public EntityStatus Status { get; set; }
 
         // Based on 
+        public string NameService { get; set; }
+        public string RoomName { get; set; }
         public int TotalService { get; set; } // tổng số lượng của 1 dịch vụ 
         public decimal ServicePrice { get; set; } // giá của dịch vụ 
         public float ServiceAmount { get; set; } // ServiceAmount = TotalService x ServicePrice

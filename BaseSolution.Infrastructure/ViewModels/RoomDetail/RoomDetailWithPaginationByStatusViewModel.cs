@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace BaseSolution.Infrastructure.ViewModels.RoomDetail
 {
-    public class RoomDetailWithPaginationByStatusViewModel : ViewModelBase<ViewRoomDetailWithPaginationRequest>
+    public class RoomDetailWithPaginationByStatusViewModel : ViewModelBase<ViewRoomDetailByCheckInCheckOutRequest>
     {
         private readonly IRoomDetailReadOnlyRepository _roomDetailReadOnlyRepository;
         private readonly ILocalizationService _localizationService;
@@ -23,7 +23,7 @@ namespace BaseSolution.Infrastructure.ViewModels.RoomDetail
             _roomDetailReadOnlyRepository = roomDetailReadOnlyRepository;
             _localizationService = localizationService;
          }
-        public override async Task HandleAsync(ViewRoomDetailWithPaginationRequest data, CancellationToken cancellationToken)
+        public override async Task HandleAsync(ViewRoomDetailByCheckInCheckOutRequest data, CancellationToken cancellationToken)
         {
             try
             {

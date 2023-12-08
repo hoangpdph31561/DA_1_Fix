@@ -82,15 +82,32 @@
     {
         customerId = IdCustomer.Instance.Id;
         await LoadData();
+        await LoadCombobox();
     }
     private async Task LoadData()
     {
+
+        _customerVM = await customerRespo.GetCustomer(customer);
+        lstCustomer = _customerVM.Data!.ToList();
+
         _isLoadingList = false;
     }
     private void OnClickCancel()
     {
         MudDialog.Cancel();
     }
+    private async Task LoadCombobox()
+    {
+        var roomDetail = new ViewRoomDetailByCheckInCheckOutRequest
+            {
+                CheckInBooking = (DateTimeOffset)checkIn,
+                CheckOutBooking = (DateTimeOffset)checkOut,
+            };
+        _roomDetailVM = await roomDetailRespo.GetAllRoomDetailsByStatus(roomDetail);
+        lstRoomDetails = _roomDetailVM.Data!.ToList();
+        
+    }
+
     private void Reset()
     {
         _roomBookingCreateRequest = new();

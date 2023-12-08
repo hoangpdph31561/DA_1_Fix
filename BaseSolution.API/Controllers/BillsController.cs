@@ -52,6 +52,19 @@ namespace BaseSolution.API.Controllers
             }
             return Ok(vm);
         }
+
+         [HttpGet("GetBillByIdForRoom{id}")]
+        public async Task<IActionResult> GetBillByIdForRoom(Guid id, CancellationToken cancellationToken)
+        {
+            BillViewModelForRoom vm = new(_billReadOnlyRespository, _localizationService);
+            await vm.HandleAsync(id, cancellationToken);
+            if (vm.Success)
+            {
+                BillDtoForRoom result = (BillDtoForRoom)vm.Data;
+               return Ok(result);
+            }
+             return Ok(vm);
+         }
         [HttpGet("{idCustomer}/details")]
         public async Task<IActionResult> GetBillByIdCustomer(Guid idCustomer, CancellationToken cancellationToken)
         {
@@ -63,8 +76,23 @@ namespace BaseSolution.API.Controllers
 
                 return Ok(result);
             }
+            
+             return Ok(vm);
+          }
+          [HttpGet("GetBillByIdForService{id}")]
+        public async Task<IActionResult> GetBillByIdForService(Guid id, CancellationToken cancellationToken)
+        {
+            BillViewModelForService vm = new(_billReadOnlyRespository, _localizationService);
+            await vm.HandleAsync(id, cancellationToken);
+            if (vm.Success)
+            {
+                BillDtoForService result = (BillDtoForService)vm.Data;
+
+                return Ok(result);
+            }
             return Ok(vm);
         }
+
         [HttpGet("getBillsByAdmin")]
         public async Task<IActionResult> GetBillsByAdmin([FromQuery] ViewBillWithPaginationRequest request, CancellationToken cancellationToken)
         {
@@ -86,6 +114,37 @@ namespace BaseSolution.API.Controllers
             }
             return BadRequest(vm);
         }
+
+        [HttpGet("getBillsByOtherForRoom")]
+        public async Task<IActionResult> GetBillsByOtherForRoom([FromQuery] ViewBillWithPaginationRequest request, CancellationToken cancellationToken)
+        {
+            BillsByOtherForRoomViewModel vm = new(_billReadOnlyRespository, _localizationService);
+            await vm.HandleAsync(request, cancellationToken);
+            if (vm.Success)
+            {
+                PaginationResponse<BillDtoForRoom> result = (PaginationResponse<BillDtoForRoom>)vm.Data;
+
+                return Ok(result);
+            }
+            return BadRequest(vm);
+        }
+
+         [HttpGet("getBillsByOtherForService")]
+        public async Task<IActionResult> GetBillsByOtherForService([FromQuery] ViewBillWithPaginationRequest request, CancellationToken cancellationToken)
+        {
+            BillsByOtherForServiceViewModel vm = new(_billReadOnlyRespository, _localizationService);
+            await vm.HandleAsync(request, cancellationToken);
+
+            if (vm.Success)
+            {
+                PaginationResponse<BillDtoForService> result = (PaginationResponse<BillDtoForService>)vm.Data;
+
+                return Ok(result);
+            }
+            return BadRequest(vm);
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> CreateBill(BillCreateRequest request, CancellationToken cancellationToken)
         {

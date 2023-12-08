@@ -17,11 +17,11 @@
                     <MudTd>@(_lstServiceOrder.IndexOf(context) + 1)</MudTd>
                         <MudTd>@context.ServiceName</MudTd>
                         <MudTd>@context.Quantity</MudTd>
+                        <MudTd>
                         <MudChip Icon="@Icons.Material.Filled.Add" @onclick="async() => await OpenAdd(context.RoomBookingDetailId,context.CustomerId)" Color="Color.Primary">Thêm dịch vụ</MudChip>
-
+                        </MudTd>
                     </RowTemplate>
                 </MudTable>
-
         }
     </DialogContent>
     <DialogActions>

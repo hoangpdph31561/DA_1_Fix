@@ -34,5 +34,10 @@ namespace BaseSolution.Application.DataTransferObjects.RoomDetail
         //Status roomType
         public EntityStatus RoomTypeStatus { get; set; }
 
+        // để check xem trong khoảng tg này có phòng nào trống không !
+        public DateTimeOffset CheckInBooking { get; set; }
+        public DateTimeOffset CheckOutBooking { get; set; }
+
+
     }
 }

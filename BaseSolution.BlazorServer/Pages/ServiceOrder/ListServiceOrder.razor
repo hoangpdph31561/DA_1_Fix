@@ -37,7 +37,6 @@
                             <MudTh>Số lượng</MudTh>
                             <MudTh>Gía</MudTh>
                             <MudTh>Tổng tiền</MudTh>
-                            <MudTh>Trạng thái</MudTh>
                             <MudTh>Hành động</MudTh>
                         </HeaderContent>
                         <RowTemplate>
@@ -48,9 +47,8 @@
                                 <MudTh>@context.Quantity</MudTh>
                                 <MudTh>@context.Price</MudTh>
                                 <MudTh>@context.TotalAmount</MudTh>
-                                <MudTd><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTd>
                                 <MudTd>
-                                    <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@(() => OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
+                                    <MudChip Color="Color.Primary" OnClick="@(() => OpenDetail(context.CustomerId,context.Id))" Disabled="@_isDisableControls">Thanh toán</MudChip>
                                 </MudTd>
                             </RowTemplate>
                         </MudTable>
@@ -66,13 +64,18 @@
     [Inject]
     public IServiceOrderRepo serviceOrderRepo { get; set; }
     [Inject]
+    public IBillRespo billRepo { get; set; }
+    [Inject]
     public IDialogService _dialogService { get; set; }
+    [Inject]
     public ISnackbar _snackbar { get; set; }
     private PaginationResponse<ServiceOrderDTO> ServiceOrderVM;
     private bool _isLoadingAll = true;
     private bool _isLoadingList = true;
     private bool _isDisableControls = false;
     private ViewServiceOrderWithPaginationRequest request = new();
+
+    private BillCreateRequest createBillRequest = new();
     private List<ServiceOrderDTO> lstServiceOrder;
     #endregion
     #region Code xử lý
@@ -100,17 +103,24 @@
         request.PageNumber = 1;
         request.SearchString= searchString;
         await LoadData();
-
     }
-    private async Task OpenDetail(Guid idServiceOrder)
+    private async Task OpenDetail(Guid CustomerId, Guid idServiceOrder)
     {
-        var parameters = new DialogParameters<ServiceOderUpdate>();
-        parameters.Add(x => x.idServiceOrder, idServiceOrder);
-        var dialog = await _dialogService.ShowAsync<ServiceOderUpdate>("Chi tiết dịch vụ", parameters);
-        var result = await dialog.Result;
-        if (!result.Canceled)
+        bool checkServiceForRoombooking = lstServiceOrder.Any(x => x.Id == idServiceOrder && x.RoomBookingDetailId != null);
+        if(checkServiceForRoombooking)
         {
-            await LoadData();
+            _snackbar.Add("Dịch vụ này được đặt theo phòng! Vui lòng thanh toán theo phòng.", Severity.Info);
+        }
+        else
+        {
+            var bill = new BillCreateRequest
+                {
+                    CustomerId = CustomerId,
+                    ServiceOrderId = idServiceOrder,
+                    RoomBookingId = null
+                };
+            await billRepo.CreateNewBill(bill);
+            _snackbar.Add("Đã thanh toán ! Vui lòng xem thông tin ở quản lí hóa đơn ", Severity.Info);
         }
     }
     #endregion

@@ -1,0 +1,110 @@
+﻿@page "/bill/service"
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Amenity;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Amenity.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Bill;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Bill.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request;
+@using BaseSolution.BlazorServer.Respository.Interfaces;
+<PageTitle>Quản lý tiện ích khách sạn</PageTitle>
+<CustomListDisplayP2 Label="@("Danh sách các bill của dịch vụ ")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
+    <HeaderContent>
+    </HeaderContent>
+    <BodyContent>
+        <MudPaper Elevation="0" Class="custom-list-display-border">
+            @if (lstBill == null)
+            {
+                <MudText>Không có data</MudText>
+            }
+            @if (_isLoadingList)
+            {
+                <MudProgressLinear Color="Color.Primary" Indeterminate="true"></MudProgressLinear>
+            }
+            else
+            {
+                <MudCard Class="p-3" Elevation="2">
+                    <MudTable Items="@billVM.Data">
+                        <HeaderContent>
+                            <MudTh>STT</MudTh>
+                            <MudTh>Mã hóa đơn</MudTh>
+                            <MudTh>Ngày xuất</MudTh>
+                            <MudTh>Tổng tiền</MudTh>
+                            <MudTh>Hành động</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd>@(lstBill.IndexOf(context) + 1)</MudTd>
+                                <MudTd>@context.Id</MudTd>
+                                <MudTd>@context.CreatedTime.DateTime</MudTd>
+                                <MudTh>@context.ServiceAmount</MudTh>
+                                <MudTd>
+                                    <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@(() => OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
+                                </MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                        <MudDivider />
+                        <CustomPagination Class="my-1" HasNext="@billVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="billVM.PageNumber"></CustomPagination>
+                    </MudCard>
+            }
+        </MudPaper>
+    </BodyContent>
+</CustomListDisplayP2>
+@code {
+    #region Khai báo
+    [Inject]
+    public IBillRespo billRepo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    private PaginationResponse<BillDtoForService> billVM;
+    private bool _isLoadingAll = true;
+    private bool _isLoadingList = true;
+    private bool _isDisableControls = false;
+    private ViewBillWithPaginationRequest request = new();
+    private List<BillDtoForService> lstBill;
+    #endregion
+    #region Code xử lý
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        billVM = await billRepo.GetBillForService(request);
+        lstBill = billVM.Data!.ToList();
+        _isLoadingList = false;
+        _isLoadingAll = false;
+    }
+    private async Task OnPaginationButtonClick(int pageNumber)
+    {
+        if (_isDisableControls) return;
+        _isLoadingList = true;
+        request.PageNumber = pageNumber;
+        await LoadData();
+    }
+    private async Task OnSearch(string? searchString)
+    {
+        _isLoadingList = true;
+        request.PageNumber = 1;
+        request.Search = searchString;
+        await LoadData();
+
+    }
+    private async Task OpenDetail(Guid idBill)
+    {
+        var parameters = new DialogParameters<BillDetailForService>();
+        parameters.Add(x => x.idBill, idBill);
+        var dialog = await _dialogService.ShowAsync<BillDetailForService>("Chi tiết hóa đơn", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
+    }
+    #endregion
+    #region Code event
+
+    #endregion
+}

@@ -8,7 +8,7 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
     {
         Task<PaginationResponse<RoomDetailDTO>> GetAllRoomDetails(ViewRoomDetailWithPaginationRequest request);
 
-        Task<PaginationResponse<RoomDetailDTO>> GetAllRoomDetailsByStatus(ViewRoomDetailWithPaginationRequest request);
+        Task<PaginationResponse<RoomDetailDTO>> GetAllRoomDetailsByStatus(ViewRoomDetailByCheckInCheckOutRequest request);
 
         Task<RoomDetailDTO> GetRoomDetailById(Guid id);
         Task<List<RoomDetailDTO>> GetRoomDetailByIdRoomType(Guid id);

@@ -5,32 +5,6 @@
 <MudNavMenu Color="Color.Primary">
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
 
-    <MudNavMenu>
-        <MudNavGroup Icon="@Icons.Material.Filled.Settings" Title="System">
-            <MudNavLink Href="/system/config">System Configuration</MudNavLink>
-            <MudNavLink Href="/system/web-config">Website Configuration</MudNavLink>
-        </MudNavGroup>
-    </MudNavMenu>
-
-    <MudNavMenu>
-        <MudNavGroup Icon="@Icons.Material.Filled.PeopleAlt" Title="User">
-            <MudNavLink Href="/user/list">List</MudNavLink>
-            <MudNavLink Href="/user/list-to-manager">Danh sách nhân viên</MudNavLink>
-        </MudNavGroup>
-    </MudNavMenu>
-
-    <MudNavMenu>
-        <MudNavGroup Icon="@Icons.Material.Filled.Article" Title="Content">
-            <MudNavLink Href="/content/artical-list">List</MudNavLink>
-        </MudNavGroup>
-    </MudNavMenu>
-
-    <MudNavMenu>
-        <MudNavGroup Icon="@Icons.Material.Filled.Security" Title="Permission">
-            <MudNavLink Href="/permission/list">Permission List</MudNavLink>
-            <MudNavLink Href="/permission/role/list">Role List</MudNavLink>
-        </MudNavGroup>
-    </MudNavMenu>
 
     @*  <MudNavLink Href="/login" Icon="@Icons.Material.Filled.MapsHomeWork">Login</MudNavLink> *@
     <AuthorizeView Roles="Admin">

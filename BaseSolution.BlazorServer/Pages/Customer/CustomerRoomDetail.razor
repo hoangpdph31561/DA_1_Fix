@@ -10,62 +10,42 @@
         }
         else
         {
-            @*  <MudGrid>
-        <MudItem xs="12" md="3" lg="2">
-        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Checkin" DateFormat="dd/MM/yyyy" Date="@(new System.DateTime(2023,12,11))" />
-        </MudItem>
-        <MudItem xs="12" md="3" lg="2">
-        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Checkout" DateFormat="dd/MM/yyyy" Date="@(new System.DateTime(2023,12,15))" />
-        </MudItem>
+            <MudPaper Elevation="0" Class="pa-2">
+                <MudItem>
+                    <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Giờ vào" DateFormat="dd/MM/yyyy" @bind-Date="checkIn" Required="true" />
+                </MudItem>
+                <MudItem>
+                    <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Giờ ra" DateFormat="dd/MM/yyyy" @bind-Date="checkOut" Required="true" />
+                </MudItem>
+                <MudChip Icon="@Icons.Material.Filled.Search" Color="Color.Primary" OnClick="@( async() => await FilterByTime())" Disabled="@_isDisableControls">Tìm theo thời gian</MudChip>
+            </MudPaper>
+            <MudPaper Elevation="0" Class="pa-2">
+                <MudTable Items="_lstRoomDetail">
+                    <HeaderContent>
+                        <MudTh>STT</MudTh>
+                        <MudTh>Tên phòng</MudTh>
+                        <MudTh>Giá</MudTh>
+                        <MudTh>Số người tối đa</MudTh>
+                        <MudTh>Diện tích phòng</MudTh>
+                        <MudTh>Hành động</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>@(_lstRoomDetail.IndexOf(context) + 1)</MudTd>
+                        <MudTd>@context.Name</MudTd>
+                            <MudTd>@context.Price</MudTd>
+                            <MudTd>@context.MaxPeopleStay</MudTd>
+                            <MudTh>@context.RoomSize</MudTh>
+                            <MudTh>
+                                <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@( async() => await OpenDetail(context.Id))" Disabled="@_isDisableControls">Xem phòng</MudChip>
+                                <MudChip Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@( async() => await OpenAdd(context.Id))" Disabled="@_isDisableControls">Đặt phòng</MudChip>
+                            </MudTh>
+                        </RowTemplate>
+                        <PagerContent>
+                            <MudTablePager />
+                        </PagerContent>
+                    </MudTable>
+                </MudPaper>
 
-        <MudItem xs="12" md="3" lg="2">
-        <MudSelect Label="Số người tối đa" @bind-Value="_idRoomDetail">
-        @foreach (var item in _lstRoomDetail)
-        {
-        <MudSelectItem Value="@item.Id.ToString()">@item.MaxPeopleStay</MudSelectItem>
-        }
-        </MudSelect>
-        </MudItem>
-        <MudItem xs="12" md="3" lg="2">
-        <MudSelect Label="Giá" @bind-Value="_idRoomDetail">
-        @foreach (var item in _lstRoomDetail)
-        {
-        <MudSelectItem Value="@item.Id.ToString()">@item.Price</MudSelectItem>
-        }
-        </MudSelect>
-        <MudSelect Label="Diện tích phòng" @bind-Value="_idRoomDetail">
-        @foreach (var item in _lstRoomDetail)
-        {
-        <MudSelectItem Value="@item.Id.ToString()">@item.RoomSize</MudSelectItem>
-        }
-        </MudSelect>
-        </MudItem>
-
-        </MudGrid> *@
-            <MudTable Items="_lstRoomDetail">
-                <HeaderContent>
-                    <MudTh>STT</MudTh>
-                    <MudTh>Tên phòng</MudTh>
-                    <MudTh>Giá</MudTh>
-                    <MudTh>Số người tối đa</MudTh>
-                    <MudTh>Diện tích phòng</MudTh>
-                    <MudTh>Hành động</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd>@(_lstRoomDetail.IndexOf(context) + 1)</MudTd>
-                    <MudTd>@context.Name</MudTd>
-                        <MudTd>@context.Price</MudTd>
-                        <MudTd>@context.MaxPeopleStay</MudTd>
-                        <MudTh>@context.RoomSize</MudTh>
-                        <MudTh>
-                            <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@( async() => await OpenDetail(context.Id))" Disabled="@_isDisableControls">Xem phòng</MudChip>
-                            <MudChip Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@( async() => await OpenAdd(context.Id))" Disabled="@_isDisableControls">Đặt phòng</MudChip>
-                        </MudTh>
-                    </RowTemplate>
-                    <PagerContent>
-                        <MudTablePager />
-                    </PagerContent>
-                </MudTable>
         }
     </DialogContent>
     <DialogActions>
@@ -95,7 +75,8 @@
     [Inject]
     public IRoomTypeRepo roomTypeRespo { get; set; }
     private RoomTypeDTO? roomTypeInfo;
-
+    DateTime? checkIn = DateTime.Now;
+    DateTime? checkOut = DateTime.Now;
     private PaginationResponse<RoomDetailDTO> _roomDetailVM = new PaginationResponse<RoomDetailDTO>();
     private List<RoomDetailDTO>? _lstRoomDetail;
     private ViewRoomDetailWithPaginationRequest _roomDetailRequest = new();
@@ -104,6 +85,7 @@
 
     protected async override Task OnInitializedAsync()
     {
+        await FilterByTime();
         await LoadData();
     }
     private async Task LoadData()
@@ -111,6 +93,18 @@
         //truyền vào id RoomType lấy ra list RoomDetail
         _roomDetailVM.Data = await roomDetailRespo.GetRoomDetailByIdRoomType(idRoomType);
         _lstRoomDetail = _roomDetailVM.Data!.ToList();
+    }
+    private async Task FilterByTime()
+    {
+        var roomDetail = new ViewRoomDetailByCheckInCheckOutRequest
+            {
+                CheckInBooking = (DateTimeOffset)checkIn!,
+                CheckOutBooking = (DateTimeOffset)checkOut!,
+            };
+        _roomDetailVM = await roomDetailRespo.GetAllRoomDetailsByStatus(roomDetail);
+        _lstRoomDetail = _roomDetailVM.Data!.ToList();
+        _lstRoomDetail = _lstRoomDetail.Where(r => r.RoomTypeId == idRoomType).ToList();
+        StateHasChanged();
     }
     public async Task OpenAdd(Guid idRoomDetail)
     {

@@ -78,7 +78,7 @@
         var roomBookings = await roomBookingRespo.GetRoomBookingByIdCustomerAsync(customerId);
         foreach (var roomBooking in roomBookings)
         {
-            if (roomBooking.Status == RoomStatus.Vacant)
+            if (roomBooking.StatusRoom == RoomStatus.Vacant)
             {
                 _roomBookingVM.Data.Add(roomBooking);
             }

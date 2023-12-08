@@ -28,6 +28,17 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             }
         }
 
+        public async Task<bool> DeleteRoomBookingDetail(RoomBookingDetailDeleteRequest request)
+        {
+            string url = $"/api/RoomBookingDetails?Id={request.Id}";
+            if (request.DeletedBy != null)
+            {
+                url += $"&DeletedBy={request.DeletedBy}";
+            }
+            var result = await _httpClient.DeleteAsync(url);
+            return result.IsSuccessStatusCode;
+        }
+
         public async Task<PaginationResponse<RoomBookingDetailDTO>> GetRoomBookingDetailAsync(ViewRoomBookingDetailRequest request)
         {
             try

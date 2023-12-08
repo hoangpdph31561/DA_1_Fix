@@ -2,6 +2,7 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBookingDetail.Request
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request
 @using BaseSolution.BlazorServer.Respository.Interfaces
@@ -44,8 +45,8 @@
                                 <MudTd>@context.BookingType</MudTd>
                                 <MudTd>@context.PrePaid</MudTd>
                                 <MudTd>@context.RoomPrice</MudTd>
-                                <MudTd><BadgeRoomStatus Status="@context.Status"></BadgeRoomStatus></MudTd>
-                                @if (context.Status == RoomStatus.AwaitingConfirmation)
+                                <MudTd><BadgeRoomStatus Status="@context.StatusRoom"></BadgeRoomStatus></MudTd>
+                                @if (context.StatusRoom == RoomStatus.AwaitingConfirmation)
                             {
                                 <MudTd>
                                     <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="(async () => await CancelBooking(context.Id))">Hủy</MudButton>
@@ -88,6 +89,7 @@
     private ViewRoombookingPaginationRequest _roomBookingRequest = new();
     private RoomBookingDeleteRequest _roomBookingDelete = new();
     private RoomDetailUpdateStatusRequest _updateRoomDetailStatus = new();
+    private RoomBookingDetailDeleteRequest _deleteRoomBookingDetail = new();
     #endregion
     #region
     private bool _isLoadingList = true;
@@ -109,7 +111,7 @@
         var roomBookings = await _roomBookingRepo.GetRoomBookingByIdCustomerAsync(customerId);
         foreach (var roomBooking in roomBookings)
         {
-            if (roomBooking.Status == RoomStatus.Occupied || roomBooking.Status == RoomStatus.AwaitingConfirmation)
+            if (roomBooking.StatusRoom == RoomStatus.Occupied || roomBooking.StatusRoom == RoomStatus.AwaitingConfirmation)
             {
                 _roomBookingVM.Data.Add(roomBooking);
             }
@@ -147,6 +149,8 @@
             _roomBookingDelete.Id = idRoomBooking;
             var deleteRoomBooking = await _roomBookingRepo.DeleteRoomBooking(_roomBookingDelete);
             var getRoomBookingDetail = await _roomBookingDetailRepo.GetRoomBookingDetailByRoomBookingId(idRoomBooking);
+            _deleteRoomBookingDetail.Id = getRoomBookingDetail.Id;
+            var deleteRoomBookingDetail = await _roomBookingDetailRepo.DeleteRoomBookingDetail(_deleteRoomBookingDetail);
             _updateRoomDetailStatus.Id = getRoomBookingDetail.RoomDetailId;
             _updateRoomDetailStatus.Status = RoomStatus.Vacant;
             var updateRoomDetail = await _roomDetailRepo.UpdateRoomDetailStatus(_updateRoomDetailStatus);

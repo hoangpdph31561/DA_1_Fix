@@ -11,5 +11,6 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
        Task<bool> UpdateRoomBookingDetail(RoomBookingDetailUpdateRequest request);
        Task<bool> UpdateRoomBookingDetail2(RoomBookingDetailUpdate2Request request);
         Task<bool> CreateNewRoomBookingDetail(RoomBookingDetailCreateRequest request);
+        Task<bool> DeleteRoomBookingDetail(RoomBookingDetailDeleteRequest request);
     }
 }

@@ -10,20 +10,20 @@ using System.Threading.Tasks;
 
 namespace BaseSolution.Infrastructure.ViewModels.ServiceOrder
 {
-    public class ServiceOrderListWithPaginationByIdCustomerViewModel : ViewModelBase<Guid>
+    public class ServiceOrderListWithPaginationByIdRoomBookingViewModel : ViewModelBase<Guid>
     {
         private readonly IServiceOrderReadOnlyRespository _serviceOrderReadOnly;
         private readonly ILocalizationService _localizationService;
-        public ServiceOrderListWithPaginationByIdCustomerViewModel(IServiceOrderReadOnlyRespository serviceOrderReadOnly, ILocalizationService localizationService)
+        public ServiceOrderListWithPaginationByIdRoomBookingViewModel(IServiceOrderReadOnlyRespository serviceOrderReadOnly, ILocalizationService localizationService)
         {
             _serviceOrderReadOnly = serviceOrderReadOnly;
             _localizationService = localizationService;
         }
-        public override async Task HandleAsync(Guid idCustomer, CancellationToken cancellationToken)
+        public override async Task HandleAsync(Guid iDRoomBooking, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _serviceOrderReadOnly.GetServiceOrderByIdCustomerAsync(idCustomer, cancellationToken);
+                var result = await _serviceOrderReadOnly.GetServiceOrderByIdRoomBookingAsync(iDRoomBooking, cancellationToken);
 
                 Data = result.Data!;
                 Success = result.Success;

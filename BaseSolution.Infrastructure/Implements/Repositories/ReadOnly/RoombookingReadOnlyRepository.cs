@@ -48,7 +48,6 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 });
             }
         }
-
         public async Task<RequestResult<List<RoombookingDTO>>> GetRoombookingByIdCustomerAsync(Guid idCustomer, CancellationToken cancellationToken)
         {
             try

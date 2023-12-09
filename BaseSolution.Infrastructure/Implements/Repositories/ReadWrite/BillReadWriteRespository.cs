@@ -60,7 +60,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                         await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
                     }
                 }
-                entity.CreatedTime = DateTimeOffset.UtcNow;
+                entity.CreatedTime = DateTimeOffset.Now;
                 entity.CustomerId = entity.CustomerId;
                 entity.RoomBookingId = entity.RoomBookingId;
                 entity.ServiceOrderId = entity.ServiceOrderId;

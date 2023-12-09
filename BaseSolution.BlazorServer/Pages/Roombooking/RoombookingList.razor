@@ -27,7 +27,7 @@
             }
             else
             {
-                <MudCard Class="p-3" Elevation="2">
+                <MudCard Class="p-3" Elevation="0">
                     <MudTable Items="@roomBookingVM.Data">
                         <HeaderContent>
                             <MudTh>STT</MudTh>
@@ -113,10 +113,10 @@
     {
         try
         {
-            var parameters = new DialogParameters<GetServiceOrderByIdCustomer>();
+            var parameters = new DialogParameters<GetServiceOrderByIdRoomBooking>();
             parameters.Add(x => x.idroomBookingDetail, idroomBookingDetail);
             parameters.Add(x => x.CustomerId, CustomerId);
-            var dialog = await _dialogService.ShowAsync<GetServiceOrderByIdCustomer>("Danh sách dịch vụ", parameters);
+            var dialog = await _dialogService.ShowAsync<GetServiceOrderByIdRoomBooking>("Danh sách dịch vụ", parameters);
             var result = await dialog.Result;
             if (!result.Canceled)
             {

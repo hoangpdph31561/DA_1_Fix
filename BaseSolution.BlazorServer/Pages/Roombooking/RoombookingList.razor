@@ -121,7 +121,10 @@
             if (!result.Canceled)
             {
                 await LoadData();
+                
             }
+            
+            StateHasChanged();
         }
         catch (Exception)
         {

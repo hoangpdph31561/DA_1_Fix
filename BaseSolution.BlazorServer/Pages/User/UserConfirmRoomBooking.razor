@@ -133,6 +133,7 @@
             _updateRoomDetailStatus.Status = RoomStatus.Occupied;
             var updateRoomDetail = await _roomDetailRepo.UpdateRoomDetailStatus(_updateRoomDetailStatus);
             _snackbar.Add("Đã duyệt đặt phòng cho khách!", Severity.Success);
+            await LoadData();
             StateHasChanged();
         }
     }
@@ -154,6 +155,8 @@
             _updateRoomDetailStatus.Status = RoomStatus.Vacant;
             var updateRoomDetail = await _roomDetailRepo.UpdateRoomDetailStatus(_updateRoomDetailStatus);
             _snackbar.Add("Đã huỷ đặt phòng!", Severity.Success);
+            await LoadData();
+            StateHasChanged();
         }
     }
 }

@@ -91,7 +91,7 @@
     }
     private async Task OnClickCancel()
     {
-        MudDialog.Cancel();
+        MudDialog.Close(DialogResult.Ok(true));
         await LoadData();
         StateHasChanged();
     }

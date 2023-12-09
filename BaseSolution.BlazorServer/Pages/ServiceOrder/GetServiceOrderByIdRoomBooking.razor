@@ -39,7 +39,11 @@
 @code {
     #region
     [Parameter]
+    public Guid idroomBookingDetail { get; set; }
+
+     [Parameter]
     public Guid CustomerId { get; set; }
+
 
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
@@ -53,12 +57,13 @@
     [Inject]
     public IDialogService _dialogService { get; set; }
 
-    private ServiceOrderForServiceOrderDTO? serviceOderInfo;
+    private ServiceOrderForRoomBookingDTO? serviceOderInfo;
 
 
-    private PaginationResponse<ServiceOrderForServiceOrderDTO> _ServiceOrderlVM = new PaginationResponse<ServiceOrderForServiceOrderDTO>();
-    private List<ServiceOrderForServiceOrderDTO>? _lstServiceOrder;
+    private PaginationResponse<ServiceOrderForRoomBookingDTO> _ServiceOrderlVM = new PaginationResponse<ServiceOrderForRoomBookingDTO>();
+    private List<ServiceOrderForRoomBookingDTO>? _lstServiceOrder;
 
+    private ViewRoomDetailWithPaginationRequest roomDetailRequest = new();
     bool _isDisableControls = false;
     #endregion
 
@@ -68,18 +73,17 @@
     }
     private async Task LoadData()
     {
-        _ServiceOrderlVM.Data = await serviceOrderRepo.GetServiceOrderByIdCustomer(CustomerId);
+        _ServiceOrderlVM.Data = await serviceOrderRepo.GetServiceOrderByIdRoomBooking(idroomBookingDetail);
         _lstServiceOrder = _ServiceOrderlVM.Data!.ToList();
     }
     public async Task OpenAdd()
     {
-        var parameters = new DialogParameters<ServiceOrderCreateForCustomer>();
+        var parameters = new DialogParameters<ServiceOrderCreateForRoomBooking>();
         parameters.Add(x => x.idCustomer, CustomerId);
-        var dialog = await _dialogService.ShowAsync<ServiceOrderCreateForCustomer>("Thêm dịch vụ", parameters);
+        parameters.Add(x => x.idroomBookingDetail, idroomBookingDetail);
+        var dialog = await _dialogService.ShowAsync<ServiceOrderCreateForRoomBooking>("Thêm dịch vụ", parameters);
         var result = await dialog.Result;
-        await LoadData();
-        StateHasChanged();
-
+      
         if (!result.Canceled)
         {
             await LoadData();
@@ -88,6 +92,7 @@
     private async Task OnClickCancel()
     {
         MudDialog.Cancel();
-      
+        await LoadData();
+        StateHasChanged();
     }
 }

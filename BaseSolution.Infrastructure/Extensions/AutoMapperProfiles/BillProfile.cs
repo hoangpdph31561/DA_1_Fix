@@ -50,6 +50,7 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
                  .ForMember(des => des.ServicePrice, opt => opt.MapFrom(src => src.ServiceOrder.ServiceOrderDetails.Select(x => x.Service.Price).FirstOrDefault()))
                  .ForMember(des => des.NameService, opt => opt.MapFrom(src => src.ServiceOrder.ServiceOrderDetails.Select(x => x.Service.Name).FirstOrDefault()))
                  .ForMember(des => des.StatusServicrOrder, opt => opt.MapFrom(src => src.ServiceOrder.Status))
+                 .ForMember(des => des.RoomBookingDetailId, opt => opt.MapFrom(src => src.ServiceOrder.RoomBookingDetailId))
                 ;
         }
     }

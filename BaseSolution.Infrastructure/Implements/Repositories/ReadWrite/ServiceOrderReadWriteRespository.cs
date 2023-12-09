@@ -71,6 +71,38 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
             }
         }
 
+
+          public async Task<RequestResult<Guid>> CreateNewServiceOrderForCustomer(ServiceOrderEntity entity, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var _LstIdCustomer = _appReadWriteDbContext.ServiceOrders.Select(x => x.CustomerId).ToList();
+                var idCustomer = _LstIdCustomer.FirstOrDefault(x => x.Equals(entity.CustomerId));
+                entity.CreatedTime = entity.CreatedTime;
+                entity.RoomBookingDetailId = null;
+                entity.CustomerId = idCustomer;
+                await _appReadWriteDbContext.ServiceOrders.AddAsync(entity);
+                await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
+
+                return RequestResult<Guid>.Succeed(entity.Id);
+            }
+            catch (Exception e)
+            {
+                return RequestResult<Guid>.Fail(_localizationService["Unable to create service order"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToCreate + "service order"
+                    }
+                });
+            }
+        }
+
+
+
+
+
         public async Task<RequestResult<int>> DeleteServiceOrder(ServiceOrderDeleteRequest request, CancellationToken cancellationToken)
         {
             try

@@ -24,6 +24,13 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
                .ForMember(dest => dest.RoomBookingDetailId, opt => opt.MapFrom(src => src.RoomBookingDetailId))
                .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.RoomBookingDetail.RoomBooking.CustomerId));
 
+
+            CreateMap<ServiceOrderEntity, ServiceOrderForServiceOrderDTO>()
+                .ForMember(dest => dest.ServiceId, opt => opt.MapFrom(src => src.ServiceOrderDetails.Select(x => x.Service.Id).FirstOrDefault()))
+               .ForMember(dest => dest.ServiceName, opt => opt.MapFrom(src => src.ServiceOrderDetails.Select(x => x.Service.Name).FirstOrDefault()))
+                 .ForMember(des => des.CustomerId, opt => opt.MapFrom(src => src.CustomerId));
+
+
             CreateMap<ServiceOrderCreateRequest, ServiceOrderEntity>()
                   .ForPath(des => des.ServiceOrderDetails, opt => opt.MapFrom(src =>
                  new List<ServiceOrderDetailEntity>
@@ -41,6 +48,17 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
 
             CreateMap<ServiceOrderCreateForRoomBookingRequest, ServiceOrderEntity>()
                 .ForMember(des => des.RoomBookingDetailId, opt => opt.MapFrom(src => src.RoomBookingDetailId))
+                .ForPath(des => des.ServiceOrderDetails, opt => opt.MapFrom(src =>
+                 new List<ServiceOrderDetailEntity>
+                {
+                     new ServiceOrderDetailEntity
+                     {
+                         ServiceId = src.ServiceId,
+                     }
+                }))
+                ;
+            CreateMap<ServiceOrderCreateForCustomerRequest, ServiceOrderEntity>()
+                .ForMember(des => des.CustomerId, opt => opt.MapFrom(src => src.CustomerId))
                 .ForPath(des => des.ServiceOrderDetails, opt => opt.MapFrom(src =>
                  new List<ServiceOrderDetailEntity>
                 {

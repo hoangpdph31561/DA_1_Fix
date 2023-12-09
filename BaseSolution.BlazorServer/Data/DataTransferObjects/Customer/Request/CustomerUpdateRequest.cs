@@ -11,7 +11,7 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
     public class CustomerUpdateRequest
     {
         public Guid Id { get; set; }
-        [RegularExpression(@"^[a-zA-Z\s]{5,}$", ErrorMessage = "Chỉ được nhập chữ và khoảng trắng, ít nhất 5 ký tự!")]
+        [RegularExpression(@"^[\p{L}\s]{5,}$", ErrorMessage = "Vui lòng nhập tên có ít nhất 5 ký tự")]
         public string Name { get; set; } = string.Empty;
         [RegularExpression(@"^\S+@\S+\.\S+$", ErrorMessage = "Vui lòng nhập đúng định dạng email.")]
         public string Email { get; set; } = string.Empty;

@@ -15,7 +15,8 @@ namespace BaseSolution.Application.Interfaces.Repositories.ReadOnly
         Task<RequestResult<ServiceOrderDTO?>> GetServiceOrderByIdAsync(Guid id, CancellationToken cancellationToken);
         Task<RequestResult<PaginationResponse<ServiceOrderDTO>>> GetServicesByAdminAsync(ViewServiceOrderWithPaginationRequest request, CancellationToken cancellationToken);
         Task<RequestResult<PaginationResponse<ServiceOrderDTO>>> GetServicesByOtherAsync(ViewServiceOrderWithPaginationRequest request, CancellationToken cancellationToken);
-        Task<RequestResult<List<ServiceOrderForRoomBookingDTO>>> GetServiceOrderByIdRoomBookingAsync(Guid idRoombooking, CancellationToken cancellationToken);
+        Task<RequestResult<List<ServiceOrderForRoomBookingDTO>>> GetServiceOrderByIdRoomBookingAsync(Guid idRoombookingDetail, CancellationToken cancellationToken);
+        Task<RequestResult<List<ServiceOrderForServiceOrderDTO>>> GetServiceOrderByIdCustomerAsync(Guid idCustomer, CancellationToken cancellationToken);
 
     }
 }

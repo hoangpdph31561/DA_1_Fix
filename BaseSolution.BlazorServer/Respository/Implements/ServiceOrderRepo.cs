@@ -28,6 +28,12 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             var result = await _httpClient.PostAsJsonAsync("/api/ServiceOrders/CreateNewServiceOrderForRoomBooking", request);
             return result.IsSuccessStatusCode;
         }
+        public async Task<bool> CreateServiceForCustomer(ServiceOrderCreateForCustomerRequest request)
+        {
+            var result = await _httpClient.PostAsJsonAsync("/api/ServiceOrders/CreateNewServiceOrderForCustomer", request);
+            return result.IsSuccessStatusCode;
+        }
+
 
         public async Task<PaginationResponse<ServiceOrderDTO>> GetAllServices(ViewServiceOrderWithPaginationRequest request)
         {
@@ -40,9 +46,15 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             return result;
         }
 
-        public async Task<List<ServiceOrderForRoomBookingDTO>> GetRoomDetailByIdRoomBooking(Guid id)
+        public async Task<List<ServiceOrderForRoomBookingDTO>> GetServiceOrderByIdRoomBooking(Guid id)
         {
             var result = await _httpClient.GetFromJsonAsync<List<ServiceOrderForRoomBookingDTO>>($"api/ServiceOrders/ServiceOrdersByIdRoomBooking?idRoombooking={id}");
+            return result;
+        }
+
+        public async Task<List<ServiceOrderForServiceOrderDTO>> GetServiceOrderByIdCustomer(Guid id)
+        {
+            var result = await _httpClient.GetFromJsonAsync<List<ServiceOrderForServiceOrderDTO>>($"api/ServiceOrders/GetServiceOrdersByIdCustomer?idCustomer={id}");
             return result;
         }
         public async Task<ServiceOrderDTO> GetServiceOrderById(Guid id)
@@ -56,5 +68,6 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             var result = await _httpClient.PutAsJsonAsync("/api/ServiceOrders", request);
             return result.IsSuccessStatusCode;
         }
+
     }
 }

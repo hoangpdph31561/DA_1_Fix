@@ -18,5 +18,6 @@ namespace BaseSolution.Application.DataTransferObjects.Bill.Request
         public decimal ServicePrice { get; set; }
         public string NameService { get; set; }
         public decimal ServiceAmount { get; set; }
+        public Guid? RoomBookingDetailId { get; set; }
     }
 }

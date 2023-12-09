@@ -4,17 +4,17 @@
 @using BaseSolution.BlazorServer.Respository.Interfaces;
 <MudDialog>
     <DialogContent>
-<MudForm Model="@request" @ref="_form">
-    <MudPaper Elevation="0">
-        <MudSelect T="string" Label="Dịch vụ" Class="mb-2"
-                   AnchorOrigin="Origin.BottomCenter" @bind-Value="@serviceId" For="@(() => serviceId)">
-            @foreach (var item in lstService)
-            {
-                <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
-            }
-        </MudSelect>
-    </MudPaper>
-</MudForm>
+        <MudForm Model="@request" @ref="_form">
+            <MudPaper Elevation="0">
+                <MudSelect T="string" Label="Dịch vụ" Class="mb-2"
+                           AnchorOrigin="Origin.BottomCenter" @bind-Value="@serviceId" For="@(() => serviceId)">
+                    @foreach (var item in lstService)
+                    {
+                        <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudPaper>
+        </MudForm>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="OnClickCancel">Hủy</MudButton>
@@ -24,8 +24,6 @@
 </MudDialog>
 
 @code {
-    [Parameter]
-    public Guid idroomBookingDetail { get; set; }
     [Parameter]
     public Guid idCustomer { get; set; }
     private string serviceId;
@@ -42,7 +40,7 @@
     public ISnackbar _snackbar { get; set; }
     private List<ServiceDTO> lstService = new();
     private ViewServiceWithPaginationRequest serviceViewRequest = new();
-    private ServiceOrderCreateForRoomBookingRequest request = new();
+    private ServiceOrderCreateForCustomerRequest request = new();
     private bool _isLoadingList = true;
     MudForm _form;
 
@@ -78,15 +76,12 @@
         if (confirm == true)
         {
             request.CustomerId = idCustomer;
-            request.RoomBookingDetailId = idroomBookingDetail;
             request.ServiceId = Guid.Parse(serviceId);
-            var result = await serviceOrderRepo.CreateServiceForRoomBooking(request);
+            var result = await serviceOrderRepo.CreateServiceForCustomer(request);
             if (result == true)
             {
                 MudDialog.Close(DialogResult.Ok(true));
                 _snackbar.Add("Thêm thành công", Severity.Success);
-                await LoadData();
-                StateHasChanged();
             }
             else
             {

@@ -61,6 +61,39 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 });
             }
         }
+         public async Task<RequestResult<List<ServiceOrderForServiceOrderDTO>>> GetServiceOrderByIdCustomerAsync(Guid idCustomer, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var getList = _appReadOnlyDbContext.ServiceOrders.AsNoTracking().ProjectTo<ServiceOrderForServiceOrderDTO>(_mapper.ConfigurationProvider);
+                var listByType = await getList.Where(c => c.CustomerId == idCustomer).ToListAsync();
+                List<ServiceOrderForServiceOrderDTO> lstTepRests = null;
+                lstTepRests = listByType.GroupBy(c => new
+                {
+                    c.ServiceName,
+                    c.ServiceId,
+                    c.CustomerId,
+                }).Select(grb => new ServiceOrderForServiceOrderDTO()
+                {
+                    ServiceName = grb.Key.ServiceName,
+                    ServiceId = grb.Key.ServiceId,
+                    Quantity = grb.Count(),
+                    CustomerId = grb.Key.CustomerId
+                }).ToList();
+                return RequestResult<List<ServiceOrderForServiceOrderDTO>>.Succeed(lstTepRests);
+            }
+            catch (Exception e)
+            {
+                return RequestResult<List<ServiceOrderForServiceOrderDTO>>.Fail(_localizationService["ServiceOrder is not found"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error = e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "ServiceOrder"
+                    }
+                });
+            }
+        }
 
         public async Task<RequestResult<ServiceOrderDTO?>> GetServiceOrderByIdAsync(Guid id, CancellationToken cancellationToken)
         {
@@ -95,7 +128,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 {
                     query = query.Where(x => x.CustomerName.Contains(request.SearchString!));
                 }
-                var result = await query.Where(x => x.Status != EntityStatus.InActive).PaginateAsync(request, cancellationToken);
+                var result = await query.Where(x => x.Status != EntityStatus.InActive && x.RoomBookingDetailId == null).PaginateAsync(request, cancellationToken);
 
                 List<ServiceOrderDTO> lstTepRests = null;
                 lstTepRests = result.Data!.GroupBy(c => new
@@ -151,7 +184,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 {
                     query = query.Where(x => x.CustomerName.Contains(request.SearchString!));
                 }
-                    var result = await query.Where(x => x.Status != EntityStatus.InActive).PaginateAsync(request, cancellationToken);
+                    var result = await query.Where(x => x.Status != EntityStatus.InActive && x.RoomBookingDetailId == null).PaginateAsync(request, cancellationToken);
 
                 List<ServiceOrderDTO> lstTepRests = null;
                 lstTepRests = result.Data!.GroupBy(c => new

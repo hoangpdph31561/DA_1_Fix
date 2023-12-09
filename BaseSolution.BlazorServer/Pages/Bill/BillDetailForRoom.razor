@@ -13,29 +13,73 @@
 @using BaseSolution.BlazorServer.Pages.Customer;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
 
-<MudForm Model="@bill" @ref="_form">
-    <MudPaper Elevation="0">
-        <MudItem>
-            <MudTextField Label="Tên khách hàng" Value="bill.CustomerName" ReadOnly="true" />
+<MudForm Model="@bill" @ref="_form" class="custom-form">
+    <MudPaper Elevation="0" class="custom-paper">
+        <MudItem class="custom-item">
+            <MudTextField Label="Tên khách hàng" Value="bill.CustomerName" ReadOnly="true" class="custom-textfield" />
         </MudItem>
-        <MudItem>
-            <MudTextField Label="Tên phòng" Value="bill.RoomName" ReadOnly="true" />
+        <MudItem class="custom-item">
+            <MudTextField Label="Tên phòng" Value="bill.RoomName" ReadOnly="true" class="custom-textfield" />
         </MudItem>
-        <MudItem>
-            <MudTextField Label="Gía phòng" Value="bill.RoomPrice" ReadOnly="true" />
+        <MudItem class="custom-item">
+            <MudTextField Label="Gía phòng" Value="bill.RoomPrice" ReadOnly="true" class="custom-textfield" />
         </MudItem>
-        <MudItem>
-            <MudTextField Label="Tên dịch vụ" Value="bill.NameService" ReadOnly="true" />
+        <MudItem class="custom-item">
+            <MudTextField Label="Tông sô dịch vụ" Value="bill.TotalService" ReadOnly="true" class="custom-textfield" />
         </MudItem>
-           <MudItem>
-            <MudTextField Label="Tông sô dịch vụ" Value="bill.TotalService" ReadOnly="true" />
-        </MudItem>
-        
-         <MudItem>
-            <MudTextField Label="Tổng tiền" Value="bill.TotalAmount" ReadOnly="true" />
+        <MudItem class="custom-item">
+            <MudTextField Label="Tổng tiền" Value="bill.TotalAmount" ReadOnly="true" class="custom-textfield" />
         </MudItem>
     </MudPaper>
 </MudForm>
+
+<style>
+    /* Style for the MudForm container */
+    .custom-form {
+        max-width: 600px; /* Adjust the width as needed */
+        margin: auto;
+        padding: 20px;
+    }
+
+    /* Style for the MudPaper component */
+    .custom-paper {
+        border: 1px solid #ccc;
+        padding: 15px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+
+    /* Style for MudItem components (adjust as needed) */
+    .custom-item {
+        margin-bottom: 15px;
+    }
+
+    /* Style for MudTextField components */
+    .custom-textfield {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+        /* Optional: Style for labels */
+        .custom-textfield label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Optional: Style for read-only fields */
+        .custom-textfield[readonly] {
+            background-color: #f5f5f5;
+            color: #555;
+            cursor: not-allowed;
+        }
+
+    /* Optional: Style for the form title */
+    .custom-form-title {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+</style>
+
 <MudButton OnClick="OnClickCancel">Hủy</MudButton>
 @code {
     #region Khai báo

@@ -5,7 +5,7 @@
 @using BaseSolution.BlazorServer.Respository.Interfaces
 @inject IdCustomer idCustomer
 
-<CustomListDisplay Label="Lịch sử đặt phòng" IsLoading="@(_isLoadingAll)" OnSearch="@OnSearch">
+<CustomListDisplayP2 Label="Lịch sử đặt phòng" IsLoading="@(_isLoadingAll)" OnSearch="@OnSearch">
     <HeaderContent>
 
     </HeaderContent>
@@ -45,7 +45,7 @@
             }
         </MudPaper>
     </BodyContent>
-</CustomListDisplay>
+</CustomListDisplayP2>
 
 
 @code {
@@ -78,7 +78,7 @@
         var roomBookings = await roomBookingRespo.GetRoomBookingByIdCustomerAsync(customerId);
         foreach (var roomBooking in roomBookings)
         {
-            if (roomBooking.StatusRoom == RoomStatus.Vacant)
+            if (roomBooking.StatusRoom == RoomStatus.Vacant || roomBooking.Status == EntityStatus.Deleted)
             {
                 _roomBookingVM.Data.Add(roomBooking);
             }

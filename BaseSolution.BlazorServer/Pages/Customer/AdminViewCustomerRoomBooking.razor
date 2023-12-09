@@ -5,7 +5,7 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request
 @using BaseSolution.BlazorServer.Respository.Interfaces
 
-<CustomListDisplay Label="@("Thông tin đặt phòng")" IsLoading="@(_isLoadingAll)" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
+<CustomListDisplayP2 Label="@("Thông tin đặt phòng")" IsLoading="@(_isLoadingAll)" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>
 
     </HeaderContent>
@@ -51,7 +51,7 @@
             }
         </MudPaper>
     </BodyContent>
-</CustomListDisplay>
+</CustomListDisplayP2>
 
 
 
@@ -84,7 +84,10 @@
     private async Task LoadData()
     {
         var roomBookings = await _roomBookingRepo.GetAllRoomBooking(_roomBookingRequest);
-        _roomBookingVM.Data = roomBookings.Data.Where(x => x.StatusRoom == RoomStatus.Occupied || x.StatusRoom == RoomStatus.AwaitingConfirmation).ToList();
+        _roomBookingVM.Data = roomBookings.Data
+        .Where(x => x.StatusRoom == RoomStatus.Occupied 
+        || x.StatusRoom == RoomStatus.AwaitingConfirmation
+        || x.StatusRoom == RoomStatus.Reserved).ToList();
         _lstRoomBooking = _roomBookingVM.Data!.ToList();
         _isLoadingAll = false;
         _isLoadingList = false;

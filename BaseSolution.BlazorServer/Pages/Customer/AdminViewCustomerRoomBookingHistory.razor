@@ -3,7 +3,7 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request
 @using BaseSolution.BlazorServer.Respository.Interfaces
 
-<CustomListDisplay Label="Lịch sử đặt phòng" IsLoading="@(_isLoadingAll)" OnSearch="@OnSearch">
+<CustomListDisplayP2 Label="Lịch sử đặt phòng" IsLoading="@(_isLoadingAll)" OnSearch="@OnSearch">
     <HeaderContent>
 
     </HeaderContent>
@@ -43,7 +43,7 @@
             }
         </MudPaper>
     </BodyContent>
-</CustomListDisplay>
+</CustomListDisplayP2>
 
 
 @code {
@@ -67,7 +67,9 @@
     private async Task LoadData()
     {
         var roomBookings = await roomBookingRespo.GetAllRoomBooking(_roomBookingRequest);
-        _roomBookingVM.Data = roomBookings.Data.Where(x => x.StatusRoom == RoomStatus.Vacant || x.Status == EntityStatus.Deleted).ToList();
+        _roomBookingVM.Data = roomBookings.Data
+        .Where(x => x.Status == EntityStatus.Deleted
+        || x.Status == EntityStatus.InActive).ToList();
         _lstRoomBooking = _roomBookingVM.Data!.ToList();
         _isLoadingList = false;
         _isLoadingAll = false;

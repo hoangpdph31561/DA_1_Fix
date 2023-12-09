@@ -9,7 +9,7 @@
 @inject IdCustomer idCustomer
 @inject NavigationManager navigation
 
-<CustomListDisplay Label="@("Thông tin đặt phòng")" IsLoading="@(_isLoadingAll)" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
+<CustomListDisplayP2 Label="@("Thông tin đặt phòng")" IsLoading="@(_isLoadingAll)" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>
 
     </HeaderContent>
@@ -64,7 +64,7 @@
             }
         </MudPaper>
     </BodyContent>
-</CustomListDisplay>
+</CustomListDisplayP2>
 
 
 
@@ -90,6 +90,7 @@
     private RoomBookingDeleteRequest _roomBookingDelete = new();
     private RoomDetailUpdateStatusRequest _updateRoomDetailStatus = new();
     private RoomBookingDetailDeleteRequest _deleteRoomBookingDetail = new();
+    private RoomBookingUpdateStatusRequest _updateRoomBookingStatus = new();
     #endregion
     #region
     private bool _isLoadingList = true;
@@ -146,11 +147,17 @@
       );
         if (confirm == true)
         {
+            _updateRoomBookingStatus.Id = idRoomBooking;
+            _updateRoomBookingStatus.Status = EntityStatus.InActive;
+            var updateRoomBooking = await _roomBookingRepo.UpdateStatusRoomBooking(_updateRoomBookingStatus);
+            
             _roomBookingDelete.Id = idRoomBooking;
             var deleteRoomBooking = await _roomBookingRepo.DeleteRoomBooking(_roomBookingDelete);
+
             var getRoomBookingDetail = await _roomBookingDetailRepo.GetRoomBookingDetailByRoomBookingId(idRoomBooking);
             _deleteRoomBookingDetail.Id = getRoomBookingDetail.Id;
             var deleteRoomBookingDetail = await _roomBookingDetailRepo.DeleteRoomBookingDetail(_deleteRoomBookingDetail);
+
             _updateRoomDetailStatus.Id = getRoomBookingDetail.RoomDetailId;
             _updateRoomDetailStatus.Status = RoomStatus.Vacant;
             var updateRoomDetail = await _roomDetailRepo.UpdateRoomDetailStatus(_updateRoomDetailStatus);

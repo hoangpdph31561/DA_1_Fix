@@ -27,7 +27,7 @@
             }
             else
             {
-                <MudCard Class="p-3" Elevation="2">
+                <MudCard Class="p-3" Elevation="0">
                     <MudTable Items="@ServiceOrderVM.Data">
                         <HeaderContent>
                             <MudTh>STT</MudTh>
@@ -44,7 +44,7 @@
                                 <MudTd>@context.CustomerName</MudTd>
                                 <MudTh>@context.ServiceName</MudTh>
                                 <MudTh>@context.CreatedTime.DateTime</MudTh>
-                                <MudTh>@context.Quantity</MudTh>
+                                <MudTh>@context.Quantity <MudChip Icon="@Icons.Material.Filled.ListAlt" OnClick="@(() => OpenService(context.CustomerId))"></MudChip></MudTh>
                                 <MudTh>@context.Price</MudTh>
                                 <MudTh>@context.TotalAmount</MudTh>
                                 <MudTd>
@@ -121,7 +121,30 @@
                 };
             await billRepo.CreateNewBill(bill);
             _snackbar.Add("Đã thanh toán ! Vui lòng xem thông tin ở quản lí hóa đơn ", Severity.Info);
+            await LoadData();
+            StateHasChanged();
         }
+    }
+
+    private async Task OpenService( Guid CustomerId)
+    {
+        try
+        {
+            var parameters = new DialogParameters<GetServiceOrderByIdCustomer>();
+            parameters.Add(x => x.CustomerId, CustomerId);
+            var dialog = await _dialogService.ShowAsync<GetServiceOrderByIdCustomer>("Danh sách dịch vụ", parameters);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData();
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
     }
     #endregion
     #region Code event

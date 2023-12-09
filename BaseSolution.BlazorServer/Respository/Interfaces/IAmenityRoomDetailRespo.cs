@@ -8,5 +8,6 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
     {
         Task<PaginationResponse<AmenityRoomDetailDTO>> GetAllAmentityRoomDetail(ViewAmenityRoomDetailWithPaginationRequest request);
         Task<bool> CreateUpdateDeleteAmenityRoomDetail(List<AmenityRoomDetailCreateUpdateDelete> request);
+        Task<PaginationResponse<AmenityRoomDetailDTO>> GetAmenityRoomDetailByAmenityId(ViewAmenityRoomDetailWithPaginationRequestAndAmenityId request);
     }
 }

@@ -111,7 +111,7 @@
                     RoomTypeId = deleteId
                 });
             lstRoomDetail = roomDetailVM.Data!.ToList();
-            if (lstRoomDetail.Any(x => x.Status == RoomStatus.Occupied))
+            if (lstRoomDetail.Any(x => x.Status == RoomStatus.Occupied || x.Status == RoomStatus.Reserved || x.Status == RoomStatus.AwaitingConfirmation || x.Status == RoomStatus.DoNotDisturb))
             {
                 _snackbar.Add("Có phòng đang được thuê tại loại phòng này, không xóa được", Severity.Error);
             }

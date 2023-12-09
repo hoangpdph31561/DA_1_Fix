@@ -173,7 +173,6 @@
             };
         await billRepo.CreateNewBill(bill);
         _snackbar.Add("Đã thanh toán ! Vui lòng xem thông tin ở quản lí hóa đơn ", Severity.Info);
-
         await LoadData();
         StateHasChanged();
     }

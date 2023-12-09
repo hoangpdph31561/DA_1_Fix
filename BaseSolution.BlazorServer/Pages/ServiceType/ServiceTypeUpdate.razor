@@ -11,7 +11,7 @@
         {
             <MudForm Model="updateServiceTypeRequest" @ref="_form" @bind-IsValid="_formIsValid">
                 <MudPaper Width="100%" Elevation="0">
-                    <MudTextField @bind-Value="updateServiceTypeRequest.Name" For="@(() => updateServiceTypeRequest.Name)" Label="Tên tiện ích"></MudTextField>
+                    <MudTextField @bind-Value="updateServiceTypeRequest.Name" For="@(() => updateServiceTypeRequest.Name)" Label="Tên loại dịch vụ"></MudTextField>
                     <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="updateServiceTypeRequest.Status" For="@(() => updateServiceTypeRequest.Status)">
                         <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
                         <MudSelectItem Value="EntityStatus.InActive">Không hoạt động</MudSelectItem>

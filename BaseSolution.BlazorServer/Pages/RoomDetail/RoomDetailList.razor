@@ -247,7 +247,7 @@ else
 
             deleteRoomDetailRequest.Id = id;
             RoomDetailDTO roomDetailInfo = await roomDetailRespo.GetRoomDetailById(id);
-            if(roomDetailInfo.Status == RoomStatus.Occupied)
+            if (roomDetailInfo.Status == RoomStatus.Occupied || roomDetailInfo.Status == RoomStatus.Reserved || roomDetailInfo.Status == RoomStatus.AwaitingConfirmation || roomDetailInfo.Status == RoomStatus.DoNotDisturb)
             {
                 _snackbar.Add("Không xóa phòng đang thuê được", Severity.Error);
                 return;
@@ -275,22 +275,14 @@ else
     private async Task OpenDetail(Guid idRoomDetail)
     {
         RoomDetailDTO roomDetailInfo = await roomDetailRespo.GetRoomDetailById(idRoomDetail);
-        if(roomDetailInfo.Status == RoomStatus.Occupied)
+        var parameters = new DialogParameters<RoomDetailUpdate>();
+        parameters.Add(x => x.idRoomDetail, idRoomDetail);
+        var dialog = await _dialogService.ShowAsync<RoomDetailUpdate>("Chi tiết phòng", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
         {
-            _snackbar.Add("Không sửa phòng được do đang được thuê", Severity.Error);
+            await LoadData();
         }
-        else
-        {
-            var parameters = new DialogParameters<RoomDetailUpdate>();
-            parameters.Add(x => x.idRoomDetail, idRoomDetail);
-            var dialog = await _dialogService.ShowAsync<RoomDetailUpdate>("Chi tiết phòng", parameters);
-            var result = await dialog.Result;
-            if (!result.Canceled)
-            {
-                await LoadData();
-            }
-        }
-        
     }
     #endregion
 }

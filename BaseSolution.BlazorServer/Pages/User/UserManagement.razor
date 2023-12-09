@@ -37,6 +37,7 @@
                         <HeaderContent>
                             <MudTh>STT</MudTh>
                             <MudTh>Tên</MudTh>
+                            <MudTh>Tên tài khoản</MudTh>
                             <MudTh>Email</MudTh>
                             <MudTh>Số điện thoại</MudTh>
                             <MudTh>Chức vụ</MudTh>
@@ -46,6 +47,7 @@
                         <RowTemplate>
                             <MudTd>@(lstUser.IndexOf(context) + 1)</MudTd>
                                 <MudTd>@context.Name</MudTd>
+                                <MudTd>@context.UserName</MudTd>
                                 <MudTh>@context.Email</MudTh>
                                 <MudTh>@context.PhoneNumber</MudTh>
                                 <MudTh>@context.RoleCode</MudTh>

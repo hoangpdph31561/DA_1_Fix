@@ -29,5 +29,11 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             var result = await _httpClient.GetFromJsonAsync<PaginationResponse<AmenityRoomDetailDTO>>(url);
             return result;
         }
+
+        public async Task<PaginationResponse<AmenityRoomDetailDTO>> GetAmenityRoomDetailByAmenityId(ViewAmenityRoomDetailWithPaginationRequestAndAmenityId request)
+        {
+            var result = await _httpClient.GetFromJsonAsync<PaginationResponse<AmenityRoomDetailDTO>>($"/api/AmenityRoomDetails/getAmenityRoomDetailByAmenityId?AmenityId={request.AmenityId}&PageNumber={request.PageNumber}&PageSize={request.PageSize}");
+            return result;
+        }
     }
 }

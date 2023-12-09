@@ -258,7 +258,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 {
                     query = query.Where(x => x.CustomerName == request.SearchString);
                 }
-                var result = await query.Where(x => x.StatusServicrOrder == EntityStatus.InActive).PaginateAsync(request, cancellationToken);
+                var result = await query.Where(x => x.StatusServicrOrder == EntityStatus.InActive && x.RoomBookingDetailId == null ).PaginateAsync(request, cancellationToken);
                 foreach (var item in result.Data!)
                 {
                     item.ServiceAmount = item.TotalService * item.ServicePrice;

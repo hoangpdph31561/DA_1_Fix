@@ -130,7 +130,11 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             try
             {
                 var queryable = _dbContext.RoomDetails.AsNoTracking().AsQueryable().Where(x => !x.Deleted).ProjectTo<RoomDetailDto>(_mapper.ConfigurationProvider)
-                    .Where(x => request.CheckInBooking < x.CheckInBooking && request.CheckInBooking > x.CheckOutBooking && x.CheckOutBooking < x.CheckInBooking && x.CheckOutBooking > x.CheckOutBooking || x.Status == RoomStatus.Vacant);
+
+                    .Where(x => request.CheckInBooking < x.CheckInBooking && request.CheckInBooking < x.CheckOutBooking
+                    && request.CheckOutBooking < x.CheckInBooking && request.CheckOutBooking > x.CheckOutBooking
+                    || x.Status == RoomStatus.Vacant);
+
         
                 var result = await queryable.PaginateAsync(request, cancellationToken);
                 return RequestResult<PaginationResponse<RoomDetailDto>>.Succeed(new PaginationResponse<RoomDetailDto>()

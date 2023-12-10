@@ -50,7 +50,10 @@
     public IDialogService dialogService { get; set; }
     [Inject]
     public ISnackbar snackbar { get; set; }
-    private ViewAmenityRoomDetailWithPaginationRequest amenityRoomDetailRequest = new();
+    private ViewAmenityRoomDetailWithPaginationRequest amenityRoomDetailRequest = new()
+    {
+            PageSize = int.MaxValue - 1,
+    };
     private PaginationResponse<AmenityRoomDetailDTO> amenityRoomDetailVM;
     private List<AmenityRoomDetailDTO> lstAmenityRoomDetail;
     private List<AmenityRoomDetailInfo> lstAmenityRoomDetailSelected = new();

@@ -17,6 +17,21 @@
                     <MudTextField @bind-Value="customerUpdateRequest.PhoneNumber" For="@(() => customerUpdateRequest.PhoneNumber)" Label="Số điện thoại"></MudTextField>
 
                     <MudTextField @bind-Value="customerUpdateRequest.Email" For="@(() => customerUpdateRequest.Email)" Label="Email"></MudTextField>
+
+                   
+                    <MudSelect T="CustomerType" AnchorOrigin="Origin.BottomCenter" @bind-Value="customerUpdateRequest.CustomerType" For="@(() => customerUpdateRequest.CustomerType)" Label="Loại khách hàng">
+                        <MudSelectItem Value="CustomerType.Customer">Khách</MudSelectItem>
+                        <MudSelectItem Value="CustomerType.Guest">Khách vãng lai</MudSelectItem>
+                    </MudSelect>
+                    <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="customerUpdateRequest.Status" For="@(() => customerUpdateRequest.Status)" Label="Trạng thái">
+                                <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
+                                <MudSelectItem Value="EntityStatus.InActive">Không hoạt động</MudSelectItem>
+                                <MudSelectItem Value="EntityStatus.Pending">Chờ</MudSelectItem>
+                                <MudSelectItem Value="EntityStatus.PendingForActivation">Chờ hoạt động</MudSelectItem>
+                                <MudSelectItem Value="EntityStatus.PendingForConfirmation">Chờ kích hoạt</MudSelectItem>
+                                <MudSelectItem Value="EntityStatus.PendingForApproval">Chờ chấp thuận</MudSelectItem>
+                                <MudSelectItem Value="EntityStatus.Locked">Khóa</MudSelectItem>
+                    </MudSelect>
                     
                 </MudPaper>
             </MudForm>
@@ -63,11 +78,17 @@
         customerUpdateRequest.Name = customerInfo.Name;
         customerUpdateRequest.PhoneNumber = customerInfo.PhoneNumber;
         customerUpdateRequest.Email = customerInfo.Email;
+        customerUpdateRequest.CustomerType = customerInfo.CustomerType;
+        customerUpdateRequest.Status = customerInfo.Status;
     }
 
     private bool CheckChangeData()
     {
-        return customerInfo!.Name != customerUpdateRequest.Name || customerInfo.PhoneNumber != customerUpdateRequest.PhoneNumber || customerInfo.Email != customerUpdateRequest.Email;
+        return customerInfo!.Name != customerUpdateRequest.Name 
+        || customerInfo.PhoneNumber != customerUpdateRequest.PhoneNumber 
+        || customerInfo.Email != customerUpdateRequest.Email
+        || customerInfo.CustomerType != customerUpdateRequest.CustomerType
+        || customerInfo.Status != customerUpdateRequest.Status;
     }
     private async Task Update()
     {

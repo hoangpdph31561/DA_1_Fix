@@ -27,7 +27,7 @@ namespace BaseSolution.Application.DataTransferObjects.Customer.Request
             {
                 RuleFor(x => x.Name).NotEmpty().WithMessage("Name cannot be empty.");
 
-                RuleFor(x => x.IdentificationNumber).NotEmpty().WithMessage("IdentificationNumber cannot be empty.");
+                //RuleFor(x => x.IdentificationNumber).NotEmpty().WithMessage("IdentificationNumber cannot be empty.");
 
                 RuleFor(x => x.PhoneNumber).NotEmpty().WithMessage("Phone number cannot be empty.")
                                            .Matches(@"^\d{10,}$").WithMessage("Invalid phone number format.");

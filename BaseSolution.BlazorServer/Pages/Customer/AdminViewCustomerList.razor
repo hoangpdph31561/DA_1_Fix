@@ -24,6 +24,8 @@
                             <MudTh>Mã định danh</MudTh>
                             <MudTh>Email</MudTh>
                             <MudTh>Số điện thoại</MudTh>
+                            <MudTh>Loại khách</MudTh>
+                            <MudTh>Trạng thái</MudTh>
                             <MudTh>Hành động</MudTh>
                         </HeaderContent>
                         <RowTemplate>
@@ -31,7 +33,18 @@
                             <MudTd>@context.Name</MudTd>
                                 <MudTd>@context.IdentificationNumber</MudTd>
                                 <MudTd>@context.Email</MudTd>
-                                <MudTh>@context.PhoneNumber</MudTh>
+                                <MudTd>@context.PhoneNumber</MudTd>
+                                <MudTd>
+                                    @if (@context.CustomerType == CustomerType.Customer)
+                                {
+                                    <text>Khách</text>
+                                }
+                                else if (@context.CustomerType == CustomerType.Guest)
+                                {
+                                    <text>Khách vãng lai</text>
+                                }
+                                </MudTd>
+                                <MudTd><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTd>
                                 <MudTd>
                                     <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@( async() => await OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
                                     <MudChip Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@( async() => await OnDelete(context.Id))" Disabled="@_isDisableControls">Xóa</MudChip>
@@ -67,7 +80,7 @@
     {
         await LoadData();
     }
-    private async Task LoadData()   
+    private async Task LoadData()
     {
         customerVM = await customerRepo.GetCustomer(customerRequest);
         _lstCustomers = customerVM.Data!.ToList();

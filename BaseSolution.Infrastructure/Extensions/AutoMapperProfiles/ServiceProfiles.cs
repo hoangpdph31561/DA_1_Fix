@@ -16,7 +16,7 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
         {
             CreateMap<ServiceEntity,ServiceDTO>()
                 .ForMember(dest => dest.ServiceTypeName, opt => opt.MapFrom(src => src.ServiceType.Name))
-                .ForMember(dest => dest.TotalOrders, opt => opt.MapFrom(src => src.ServiceOrderDetails.Select(sod => sod.Amount).Sum()));
+                .ForMember(dest => dest.TotalOrders, opt => opt.MapFrom(src => src.ServiceOrderDetails.Where(x => !x.Deleted).Select(sod => sod.Amount).Sum()));
             CreateMap<ServiceCreateRequest, ServiceEntity>();
             CreateMap<ServiceUpdateRequest, ServiceEntity>();
         }

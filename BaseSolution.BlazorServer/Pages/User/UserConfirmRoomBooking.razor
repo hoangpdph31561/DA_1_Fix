@@ -30,6 +30,8 @@
                             <MudTh>STT</MudTh>
                             <MudTh>Khách hàng</MudTh>
                             <MudTh>Thời gian đặt</MudTh>
+                            <MudTh>Giờ vào</MudTh>
+                            <MudTh>Giờ ra</MudTh>
                             <MudTh>Loại phòng</MudTh>
                             <MudTh>Kiểu đặt phòng</MudTh>
                             <MudTh>Thanh toán trước</MudTh>
@@ -41,6 +43,8 @@
                             <MudTd>@(_lstRoomBooking.IndexOf(context) + 1)</MudTd>
                             <MudTd>@context.NameCustomer</MudTd>
                             <MudTd>@context.CreatedTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
+                                <MudTd>@context.CheckInBooking.ToString("HH:mm dd/MM/yyyy")</MudTd>
+                                <MudTd>@context.CheckOutBooking.ToString("HH:mm dd/MM/yyyy")</MudTd>
                                 <MudTd>@context.NameRoomType</MudTd>
                                 <MudTd>@context.BookingType</MudTd>
                                 <MudTd>@context.PrePaid</MudTd>
@@ -130,7 +134,7 @@
             var updateRoomBooking = await _roomBookingRepo.UpdateStatusRoomBooking(_updateStatusRequest);
             var getRoomBookingDetail = await _roomBookingDetailRepo.GetRoomBookingDetailByRoomBookingId(idRoomBooking);
             _updateRoomDetailStatus.Id = getRoomBookingDetail.RoomDetailId;
-            _updateRoomDetailStatus.Status = RoomStatus.Occupied;
+            _updateRoomDetailStatus.Status = RoomStatus.Reserved;
             var updateRoomDetail = await _roomDetailRepo.UpdateRoomDetailStatus(_updateRoomDetailStatus);
             _snackbar.Add("Đã duyệt đặt phòng cho khách!", Severity.Success);
             await LoadData();

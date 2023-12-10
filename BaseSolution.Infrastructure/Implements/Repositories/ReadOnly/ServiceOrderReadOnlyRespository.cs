@@ -46,7 +46,6 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                     RoomBookingDetailId = grb.Key.RoomBookingDetailId,
                     CustomerId = grb.Key.CustomerId
                 }).ToList();
-
                 return RequestResult<List<ServiceOrderForRoomBookingDTO>>.Succeed(listByType);
             }
             catch (Exception e)

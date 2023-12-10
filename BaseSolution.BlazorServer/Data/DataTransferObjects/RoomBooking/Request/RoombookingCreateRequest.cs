@@ -14,6 +14,7 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request
         public DateTimeOffset CheckInBooking { get; set; }
         [Required(ErrorMessage = "Trường này không được để trống")]
         public DateTimeOffset CheckOutBooking { get; set; }
+        public decimal Price { get; set; }
 
     }
 }

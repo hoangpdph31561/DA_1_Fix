@@ -19,6 +19,7 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
                 .ForMember(dest => dest.ServiceUnitType, opt => opt.MapFrom(src => src.Service.Unit));
             CreateMap<ServiceOrderDetailCreateRequest, ServiceOrderDetailEntity>();
             CreateMap<ServiceOrderDetailUpdateRequest, ServiceOrderDetailEntity>();
+            CreateMap<ServiceOrderCreateUpdateDeleteRequest, ServiceOrderDetailEntity>();
         }
     }
 }

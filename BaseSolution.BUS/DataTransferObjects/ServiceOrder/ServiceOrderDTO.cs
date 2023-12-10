@@ -10,8 +10,9 @@ namespace BaseSolution.Application.DataTransferObjects.ServiceOrder
     public class ServiceOrderDTO
     {
         public Guid Id { get; set; }
-        public int Quantity { get; set; } // số lượng 
+        public double Quantity { get; set; } // số lượng 
         public decimal Price { get; set; }
+        public decimal TotalPrice { get; set; } // tổng tiền của từng cái 
         public decimal TotalAmount { get; set; }
         public EntityStatus Status { get; set; }
         public DateTimeOffset CreatedTime { get; set; }

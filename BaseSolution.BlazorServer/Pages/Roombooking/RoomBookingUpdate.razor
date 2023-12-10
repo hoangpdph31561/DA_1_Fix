@@ -18,20 +18,19 @@
                 <MudGrid>
 
                     <MudItem>
-                        <MudTextField T="DateTime?" Format="s" @bind-Value="checkIn" Label="Giờ vào"  InputType="InputType.DateTimeLocal" />
+                        <MudTextField T="DateTime?" Format="s" @bind-Value="checkIn" Label="Giờ vào"  InputType="InputType.DateTimeLocal" ReadOnly="true"/>
                     </MudItem>
 
                     <MudItem>
-                        <MudTextField T="DateTime?" Format="s" @bind-Value="checkOut" Label="Giờ ra" InputType="InputType.DateTimeLocal" />
-
+                        <MudTextField T="DateTime?" Format="s" @bind-Value="checkOut" Label="Giờ ra" InputType="InputType.DateTimeLocal" ReadOnly="true" />
                     </MudItem>
 
                     <MudItem>
-                        <MudTextField T="DateTime?" Format="s"  @bind-Value="checkIn" Label="Giờ vào thực tế" InputType="InputType.DateTimeLocal" Disabled="true" />
+                        <MudTextField T="DateTime?" Format="s" @bind-Value="checkIn" Label="Giờ vào thực tế" InputType="InputType.DateTimeLocal" ReadOnly="true" />
                     </MudItem>
 
                     <MudItem>
-                        <MudTextField T="DateTime?" Format="s" @bind-Value="checkOut" Label="Giờ ra thực tế" InputType="InputType.DateTimeLocal" Disabled="true" />
+                        <MudTextField T="DateTime?" Format="s" @bind-Value="checkOutReadly" Label="Giờ ra thực tế" InputType="InputType.DateTimeLocal" />
 
                     </MudItem>
                     <MudItem xs="12" sm="6">
@@ -71,17 +70,17 @@
 
     DateTime? checkIn;
     DateTime? checkOut;
+    DateTime? checkOutReadly;
     DateTime getDate = DateTime.Now;
     #endregion
 
     #region Code xử lý
     protected async override Task OnInitializedAsync()
     {
-     
+
         await LoadData();
         roomBookingDetailVM = await roomBookingDetailRepo.GetRoomBookingDetailAsync(getRoombookingrequest);
         _lstRoomBookingdetail = (List<RoomBookingDetailDTO>)roomBookingDetailVM.Data!;
-
     }
     private async Task LoadData()
     {
@@ -90,6 +89,7 @@
             _roomBookingDetail = await roomBookingDetailRepo.GetRoomBookingDetailByRoomBookingId(idRoomBooking);
             checkIn = _roomBookingDetail.CheckInBooking.DateTime;
             checkOut = _roomBookingDetail.CheckOutBooking.DateTime;
+            checkOutReadly = _roomBookingDetail.CheckOutReality.DateTime;
         }
         catch (Exception)
         {
@@ -111,7 +111,7 @@
             {
                 Id = _roomBookingDetail.Id,
                 CheckInBooking = (DateTimeOffset)checkIn,
-                CheckOutBooking = (DateTimeOffset)checkOut,
+                CheckOutReality = (DateTimeOffset)checkOutReadly,
 
             };
         var confirm = await _dialogService.ShowMessageBox
@@ -128,7 +128,7 @@
 
             foreach (var item in _lstRoomBookingdetail)
             {
-                if (RoomBookingDetailUpdateRequest.CheckOutBooking == item.CheckInBooking)
+                if (RoomBookingDetailUpdateRequest.CheckOutReality == item.CheckInBooking)
                 {
                     check = true;
                     break; // Nếu có xung đột, thoát khỏi vòng lặp
@@ -138,7 +138,7 @@
             {
                 _snackbar.Add("Thời gian này có người vào", Severity.Error);
             }
-            else if (RoomBookingDetailUpdateRequest.CheckInBooking < getDate || RoomBookingDetailUpdateRequest.CheckOutBooking < getDate)
+            else if ( RoomBookingDetailUpdateRequest.CheckOutReality < getDate)
             {
                 _snackbar.Add("Thời gian không hợp lệ!", Severity.Error);
             }

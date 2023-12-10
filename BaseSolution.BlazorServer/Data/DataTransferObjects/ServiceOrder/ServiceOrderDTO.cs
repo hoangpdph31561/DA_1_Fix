@@ -5,7 +5,7 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.Service
     {
         public Guid Id { get; set; }
         public DateTimeOffset CreatedTime { get; set; }
-        public int Quantity { get; set; } // số lượng 
+        public double Quantity { get; set; } // số lượng tổng
         public decimal Price { get; set; }
         public float TotalAmount { get; set; }
         public EntityStatus Status { get; set; } 

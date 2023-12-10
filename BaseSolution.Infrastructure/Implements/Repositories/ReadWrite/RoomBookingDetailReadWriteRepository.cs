@@ -87,10 +87,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
             {
                 var roomBookingDetail = await GetRoomBookingDetailByIdAsync(entity.Id, cancellationToken);
 
-                roomBookingDetail.CheckInBooking = entity.CheckInBooking;
-                roomBookingDetail.CheckOutBooking = entity.CheckOutBooking;
-                roomBookingDetail.CheckInReality = entity.CheckInBooking;
-                roomBookingDetail.CheckOutReality = entity.CheckOutBooking;
+                roomBookingDetail.CheckOutReality = entity.CheckOutReality;
                 roomBookingDetail.ModifiedTime = DateTimeOffset.Now;
                 _appReadWriteDbContext.RoomBookingDetails.Update(roomBookingDetail);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);

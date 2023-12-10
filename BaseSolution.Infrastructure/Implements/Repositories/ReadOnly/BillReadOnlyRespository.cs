@@ -107,7 +107,15 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             {
                 var bill = await _appReadOnlyDbContext.Bills.AsNoTracking().Where(c => c.Id == id && !c.Deleted).ProjectTo<BillDtoForService>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(cancellationToken);
-                bill.ServiceAmount = bill.TotalService * bill.ServicePrice;
+                decimal totalServicePrice = 0;
+                var serviceOrderDetail = _appReadOnlyDbContext.ServiceOrderDetails.Where(x => x.ServiceOrderId == bill.ServiceOrderId && !x.Deleted).ToList();
+                foreach (var service in serviceOrderDetail)
+                {
+                    decimal servicePrice = service.Price * (decimal)service.Amount;
+                    totalServicePrice += servicePrice;
+                }
+                bill.TotalPrice = totalServicePrice;
+                bill.TotalAmount = bill.TotalPrice * (decimal)bill.Quantity;
                 return RequestResult<BillDtoForService?>.Succeed(bill);
             }
             catch (Exception e)
@@ -258,10 +266,18 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 {
                     query = query.Where(x => x.CustomerName == request.SearchString);
                 }
-                var result = await query.Where(x => x.StatusServicrOrder == EntityStatus.InActive && x.RoomBookingDetailId == null ).PaginateAsync(request, cancellationToken);
+                var result = await query.Where(x => x.StatusServicerOrder == EntityStatus.InActive && x.RoomBookingDetailId == null ).PaginateAsync(request, cancellationToken);
+                decimal totalServicePrice = 0;
                 foreach (var item in result.Data!)
                 {
-                    item.ServiceAmount = item.TotalService * item.ServicePrice;
+                    var serviceOrderDetail = _appReadOnlyDbContext.ServiceOrderDetails.Where(x => x.ServiceOrderId == item.ServiceOrderId && !x.Deleted).ToList();
+                    foreach (var service in serviceOrderDetail)
+                    {
+                        decimal servicePrice = service.Price * (decimal)service.Amount;
+                        totalServicePrice += servicePrice;
+                    }
+                    item.TotalPrice = totalServicePrice;
+                    item.TotalAmount = item.TotalPrice * (decimal)item.Quantity;
                 }
                 return RequestResult<PaginationResponse<BillDtoForService>>.Succeed(new PaginationResponse<BillDtoForService>()
                 {

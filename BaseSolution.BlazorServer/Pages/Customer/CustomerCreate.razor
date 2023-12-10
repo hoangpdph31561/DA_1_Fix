@@ -17,8 +17,7 @@
             <MudForm Model="createRequest" @ref="form" @bind-IsValid="@success">
                 <MudTextField T="string" Label="Tên" @bind-Value="createRequest.Name" For="@(() => createRequest.Name)" Disabled="isFormLocked" Required="true" />
                 <MudTextField T="string" Label="Mã định danh" @bind-Value="createRequest.IdentificationNumber" For="@(() => createRequest.IdentificationNumber)" Required="true" Disabled="isFormLocked" />
-                <MudTextField T="string" Label="Email" Disabled="isFormLocked" @bind-Value="createRequest.Email" For="@(() => createRequest.Email)" Required="true"
-                              Validation='new EmailAddressAttribute() { ErrorMessage = "Sai định dạng Email!" }' />
+                <MudTextField T="string" Label="Email" Disabled="isFormLocked" @bind-Value="createRequest.Email" For="@(() => createRequest.Email)" Required="true" />
                 <MudTextField T="string" Label="Số điện thoại" @bind-Value="createRequest.PhoneNumber" For="@(() => createRequest.PhoneNumber)" Disabled="isFormLocked" Required="true" />
                 <MudSpacer></MudSpacer>
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" OnClick="@SendEmail">Gửi mã</MudButton>

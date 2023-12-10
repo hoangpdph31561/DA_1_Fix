@@ -72,7 +72,7 @@ namespace BaseSolution.API.Controllers
             await vm.HandleAsync(idCustomer, cancellationToken);
             if (vm.Success)
             {
-                List<BillDTO> result = (List<BillDTO>)vm.Data;
+                List<BillDtoForRoom> result = (List<BillDtoForRoom>)vm.Data;
 
                 return Ok(result);
             }

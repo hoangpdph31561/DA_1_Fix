@@ -27,7 +27,7 @@
                     <RowTemplate>
                         <MudTd>@(_lstRoomType.IndexOf(context) + 1)</MudTd>
                         <MudTd>@context.Name</MudTd>
-                            <MudTd>@context.NumberOfAmenityRoomDetail <MudChip Icon="@Icons.Material.Filled.ListAlt" OnClick="@(() => OpenAmenity(context.Id))"></MudChip></MudTd>
+                            <MudTd>@context.NumberOfAmenities <MudChip Icon="@Icons.Material.Filled.ListAlt" OnClick="@(() => OpenAmenity(context.Id))"></MudChip></MudTd>
                         <MudTd>@context.AmountOfRoomType</MudTd>
                             <MudTd>
                                 <MudChip Color="Color.Primary" OnClick="@(() => OpenDetail(context.Id))" Disabled="@_isDisableControls">Đặt phòng</MudChip>

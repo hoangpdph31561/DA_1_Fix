@@ -110,6 +110,46 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             }
         }
 
+        public async Task<RequestResult<PaginationResponse<RoombookingDTO>>> GetRoombookingWithPaginationByAwaitAsync(ViewRoombookingWithPaginationRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _dbContext.RoomBookings.AsNoTracking().Where(x => x.Deleted == false && x.Status != EntityStatus.Deleted).ProjectTo<RoombookingDTO>(_mapper.ConfigurationProvider);
+
+                if (!string.IsNullOrWhiteSpace(request.SearchString))
+                {
+                    query = query.Where(x => x.NameCustomer.Contains(request.SearchString!));
+                }
+                var result = await query.PaginateAsync(request, cancellationToken);
+
+                foreach (var item in result.Data!)
+                {
+                    item.ServiceAmount = item.TotalService * item.ServicePrice;
+                    item.RoomAmount = UtilityExtensions.TinhTien(item.CheckInReality, item.CheckOutReality, item.RoomPrice, item.PrePaid);
+                    item.TotalAmount = item.ServiceAmount + item.RoomAmount;
+                }
+                return RequestResult<PaginationResponse<RoombookingDTO>>.Succeed(new PaginationResponse<RoombookingDTO>
+                {
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize,
+                    HasNext = result.HasNext,
+                    Data = result.Data
+                });
+            }
+            catch (Exception e)
+            {
+
+                return RequestResult<PaginationResponse<RoombookingDTO>>.Fail(_localizationService["List of roombooking are not found"], new[]
+                {
+                    new ErrorItem
+                    {
+                        Error= e.Message,
+                        FieldName = LocalizationString.Common.FailedToGet + "list of roombooking"
+                    }
+                });
+            }
+        }
+
         public async Task<RequestResult<PaginationResponse<RoombookingDTO>>> GetRoombookingWithPaginationByOtherAsync(ViewRoombookingWithPaginationRequest request, CancellationToken cancellationToken)
         {
             try

@@ -84,16 +84,12 @@
     protected async override Task OnInitializedAsync()
     {
         await FilterByTime();
-        await LoadData();
     }
-    private async Task LoadData()
-    {
-        //truyền vào id RoomType lấy ra list RoomDetail
-        _roomDetailVM.Data = await roomDetailRespo.GetRoomDetailByIdRoomType(idRoomType);
-        _lstRoomDetail = _roomDetailVM.Data!.ToList();
-    }
+   
     private async Task FilterByTime()
     {
+        if (checkIn < checkOut || checkOut < DateTime.UtcNow)
+        {
         var roomDetail = new ViewRoomDetailByCheckInCheckOutRequest
             {
                 CheckInBooking = (DateTimeOffset)checkIn!,
@@ -103,6 +99,11 @@
         _lstRoomDetail = _roomDetailVM.Data!.ToList();
         _lstRoomDetail = _lstRoomDetail.Where(r => r.RoomTypeId == idRoomType).ToList();
         StateHasChanged();
+        }
+        else
+        {
+            _snackbar.Add("Thời gian phải hợp lệ!", Severity.Warning);
+        }
     }
     public async Task OpenAdd(Guid idRoomDetail)
     {
@@ -115,15 +116,13 @@
             var result = await dialog.Result;
             if (!result.Canceled)
             {
-                await LoadData();
+                await FilterByTime();
             }
         }
         else
         {
             _snackbar.Add("Phòng không thể thuê!", Severity.Info);
         }
-
-
     }
     public async Task OpenDetail(Guid idRoomDetail)
     {
@@ -133,7 +132,7 @@
         var result = await dialog.Result;
         if (!result.Canceled)
         {
-            await LoadData();
+            await FilterByTime();
         }
     }
     private void OnClickCancel()

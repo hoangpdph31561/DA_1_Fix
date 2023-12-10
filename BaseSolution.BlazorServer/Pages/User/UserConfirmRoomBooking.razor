@@ -96,7 +96,7 @@
     }
     private async Task LoadData()
     {
-        var roomBookings = await _roomBookingRepo.GetAllRoomBooking(_roomBookingRequest);   
+        var roomBookings = await _roomBookingRepo.GetAllRoomBookingByAwait(_roomBookingRequest);   
         _roomBookingVM.Data = roomBookings.Data.Where(x => x.Status == EntityStatus.PendingForConfirmation && x.StatusRoom == RoomStatus.AwaitingConfirmation).ToList();
         _lstRoomBooking = _roomBookingVM.Data!.ToList();
         _isLoadingAll = false;

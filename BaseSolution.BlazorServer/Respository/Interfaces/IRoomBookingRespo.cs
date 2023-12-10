@@ -7,6 +7,7 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
     public interface IRoomBookingRespo
     {
         Task<PaginationResponse<RoomBookingDto>> GetAllRoomBooking(ViewRoombookingPaginationRequest request);
+        Task<PaginationResponse<RoomBookingDto>> GetAllRoomBookingByAwait(ViewRoombookingPaginationRequest request);
         Task<bool> CreateNewRoomBooking(RoombookingCreateRequest request);
         Task<bool> UpdateRoomBooking(RoombookingUpdateRequest request);
         Task<bool> UpdateStatusRoomBooking(RoomBookingUpdateStatusRequest request);

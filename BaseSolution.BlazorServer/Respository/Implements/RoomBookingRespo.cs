@@ -74,6 +74,24 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             }
         }
 
+        public async Task<PaginationResponse<RoomBookingDto>> GetAllRoomBookingByAwait(ViewRoombookingPaginationRequest request)
+        {
+            try
+            {
+                string url = $"/api/RoomBookings/getRoomBookingByAwait?PageNumber={request.PageNumber}&PageSize={request.PageSize}";
+                if (!String.IsNullOrEmpty(request.SearchString))
+                {
+                    url = $"/api/RoomBookings/getRoomBookingByAwait?SearchString={request.SearchString}&PageNumber={request.PageNumber}&PageSize={request.PageSize}";
+                }
+                var result = await _httpClient.GetFromJsonAsync<PaginationResponse<RoomBookingDto>>(url);
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<RoomBookingDto> GetRoomBookingById(Guid id)
         {
             try

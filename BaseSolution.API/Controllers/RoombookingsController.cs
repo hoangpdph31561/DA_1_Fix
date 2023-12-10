@@ -67,7 +67,20 @@ public class RoombookingsController : ControllerBase
         }
         return BadRequest(vm);
     }
+    [HttpGet("getRoomBookingByAwait")]
+    public async Task<IActionResult> GetListRoomBookingDetailByAwait([FromQuery] ViewRoombookingWithPaginationRequest request, CancellationToken cancellationToken)
+    {
+        RoomBookingListWithPaginationByAwaitViewModel vm = new(_roombookingrReadOnlyRespository, _localizationService);
+        await vm.HandleAsync(request, cancellationToken);
 
+        if (vm.Success)
+
+        {
+            PaginationResponse<RoombookingDTO> result = (PaginationResponse<RoombookingDTO>)vm.Data;
+            return Ok(result);
+        }
+        return BadRequest(vm);
+    }
     [HttpGet("{id}")]
     public async Task<IActionResult> GetRoomBookingDetailByAdmin(Guid id, CancellationToken cancellationToken)
     {

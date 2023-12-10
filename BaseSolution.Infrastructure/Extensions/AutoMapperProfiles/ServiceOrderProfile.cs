@@ -23,8 +23,8 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
                 .ForMember(dest => dest.ServiceId, opt => opt.MapFrom(src => src.ServiceOrderDetails.Select(x => x.Service.Id).FirstOrDefault()))
                .ForMember(dest => dest.ServiceName, opt => opt.MapFrom(src => src.ServiceOrderDetails.Select(x => x.Service.Name).FirstOrDefault()))
                .ForMember(dest => dest.RoomBookingDetailId, opt => opt.MapFrom(src => src.RoomBookingDetailId))
+               .ForMember(dest => dest.lstServiceOrder, opt => opt.MapFrom(src => src.ServiceOrderDetails))
                .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.RoomBookingDetail.RoomBooking.CustomerId));
-
 
             CreateMap<ServiceOrderCreateRequest, ServiceOrderEntity>()
                   .ForPath(des => des.ServiceOrderDetails, opt => opt.MapFrom(src =>
@@ -48,6 +48,8 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
                      new ServiceOrderDetailEntity
                      {
                          ServiceId = src.ServiceId,
+                         Price = src.Price,
+                         Amount = 1
                      }
                 }))
                 ;

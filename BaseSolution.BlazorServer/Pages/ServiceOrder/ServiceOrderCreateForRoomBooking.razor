@@ -77,9 +77,11 @@
         );
         if (confirm == true)
         {
+
             request.CustomerId = idCustomer;
             request.RoomBookingDetailId = idroomBookingDetail;
             request.ServiceId = Guid.Parse(serviceId);
+            request.Price = lstService.FirstOrDefault(x => x.Id == request.ServiceId)!.Price;
             var result = await serviceOrderRepo.CreateServiceForRoomBooking(request);
             if (result == true)
             {

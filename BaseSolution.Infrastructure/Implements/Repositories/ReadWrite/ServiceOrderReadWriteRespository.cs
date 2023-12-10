@@ -48,15 +48,38 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
         {
             try
             {
-                var _LstIdCustomer = _appReadWriteDbContext.RoomBookingDetails.Select(x => x.RoomBooking.CustomerId).ToList();
-                var idCustomer = _LstIdCustomer.FirstOrDefault(x => x.Equals(entity.CustomerId));
-                entity.CreatedTime = entity.CreatedTime;
-                entity.RoomBookingDetailId = entity.RoomBookingDetailId;
-                entity.CustomerId = idCustomer;
-                await _appReadWriteDbContext.ServiceOrders.AddAsync(entity);
-                await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
-
-                return RequestResult<Guid>.Succeed(entity.Id);
+                var serviceOrder = _appReadWriteDbContext.ServiceOrders.FirstOrDefault(x => x.RoomBookingDetailId == entity.RoomBookingDetailId && x.CustomerId == x.CustomerId && !x.Deleted);
+                if (serviceOrder!= null)
+                {
+                    foreach (var item in entity.ServiceOrderDetails)
+                    {
+                        item.ServiceOrderId = serviceOrder.Id;
+                        var serviceOrderDetail = _appReadWriteDbContext.ServiceOrderDetails.FirstOrDefault(x => x.ServiceOrderId == item.ServiceOrderId && x.ServiceId == item.ServiceId && !x.Deleted);
+                        if(serviceOrderDetail!= null)
+                        {
+                            serviceOrderDetail.Amount++;
+                            await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
+                        }
+                        else
+                        {
+                            await _appReadWriteDbContext.ServiceOrderDetails.AddAsync(item);
+                            await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
+                        }
+                    }
+                    return RequestResult<Guid>.Succeed(serviceOrder.Id);
+                }
+                else
+                {
+                    var _LstIdCustomer = _appReadWriteDbContext.RoomBookingDetails.Select(x => x.RoomBooking.CustomerId).ToList();
+                    var idCustomer = _LstIdCustomer.FirstOrDefault(x => x.Equals(entity.CustomerId));
+                    entity.CreatedTime = entity.CreatedTime;
+                    entity.RoomBookingDetailId = entity.RoomBookingDetailId;
+                    entity.CustomerId = idCustomer;
+                    await _appReadWriteDbContext.ServiceOrders.AddAsync(entity);
+                    await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
+                    return RequestResult<Guid>.Succeed(entity.Id);
+                }
+               
             }
             catch (Exception e)
             {

@@ -6,6 +6,7 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.Bill
     {
         public Guid CustomerId { get; set; } // map được sẵn 
         public Guid Id { get; set; }
+        public Guid ServiceOrderId { get; set; }
         public string CustomerName { get; set; }
         public DateTimeOffset CreatedTime { get; set; }
         public Guid? RoomBookingId { get; set; } // // map được sẵn 

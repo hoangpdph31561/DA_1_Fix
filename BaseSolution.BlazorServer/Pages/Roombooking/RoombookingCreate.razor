@@ -18,7 +18,7 @@
         else
         {
             <MudForm Model="@roomBookingCreateRequest" @ref="_form">
-                <MudPaper Elevation="0" >
+                <MudPaper Elevation="0">
                     <MudTextField Label="Tìm kiếm khách hàng" @bind-Value="searchMDD" TextChanged="OnTextChanged" />
                     <MudSelect T="string" Label="Khách hàng" Class="mb-2"
                                AnchorOrigin="Origin.BottomCenter" @bind-Value="@customerId" For="@(() => customerId)" C>
@@ -35,17 +35,17 @@
                     <MudItem>
                         <MudTextField T="DateTime?" Format="s" @bind-Value="checkOut" Label="Giờ ra" InputType="InputType.DateTimeLocal" />
                     </MudItem>
-                 
+
                     <MudChip Icon="@Icons.Material.Filled.Search" @onclick="async() => await LoadCombobox()" Color="Color.Primary">Tìm kiếm phòng trống</MudChip>
-                    <MudSelect  T="string" Label="Phòng còn trống" Class="mb-2"
+                    <MudSelect T="string" Label="Phòng còn trống" Class="mb-2"
                                AnchorOrigin="Origin.BottomCenter" @bind-Value="@roomDetailId" For="@(() => roomDetailId)">
                         @foreach (var item in lstRoomDetails)
                         {
                             <MudSelectItem Value="@item.Id.ToString()">@item.Name: Số lượng người ở: @item.MaxPeopleStay</MudSelectItem>
                         }
                     </MudSelect>
-                  
-            </MudPaper>
+
+                </MudPaper>
             </MudForm>
         }
     </DialogContent>
@@ -77,7 +77,10 @@
 
     // private ViewRoomDetailByCheckInCheckOutRequest roomDetailRequest = new();
 
-    private ViewCustomerWithPaginationRequest customer = new();
+    private ViewCustomerWithPaginationRequest customer = new()
+        {
+            PageSize = int.MaxValue - 1
+        };
 
     private PaginationResponse<RoomDetailDTO> roomDetailVM;
     private PaginationResponse<CustomerDTO> CustomerVM;
@@ -104,7 +107,7 @@
     }
     private async Task LoadData()
     {
-       
+
         CustomerVM = await cumtomerRespo.GetCustomer(customer);
         lstCustomer = CustomerVM.Data!.ToList();
 
@@ -119,14 +122,14 @@
             };
         roomDetailVM = await roomDetailRespo.GetAllRoomDetailsByStatus(roomDetail);
         lstRoomDetails = roomDetailVM.Data!.ToList();
-       
+
         StateHasChanged();
     }
 
     private void OnTextChanged(string value)
     {
         searchMDD = value;
-     lstCustomeerFillter = lstCustomer.Where(x => x.IdentificationNumber == searchMDD).ToList();
+        lstCustomeerFillter = lstCustomer.Where(x => x.IdentificationNumber == searchMDD).ToList();
     }
 
     private void OnClickCancel()
@@ -163,7 +166,7 @@
                     return;
                 }
 
-                if ( checkOut < DateTime.Now)
+                if (checkOut < DateTime.Now)
                 {
                     _snackbar.Add
                    (
@@ -178,7 +181,7 @@
                 roomBookingCreateRequest.CustomerId = Guid.Parse(customerId);
                 roomBookingCreateRequest.BookingType = BookingType.Offline;
                 roomBookingCreateRequest.CodeBooking = UtilityExtentions.GenerateRandomString(6);
-                 roomBookingCreateRequest.CheckOutBooking = (DateTimeOffset)checkOut;
+                roomBookingCreateRequest.CheckOutBooking = (DateTimeOffset)checkOut;
                 roomBookingCreateRequest.CheckInBooking = (DateTimeOffset)checkIn;
 
                 if (roomBookingCreateRequest.RoomDetailId == Guid.Empty || roomBookingCreateRequest.CustomerId == Guid.Empty || checkOut == null || checkIn == null)
@@ -209,10 +212,10 @@
             }
             catch (Exception)
             {
-                
+
                 throw;
             }
-          
+
         }
     }
 

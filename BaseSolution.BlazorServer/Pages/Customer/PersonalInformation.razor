@@ -4,10 +4,7 @@
 @page "/customer/PersonalInformation"
 @inject IdCustomer idCustomer
 
-<CustomListDisplayP2 Label="@("Thông tin cá nhân")" IsLoading="_isLoadingAll">
-    <HeaderContent>
-        
-    </HeaderContent>
+<CustomListDisplayP2 Label="@("Thông tin cá nhân")" IsLoading="_isLoadingAll" HideSearch="true">
     <BodyContent>
         <MudPaper Elevation="0" Class="custom-list-display-border">
             @if (_isLoadingList)

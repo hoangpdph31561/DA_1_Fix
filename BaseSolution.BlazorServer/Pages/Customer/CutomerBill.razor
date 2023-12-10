@@ -6,7 +6,7 @@
 @using BaseSolution.BlazorServer.Respository.Interfaces
 @page "/customer/Bill"
 @inject IdCustomer idCustomer
-<CustomListDisplayP2 Label="Xem hóa đơn" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
+<CustomListDisplayP2 Label="Xem hóa đơn" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" HideSearch="true">
     <HeaderContent>
 
     </HeaderContent>
@@ -89,12 +89,5 @@
         billRequest.PageNumber = pageNumber;
         await LoadData();
     }
-    private async Task OnSearch(string? searchString)
-    {
-        if (_isDisableControls) return;
-        _isLoadingList = true;
-        billRequest.PageNumber = 1;
-        billRequest.Search = searchString;
-        await LoadData();
-    }
+    
 }

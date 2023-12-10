@@ -33,6 +33,8 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
                      new ServiceOrderDetailEntity
                      {
                          ServiceId = src.ServiceId,
+                         Price = src.Price,
+                           Amount = 1
                      }
                 }))
                 .ForMember(des => des.CustomerId, opt => opt.MapFrom(src => src.CustomerId))

@@ -103,14 +103,14 @@
                 {
                     lstServiceOrderDetailSelected.Add(new ServiceOrderDetailInfo
                         {
-                            IsExist = true,
+                            IsExist = false,
                             ServiceId = item.Id,
                             ServiceName = item.Name,
                             Amount = 0
                         });
                     lstServiceOrderDetailSelectedOriginal.Add(new ServiceOrderDetailInfo
                         {
-                            IsExist = true,
+                            IsExist = false,
                             ServiceId = item.Id,
                             ServiceName = item.Name,
                             Amount = 0
@@ -153,7 +153,8 @@
                         {
                             ServiceOrderId = idServiceOrder,
                             ServiceId = item.ServiceId,
-                            Amount = item.Amount
+                            Amount = item.Amount,
+                            Price = lstService.FirstOrDefault(x => x.Id == item.ServiceId)!.Price
                         });
                 }
             }

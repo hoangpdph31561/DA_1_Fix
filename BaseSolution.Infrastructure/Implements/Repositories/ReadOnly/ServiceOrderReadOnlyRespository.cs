@@ -31,8 +31,23 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             try
             {
                 var getList = _appReadOnlyDbContext.ServiceOrders.AsNoTracking().ProjectTo<ServiceOrderForRoomBookingDTO>(_mapper.ConfigurationProvider);
-               
-                return RequestResult<List<ServiceOrderForRoomBookingDTO>>.Succeed(await getList.ToListAsync());
+                var listByType = await getList.Where(c => c.RoomBookingDetailId == idRoombooking).ToListAsync();
+                List<ServiceOrderForRoomBookingDTO> lstTepRests = null;
+                lstTepRests = listByType.GroupBy(c => new
+                {
+                    c.ServiceName,
+                    c.ServiceId,
+                    c.RoomBookingDetailId,
+                    c.CustomerId,
+                }).Select(grb => new ServiceOrderForRoomBookingDTO()
+                {
+                    ServiceName = grb.Key.ServiceName,
+                    ServiceId = grb.Key.ServiceId,
+                    RoomBookingDetailId = grb.Key.RoomBookingDetailId,
+                    CustomerId = grb.Key.CustomerId
+                }).ToList();
+
+                return RequestResult<List<ServiceOrderForRoomBookingDTO>>.Succeed(listByType);
             }
             catch (Exception e)
             {
@@ -124,30 +139,16 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 {
                     query = query.Where(x => x.CustomerName.Contains(request.SearchString!));
                 }
-                // get giá để lưu vào ServiceOrderDetails
-                var service = _appReadOnlyDbContext.Services.ToList();
-                foreach (var services in service)
-                {
-                    var serviceOrderDetail = _appReadOnlyDbContext.ServiceOrderDetails.FirstOrDefault(x => x.ServiceId == services.Id);
-                    if (serviceOrderDetail != null)
-                    {
-                        serviceOrderDetail.Price = services.Price;
-                        _appReadOnlyDbContext.ServiceOrderDetails.Update(serviceOrderDetail);
-                        _appReadOnlyDbContext.SaveChanges();
-                    }
-                }
+              
                 var result = await query.Where(x => x.Status != EntityStatus.InActive && x.RoomBookingDetailId == null).PaginateAsync(request, cancellationToken);
-                decimal totalServicePrice = 0;
                 foreach (var item in result.Data!)
                 {
-                    var serviceOrderDetail = _appReadOnlyDbContext.ServiceOrderDetails.Where(x => x.ServiceOrderId == item.Id && !x.Deleted).ToList();
+                    var serviceOrderDetail = _appReadOnlyDbContext.ServiceOrderDetails.Where(x => x.ServiceOrderId == item.Id && !x.Deleted && item.RoomBookingDetailId == null).ToList();
+                    item.TotalAmount = 0;
                     foreach (var services in serviceOrderDetail)
                     {
-                        decimal servicePrice = services.Price * (decimal)services.Amount;
-                        totalServicePrice += servicePrice;
+                        item.TotalAmount += services.Price * (decimal)services.Amount;
                     }
-                    item.TotalPrice = totalServicePrice;
-                    item.TotalAmount = item.TotalPrice * (decimal)item.Quantity; 
                 }
                 return RequestResult<PaginationResponse<ServiceOrderDTO>>.Succeed(new PaginationResponse<ServiceOrderDTO>()
                 {

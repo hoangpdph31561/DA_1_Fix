@@ -27,7 +27,7 @@
                             <MudTh>Checkin</MudTh>
                             <MudTh>Checkout</MudTh>
                             <MudTh>Thanh toán trước</MudTh>
-                            <MudTh>Giá</MudTh>
+                            <MudTh>Giá phòng</MudTh>
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd>@(_lstRoomBooking.IndexOf(context) + 1)</MudTd>
@@ -78,7 +78,7 @@
         var roomBookings = await roomBookingRespo.GetRoomBookingByIdCustomerAsync(customerId);
         foreach (var roomBooking in roomBookings)
         {
-            if (roomBooking.StatusRoom == RoomStatus.Vacant || roomBooking.Status == EntityStatus.Deleted)
+            if (roomBooking.Status == EntityStatus.Deleted || roomBooking.Status == EntityStatus.InActive)
             {
                 _roomBookingVM.Data.Add(roomBooking);
             }

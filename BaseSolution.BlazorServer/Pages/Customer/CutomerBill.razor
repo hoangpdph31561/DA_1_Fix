@@ -23,16 +23,18 @@
                     <HeaderContent>
                         <MudTh>STT</MudTh>
                         <MudTh>Ngày xuất</MudTh>
-                        <MudTh>Loại hóa đơn</MudTh>
+                        <MudTh>Tên phòng</MudTh>
+                        <MudTh>Giá phòng</MudTh>
                         <MudTh>Tổng tiền</MudTh>
-                        <MudTh>Trạng thái</MudTh>
+
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd>@(_lstBill.IndexOf(context) + 1)</MudTd>
                             <MudTd>@context.CreatedTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
-                            <MudTd>@context.BillType</MudTd>
+                            <MudTd>@context.RoomName</MudTd>
+                            <MudTd>@context.RoomPrice</MudTd>
                             <MudTd>@context.TotalAmount </MudTd>
-                            <MudTh><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTh>
+
                         </RowTemplate>
                     </MudTable>
                 <CustomPagination Class="my-1" HasNext="@_billVM.HasNext" OnPageChange="@(async e=> await  OnPaginationButtonClick(e))" CurrentPageNumber="@_billVM.PageNumber"></CustomPagination>
@@ -51,8 +53,8 @@
     [Inject]
     public ISnackbar snackbar { get; set; }
     private ViewBillWithPaginationRequest billRequest = new();
-    private List<BillDTO> _lstBill;
-    private PaginationResponse<BillDTO> _billVM;
+    private List<BillDtoForRoom> _lstBill;
+    private PaginationResponse<BillDtoForRoom> _billVM;
     private Guid _idBill = Guid.Empty;
     private bool _isLoadingAll = true;
     private bool _isLoadingList = true;
@@ -65,9 +67,9 @@
     }
     private async Task LoadData()
     {
-        _billVM = new PaginationResponse<BillDTO>
+        _billVM = new PaginationResponse<BillDtoForRoom>
             {
-                Data = new List<BillDTO>()
+                Data = new List<BillDtoForRoom>()
             };
 
         var bills = await billRepo.GetBillByIdCustomer(customerId);

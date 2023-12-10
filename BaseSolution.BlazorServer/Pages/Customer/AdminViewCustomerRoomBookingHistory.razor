@@ -66,10 +66,9 @@
     }
     private async Task LoadData()
     {
-        var roomBookings = await roomBookingRespo.GetAllRoomBooking(_roomBookingRequest);
+        var roomBookings = await roomBookingRespo.GetAllRoomBookingByAwait(_roomBookingRequest);
         _roomBookingVM.Data = roomBookings.Data
-        .Where(x => x.Status == EntityStatus.Active
-        || x.Status == EntityStatus.Deleted
+        .Where(x => x.Status == EntityStatus.Deleted
         || x.Status == EntityStatus.InActive).ToList();
         _lstRoomBooking = _roomBookingVM.Data!.ToList();
         _isLoadingList = false;

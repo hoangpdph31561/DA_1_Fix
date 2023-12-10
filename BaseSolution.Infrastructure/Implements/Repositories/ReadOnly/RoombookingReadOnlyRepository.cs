@@ -124,7 +124,12 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
 
                 foreach (var item in result.Data!)
                 {
-                    item.ServiceAmount = item.TotalService * item.ServicePrice;
+                    var ServiceOrderDetail = _dbContext.ServiceOrderDetails.Where(x => x.ServiceOrderId == item.ServiceOrderId && !x.Deleted).ToList();
+                    item.ServiceAmount = 0;
+                    foreach (var service in ServiceOrderDetail)
+                    {
+                        item.ServiceAmount += service.Price * (decimal)service.Amount;
+                    }
                     item.RoomAmount = UtilityExtensions.TinhTien(item.CheckInReality, item.CheckOutReality, item.RoomPrice, item.PrePaid);
                     item.TotalAmount = item.ServiceAmount + item.RoomAmount;
                 }

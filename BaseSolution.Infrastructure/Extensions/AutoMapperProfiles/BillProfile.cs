@@ -42,6 +42,7 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
                 .ForMember(des => des.TotalService, otp => otp.MapFrom(src => src.RoomBooking.RoomBookingDetails.SelectMany(x => x.ServiceOrders).SelectMany(x => x.ServiceOrderDetails).Select(x => x.ServiceId).Count()))
                 .ForMember(des => des.ServicePrice, otp => otp.MapFrom(src => src.RoomBooking.RoomBookingDetails.SelectMany(x => x.ServiceOrders).SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Price).FirstOrDefault()))
                 .ForMember(des => des.NameService, otp => otp.MapFrom(src => src.RoomBooking.RoomBookingDetails.SelectMany(x => x.ServiceOrders).SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Name).FirstOrDefault()))
+                .ForMember(des => des.ServiceOrderId, otp => otp.MapFrom(src => src.RoomBooking.RoomBookingDetails.SelectMany(x => x.ServiceOrders.Select(x => x.Id)).FirstOrDefault()))
             ;
 
             CreateMap<BillEntity, BillDtoForService>()

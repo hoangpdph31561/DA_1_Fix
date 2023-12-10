@@ -31,23 +31,8 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             try
             {
                 var getList = _appReadOnlyDbContext.ServiceOrders.AsNoTracking().ProjectTo<ServiceOrderForRoomBookingDTO>(_mapper.ConfigurationProvider);
-                var listByType = await getList.Where(c => c.RoomBookingDetailId == idRoombooking).ToListAsync();
-                List<ServiceOrderForRoomBookingDTO> lstTepRests = null;
-                lstTepRests = listByType.GroupBy(c => new
-                {
-                    c.ServiceName,
-                    c.ServiceId,
-                    c.RoomBookingDetailId,
-                    c.CustomerId,
-                }).Select(grb => new ServiceOrderForRoomBookingDTO()
-                {
-                    ServiceName = grb.Key.ServiceName,
-                    ServiceId = grb.Key.ServiceId,
-                    Quantity = grb.Count(),
-                    RoomBookingDetailId = grb.Key.RoomBookingDetailId,
-                    CustomerId = grb.Key.CustomerId
-                }).ToList();
-                return RequestResult<List<ServiceOrderForRoomBookingDTO>>.Succeed(lstTepRests);
+               
+                return RequestResult<List<ServiceOrderForRoomBookingDTO>>.Succeed(await getList.ToListAsync());
             }
             catch (Exception e)
             {

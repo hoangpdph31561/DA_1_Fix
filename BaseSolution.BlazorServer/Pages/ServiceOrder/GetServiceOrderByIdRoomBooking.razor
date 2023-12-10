@@ -13,15 +13,19 @@
         else
         {
             <MudChip Icon="@Icons.Material.Filled.Add" @onclick="async() => await OpenAdd()" Color="Color.Primary" Style="float:right">Thêm dịch vụ</MudChip>
-            <MudTable Items="_lstServiceOrder.DistinctBy(x => x.ServiceName).ToList()">
-                <RowTemplate>
-                    <MudTd>@(_lstServiceOrder.IndexOf(context) + 1)</MudTd>
-                        <MudTd>@context.ServiceName</MudTd>
-                        <MudTd>@context.Quantity</MudTd>
-                        <MudTd>
-                        </MudTd>
-                    </RowTemplate>
-                </MudTable>
+
+            @if (_lstServiceOrder.Count != 0)
+            {
+                <MudTable Items="_lstServiceOrder.First().lstServiceOrder">
+                    <RowTemplate>
+                        <MudTd>@(_lstServiceOrder.First().lstServiceOrder.IndexOf(context) + 1)</MudTd>
+                            <MudTd>@context.ServiceName</MudTd>
+                            <MudTd>@context.Amount</MudTd>
+                            <MudTd>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+            }
         }
     </DialogContent>
     <DialogActions>
@@ -41,7 +45,7 @@
     [Parameter]
     public Guid idroomBookingDetail { get; set; }
 
-     [Parameter]
+    [Parameter]
     public Guid CustomerId { get; set; }
 
 
@@ -83,7 +87,7 @@
         parameters.Add(x => x.idroomBookingDetail, idroomBookingDetail);
         var dialog = await _dialogService.ShowAsync<ServiceOrderCreateForRoomBooking>("Thêm dịch vụ", parameters);
         var result = await dialog.Result;
-      
+
         if (!result.Canceled)
         {
             await LoadData();

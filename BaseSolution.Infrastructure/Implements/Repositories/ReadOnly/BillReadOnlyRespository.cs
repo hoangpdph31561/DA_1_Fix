@@ -24,7 +24,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         private readonly ILocalizationService _localizationService;
         public BillReadOnlyRespository(AppReadOnlyDbContext appReadOnlyDbContext, IMapper mapper, ILocalizationService localizationService)
         {
-            _appReadOnlyDbContext = appReadOnlyDbContext;   
+            _appReadOnlyDbContext = appReadOnlyDbContext;
             _mapper = mapper;
             _localizationService = localizationService;
         }
@@ -58,8 +58,15 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             {
                 var bill = await _appReadOnlyDbContext.Bills.AsNoTracking().Where(c => c.Id == id && !c.Deleted).ProjectTo<BillDtoForRoom>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(cancellationToken);
-                bill.ServiceAmount = bill.TotalService * bill.ServicePrice;
-                bill.TotalAmount = bill.ServiceAmount + UtilityExtensions.TinhTien(bill.CheckInReality, bill.CheckOutReality, bill.RoomPrice, bill.PrePaid);
+
+                var ServiceOrderDetail = _appReadOnlyDbContext.ServiceOrderDetails.Where(x => x.ServiceOrderId == bill.ServiceOrderId && !x.Deleted).ToList();
+                bill.ServiceAmount = 0;
+                foreach (var service in ServiceOrderDetail)
+                {
+                    bill.ServiceAmount += service.Price * (decimal)service.Amount;
+                }
+                bill.RoomAmount = UtilityExtensions.TinhTien(bill.CheckInReality, bill.CheckOutReality, bill.RoomPrice, bill.PrePaid);
+                bill.TotalAmount = bill.ServiceAmount + bill.RoomAmount;
                 return RequestResult<BillDtoForRoom?>.Succeed(bill);
             }
             catch (Exception e)
@@ -83,11 +90,13 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                     .Where(c => c.CustomerId == idCustomer && !c.Deleted)
                     .ProjectTo<BillDtoForRoom>(_mapper.ConfigurationProvider)
                     .ToListAsync(cancellationToken);
+
                 foreach (var bill in bills)
                 {
                     bill.TotalAmount = bill.ServiceAmount + UtilityExtensions.TinhTien(bill.CheckInReality, bill.CheckOutReality, bill.RoomPrice, bill.PrePaid);
                 }
                 return RequestResult<List<BillDtoForRoom>>.Succeed(bills);
+
             }
             catch (Exception e)
             {
@@ -180,7 +189,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                var query =  _appReadOnlyDbContext.Bills.AsNoTracking().Where(x => !x.Deleted).ProjectTo<BillDTO>(_mapper.ConfigurationProvider);
+                var query = _appReadOnlyDbContext.Bills.AsNoTracking().Where(x => !x.Deleted).ProjectTo<BillDTO>(_mapper.ConfigurationProvider);
 
 
                 if (!string.IsNullOrWhiteSpace(request.SearchString))
@@ -232,9 +241,15 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                     query = query.Where(x => x.CustomerName == request.SearchString);
                 }
                 var result = await query.Where(x => x.StatusRoomBooking == EntityStatus.InActive).PaginateAsync(request, cancellationToken);
+
                 foreach (var item in result.Data!)
                 {
-                    item.ServiceAmount = item.TotalService * item.ServicePrice;
+                    var ServiceOrderDetail = _appReadOnlyDbContext.ServiceOrderDetails.Where(x => x.ServiceOrderId == item.ServiceOrderId &&!x.Deleted).ToList();
+                    item.ServiceAmount = 0;
+                    foreach (var service in ServiceOrderDetail)
+                    {
+                        item.ServiceAmount += service.Price * (decimal)service.Amount;
+                    }
                     item.RoomAmount = UtilityExtensions.TinhTien(item.CheckInReality, item.CheckOutReality, item.RoomPrice, item.PrePaid);
                     item.TotalAmount = item.ServiceAmount + item.RoomAmount;
                 }
@@ -269,7 +284,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 {
                     query = query.Where(x => x.CustomerName == request.SearchString);
                 }
-                var result = await query.Where(x => x.StatusServicerOrder == EntityStatus.InActive && x.RoomBookingDetailId == null ).PaginateAsync(request, cancellationToken);
+                var result = await query.Where(x => x.StatusServicerOrder == EntityStatus.InActive && x.RoomBookingDetailId == null).PaginateAsync(request, cancellationToken);
                 decimal totalServicePrice = 0;
                 foreach (var item in result.Data!)
                 {

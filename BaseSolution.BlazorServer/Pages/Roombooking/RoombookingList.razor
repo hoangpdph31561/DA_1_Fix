@@ -121,9 +121,9 @@
             if (!result.Canceled)
             {
                 await LoadData();
-                
+
             }
-            
+
             StateHasChanged();
         }
         catch (Exception)
@@ -159,25 +159,42 @@
     }
     private async Task Pay(Guid idRoomBooking, Guid idCustomer, Guid ServiceOrderId)
     {
-        Guid? ServiceOrder;
-        if(ServiceOrderId == Guid.Empty)
+
+        var confirm = await _dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận thanh toán?",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
         {
-            ServiceOrder = null;
+            Guid? ServiceOrder;
+            if (ServiceOrderId == Guid.Empty)
+            {
+                ServiceOrder = null;
+            }
+            else
+            {
+                ServiceOrder = ServiceOrderId;
+            }
+            var bill = new BillCreateRequest
+                {
+                    CustomerId = idCustomer,
+                    ServiceOrderId = ServiceOrder,
+                    RoomBookingId = idRoomBooking
+                };
+            await billRepo.CreateNewBill(bill);
+            _snackbar.Add("Đã thanh toán ! Vui lòng xem thông tin ở quản lí hóa đơn ", Severity.Info);
+            await LoadData();
+            StateHasChanged();
         }
         else
         {
-            ServiceOrder = ServiceOrderId;
+            _snackbar.Add("Thanh toán đã được hủy", Severity.Info);
+
         }
-        var bill = new BillCreateRequest
-            {
-                CustomerId = idCustomer,
-                ServiceOrderId = ServiceOrder,
-                RoomBookingId = idRoomBooking
-            };
-        await billRepo.CreateNewBill(bill);
-        _snackbar.Add("Đã thanh toán ! Vui lòng xem thông tin ở quản lí hóa đơn ", Severity.Info);
-        await LoadData();
-        StateHasChanged();
+
     }
 
     #endregion

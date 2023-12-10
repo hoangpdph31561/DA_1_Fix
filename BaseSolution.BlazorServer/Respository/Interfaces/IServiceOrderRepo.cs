@@ -10,9 +10,7 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
         Task<PaginationResponse<ServiceOrderDTO>> GetAllServices(ViewServiceOrderWithPaginationRequest request);
         Task<bool> CreateNewService(ServiceOrderCreateRequest request);
         Task<bool> CreateServiceForRoomBooking(ServiceOrderCreateForRoomBookingRequest request);
-        Task<bool> CreateServiceForCustomer(ServiceOrderCreateForCustomerRequest request);
         Task<List<ServiceOrderForRoomBookingDTO>> GetServiceOrderByIdRoomBooking(Guid id);
-        Task<List<ServiceOrderForServiceOrderDTO>> GetServiceOrderByIdCustomer(Guid id);
         Task<ServiceOrderDTO> GetServiceOrderById(Guid id);
         Task<bool> UpdateServiceOrder(ServiceOrderUpdateRequest request);
     }

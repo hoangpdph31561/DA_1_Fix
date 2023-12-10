@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BaseSolution.Application.DataTransferObjects.AmenityRoomDetail.Request;
 using BaseSolution.Application.DataTransferObjects.Role.Request;
 using BaseSolution.Application.DataTransferObjects.RoomBookingDetail.Request;
 using BaseSolution.Application.DataTransferObjects.ServiceOrder;
@@ -7,6 +8,8 @@ using BaseSolution.Application.DataTransferObjects.ServiceOrderDetail.Request;
 using BaseSolution.Application.Interfaces.Repositories.ReadOnly;
 using BaseSolution.Application.Interfaces.Repositories.ReadWrite;
 using BaseSolution.Application.Interfaces.Services;
+using BaseSolution.Infrastructure.Implements.Repositories.ReadWrite;
+using BaseSolution.Infrastructure.ViewModels.AmenityRoomDetail;
 using BaseSolution.Infrastructure.ViewModels.ServiceOrderDetail;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -112,6 +115,17 @@ namespace BaseSolution.API.Controllers
             ServiceOrderDetailDeleteViewModel vm = new(_serviceOrderDetailReadWrite, _localizationService);
             await vm.HandleAsync(request,cancellationToken);
             return Ok(vm);
+        }
+        [HttpPut("createUpdateDeleteServiceOrderDetail")]
+        public async Task<IActionResult> CreateUpdateDeleteServiceOrderDetail(List<ServiceOrderCreateUpdateDeleteRequest> request, CancellationToken cancellationToken)
+        {
+            ServiceOrderCreateUpdateDeleteViewModel vm = new(_serviceOrderDetailReadWrite, _localizationService);
+            await vm.HandleAsync(request, cancellationToken);
+            if (vm.Success)
+            {
+                return Ok(vm);
+            }
+            return BadRequest(vm);
         }
     }
 }

@@ -58,7 +58,7 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
                      new RoomBookingDetailEntity
                      {
                          RoomDetailId = src.RoomDetailId,
-                          CheckOutReality = src.CheckOutBooking
+                          CheckOutReality = src.CheckOutReality
                      }
                 }))
                 .ForMember(des => des.CustomerId, opt => opt.MapFrom(src => src.CustomerId))

@@ -50,6 +50,7 @@ builder.Services.AddSingleton<CustomerCreateRequest>();
 builder.Services.AddSingleton<IdCustomer>();
 builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+builder.Services.AddScoped<IServiceOrderDetailRespo, ServiceOrderDetailRespo>();
 
 
 #endregion

@@ -4,14 +4,20 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.Bill
 {
     public class BillDtoForService
     {
-        public Guid CustomerId { get; set; } // map được sẵn 
         public Guid Id { get; set; }
-        public DateTimeOffset CreatedTime { get; set; }
-        public string CustomerName { get; set; }
-        public int TotalService { get; set; }
+        public Guid ServiceOrderId { get; set; }
+        public EntityStatus StatusServicerOrder { get; set; }
+        public double Quantity { get; set; } // số lượng 
+        public decimal Price { get; set; }
+        public decimal TotalPrice { get; set; } // tổng tiền của từng cái 
+        public decimal TotalAmount { get; set; }
         public EntityStatus Status { get; set; }
-        public decimal ServicePrice { get; set; }
-        public string NameService { get; set; }
-        public decimal ServiceAmount { get; set; }
+        public DateTimeOffset CreatedTime { get; set; }
+        // base on 
+        public string CustomerName { get; set; }  // Tên khách hàng
+        public Guid CustomerId { get; set; }
+        public Guid ServiceId { get; set; }
+        public string ServiceName { get; set; }
+        public Guid? RoomBookingDetailId { get; set; } // đặt dịch vụ cho phòng  
     }
 }

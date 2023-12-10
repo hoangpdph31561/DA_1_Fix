@@ -9,6 +9,7 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Service;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceOrder.Request;
+@using BaseSolution.BlazorServer.Pages.ServiceOrderDetail;
 @using BaseSolution.BlazorServer.Respository.Interfaces;
 <PageTitle>Quản lý tiện ích khách sạn</PageTitle>
 <CustomListDisplayP2 Label="@("Danh sách các dịch vụ đã đặt ")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
@@ -32,23 +33,19 @@
                         <HeaderContent>
                             <MudTh>STT</MudTh>
                             <MudTh>Khách hàng</MudTh>
-                            <MudTh>Dịch vụ</MudTh>
                             <MudTh>Ngày đặt</MudTh>
                             <MudTh>Số lượng</MudTh>
-                            <MudTh>Gía</MudTh>
                             <MudTh>Tổng tiền</MudTh>
                             <MudTh>Hành động</MudTh>
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd>@(lstServiceOrder.IndexOf(context) + 1)</MudTd>
                                 <MudTd>@context.CustomerName</MudTd>
-                                <MudTh>@context.ServiceName</MudTh>
                                 <MudTh>@context.CreatedTime.DateTime</MudTh>
-                                <MudTh>@context.Quantity <MudChip Icon="@Icons.Material.Filled.ListAlt" OnClick="@(() => OpenService(context.CustomerId))"></MudChip></MudTh>
-                                <MudTh>@context.Price</MudTh>
+                                <MudTh>@context.Quantity <MudChip Icon="@Icons.Material.Filled.ListAlt" OnClick="@(() => OpenService(context.Id))"></MudChip></MudTh>
                                 <MudTh>@context.TotalAmount</MudTh>
                                 <MudTd>
-                                    <MudChip Color="Color.Primary" OnClick="@(() => OpenDetail(context.CustomerId,context.Id))" Disabled="@_isDisableControls">Thanh toán</MudChip>
+                                    <MudChip Color="Color.Primary" OnClick="@(() => Pay(context.CustomerId,context.Id))" Disabled="@_isDisableControls">Thanh toán</MudChip>
                                 </MudTd>
                             </RowTemplate>
                         </MudTable>
@@ -101,38 +98,53 @@
     {
         _isLoadingList = true;
         request.PageNumber = 1;
-        request.SearchString= searchString;
+        request.SearchString = searchString;
         await LoadData();
     }
-    private async Task OpenDetail(Guid CustomerId, Guid idServiceOrder)
+    private async Task Pay(Guid CustomerId, Guid idServiceOrder)
     {
-        bool checkServiceForRoombooking = lstServiceOrder.Any(x => x.Id == idServiceOrder && x.RoomBookingDetailId != null);
-        if(checkServiceForRoombooking)
+        var confirm = await _dialogService.ShowMessageBox
+       (
+           "Thông báo",
+           "Xác nhận thanh toán?",
+           "Xác nhận",
+           cancelText: "Hủy"
+       );
+        if (confirm == true)
         {
-            _snackbar.Add("Dịch vụ này được đặt theo phòng! Vui lòng thanh toán theo phòng.", Severity.Info);
+            bool checkServiceForRoombooking = lstServiceOrder.Any(x => x.Id == idServiceOrder && x.RoomBookingDetailId != null);
+            if (checkServiceForRoombooking)
+            {
+                _snackbar.Add("Dịch vụ này được đặt theo phòng! Vui lòng thanh toán theo phòng.", Severity.Info);
+            }
+            else
+            {
+                var bill = new BillCreateRequest
+                    {
+                        CustomerId = CustomerId,
+                        ServiceOrderId = idServiceOrder,
+                        RoomBookingId = null
+                    };
+                await billRepo.CreateNewBill(bill);
+                _snackbar.Add("Đã thanh toán ! Vui lòng xem thông tin ở quản lí hóa đơn ", Severity.Info);
+                await LoadData();
+                StateHasChanged();
+            }
         }
         else
         {
-            var bill = new BillCreateRequest
-                {
-                    CustomerId = CustomerId,
-                    ServiceOrderId = idServiceOrder,
-                    RoomBookingId = null
-                };
-            await billRepo.CreateNewBill(bill);
-            _snackbar.Add("Đã thanh toán ! Vui lòng xem thông tin ở quản lí hóa đơn ", Severity.Info);
-            await LoadData();
-            StateHasChanged();
+            _snackbar.Add("Thanh toán đã được hủy", Severity.Info);
+
         }
     }
 
-    private async Task OpenService( Guid CustomerId)
+    private async Task OpenService(Guid idServiceOrder)
     {
         try
         {
-            var parameters = new DialogParameters<GetServiceOrderByIdCustomer>();
-            parameters.Add(x => x.CustomerId, CustomerId);
-            var dialog = await _dialogService.ShowAsync<GetServiceOrderByIdCustomer>("Danh sách dịch vụ", parameters);
+            var parameters = new DialogParameters<ServiceOrderDetailView>();
+            parameters.Add(x => x.idServiceOrder, idServiceOrder);
+            var dialog = await _dialogService.ShowAsync<ServiceOrderDetailView>("Danh sách dịch vụ", parameters);
             var result = await dialog.Result;
             if (!result.Canceled)
             {
@@ -150,7 +162,7 @@
     #region Code event
     private async Task OpenAdd()
     {
-        var dialog = await _dialogService.ShowAsync<ServicerOrderCreate>("Thêm dịch vụ đã đặt");
+        var dialog = await _dialogService.ShowAsync<ServicerOrderCreate>("Thêm dịch vụ đặt");
         var result = await dialog.Result;
         if (!result.Canceled)
         {

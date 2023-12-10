@@ -78,20 +78,6 @@ namespace BaseSolution.API.Controllers
             }
             return BadRequest(vm);
         }
-
-          [HttpGet("GetServiceOrdersByIdCustomer")]
-        public async Task<IActionResult> GetServiceOrdersByIdCustomer(Guid idCustomer, CancellationToken cancellationToken)
-        {
-            ServiceOrderListWithPaginationByIdCustomerViewModel vm = new(_serviceOrderReadOnly, _localizationService);
-            await vm.HandleAsync(idCustomer, cancellationToken);
-            if(vm.Success)
-            {
-                List<ServiceOrderForServiceOrderDTO> result = (List<ServiceOrderForServiceOrderDTO>)vm.Data;
-                return Ok(result);
-            }
-            return BadRequest(vm);
-        }
-
         [HttpPost]
         public async Task<IActionResult> CreateNewServiceOrder(ServiceOrderCreateRequest request, CancellationToken cancellationToken)
         {
@@ -115,18 +101,6 @@ namespace BaseSolution.API.Controllers
             await vm.HandleAsync(request, cancellationToken);
             return Ok(vm);
         }
-
-
-          [HttpPost("CreateNewServiceOrderForCustomer")]
-        public async Task<IActionResult> CreateNewServiceOrderForCustomer(ServiceOrderCreateForCustomerRequest request, CancellationToken cancellationToken)
-        {
-
-            CreateNewServiceOrderForCustomerViewModel vm = new(_serviceOrderReadOnly, _serviceOrderReadWrite, _mapper, _localizationService);
-            await vm.HandleAsync(request, cancellationToken);
-            return Ok(vm);
-        }
-
-
         [HttpPut]
         public async Task<IActionResult> UpdateServiceOrder (ServiceOrderUpdateRequest request, CancellationToken cancellationToken)
         {

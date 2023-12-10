@@ -61,40 +61,6 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 });
             }
         }
-         public async Task<RequestResult<List<ServiceOrderForServiceOrderDTO>>> GetServiceOrderByIdCustomerAsync(Guid idCustomer, CancellationToken cancellationToken)
-        {
-            try
-            {
-                var getList = _appReadOnlyDbContext.ServiceOrders.AsNoTracking().ProjectTo<ServiceOrderForServiceOrderDTO>(_mapper.ConfigurationProvider);
-                var listByType = await getList.Where(c => c.CustomerId == idCustomer).ToListAsync();
-                List<ServiceOrderForServiceOrderDTO> lstTepRests = null;
-                lstTepRests = listByType.GroupBy(c => new
-                {
-                    c.ServiceName,
-                    c.ServiceId,
-                    c.CustomerId,
-                }).Select(grb => new ServiceOrderForServiceOrderDTO()
-                {
-                    ServiceName = grb.Key.ServiceName,
-                    ServiceId = grb.Key.ServiceId,
-                    Quantity = grb.Count(),
-                    CustomerId = grb.Key.CustomerId
-                }).ToList();
-                return RequestResult<List<ServiceOrderForServiceOrderDTO>>.Succeed(lstTepRests);
-            }
-            catch (Exception e)
-            {
-                return RequestResult<List<ServiceOrderForServiceOrderDTO>>.Fail(_localizationService["ServiceOrder is not found"], new[]
-                {
-                    new ErrorItem
-                    {
-                        Error = e.Message,
-                        FieldName = LocalizationString.Common.FailedToGet + "ServiceOrder"
-                    }
-                });
-            }
-        }
-
         public async Task<RequestResult<ServiceOrderDTO?>> GetServiceOrderByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             try
@@ -128,38 +94,28 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                 {
                     query = query.Where(x => x.CustomerName.Contains(request.SearchString!));
                 }
+                var service = _appReadOnlyDbContext.Services.ToList();
+                foreach (var services in service)
+                {
+                    var serviceOrderDetail = _appReadOnlyDbContext.ServiceOrderDetails.FirstOrDefault(x => x.ServiceId == services.Id);
+                    if (serviceOrderDetail != null)
+                    {
+                        serviceOrderDetail.Price = services.Price;
+                        _appReadOnlyDbContext.ServiceOrderDetails.Update(serviceOrderDetail);
+                        _appReadOnlyDbContext.SaveChanges();
+                    }
+                }
                 var result = await query.Where(x => x.Status != EntityStatus.InActive && x.RoomBookingDetailId == null).PaginateAsync(request, cancellationToken);
-
-                List<ServiceOrderDTO> lstTepRests = null;
-                lstTepRests = result.Data!.GroupBy(c => new
+                foreach (var item in result.Data!)
                 {
-                    c.Price,
-                    c.ServiceName,
-                    c.CustomerName,
-                    c.CustomerId,
-                    c.ServiceId,
-                    c.Status,
-                    c.RoomBookingDetailId,
-                }).Select(grb => new ServiceOrderDTO()
-                {
-                    Price = grb.Key.Price,
-                    ServiceName = grb.Key.ServiceName,
-                    CustomerName = grb.Key.CustomerName,
-                    CustomerId = grb.Key.CustomerId,
-                    ServiceId = grb.Key.ServiceId,
-                    Quantity = grb.Count(),
-                    TotalAmount = grb.Key.Price * grb.Count(),
-                    Status = grb.Key.Status,
-                    Id = result.Data!.Where(x => x.CustomerId == grb.Key.CustomerId).Select(x => x.Id).FirstOrDefault(),
-                    CreatedTime = result.Data!.Where(x => x.CustomerId == grb.Key.CustomerId).Select(x => x.CreatedTime).FirstOrDefault(),
-                    RoomBookingDetailId = grb.Key.RoomBookingDetailId
-                }).ToList();
+                    item.TotalAmount = item.Price * (decimal)item.Quantity;
+                }
                 return RequestResult<PaginationResponse<ServiceOrderDTO>>.Succeed(new PaginationResponse<ServiceOrderDTO>()
                 {
                     PageNumber = request.PageNumber,
                     PageSize = request.PageSize,
                     HasNext = result.HasNext,
-                    Data = lstTepRests
+                    Data = result.Data
                 });
             }
             catch (Exception e)
@@ -179,44 +135,41 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             try
             {
                 var query = _appReadOnlyDbContext.ServiceOrders.AsNoTracking().Where(x => !x.Deleted).ProjectTo<ServiceOrderDTO>(_mapper.ConfigurationProvider);
-
                 if (!string.IsNullOrWhiteSpace(request.SearchString))
                 {
                     query = query.Where(x => x.CustomerName.Contains(request.SearchString!));
                 }
-                    var result = await query.Where(x => x.Status != EntityStatus.InActive && x.RoomBookingDetailId == null).PaginateAsync(request, cancellationToken);
-
-                List<ServiceOrderDTO> lstTepRests = null;
-                lstTepRests = result.Data!.GroupBy(c => new
+                // get giá để lưu vào ServiceOrderDetails
+                var service = _appReadOnlyDbContext.Services.ToList();
+                foreach (var services in service)
                 {
-                    c.Price,
-                    c.ServiceName,
-                    c.CustomerName,
-                    c.CustomerId,
-                    c.ServiceId,
-                    c.Status,
-                    c.RoomBookingDetailId
-                }).Select(grb => new ServiceOrderDTO()
+                    var serviceOrderDetail = _appReadOnlyDbContext.ServiceOrderDetails.FirstOrDefault(x => x.ServiceId == services.Id);
+                    if (serviceOrderDetail != null)
+                    {
+                        serviceOrderDetail.Price = services.Price;
+                        _appReadOnlyDbContext.ServiceOrderDetails.Update(serviceOrderDetail);
+                        _appReadOnlyDbContext.SaveChanges();
+                    }
+                }
+                var result = await query.Where(x => x.Status != EntityStatus.InActive && x.RoomBookingDetailId == null).PaginateAsync(request, cancellationToken);
+                decimal totalServicePrice = 0;
+                foreach (var item in result.Data!)
                 {
-                    Price = grb.Key.Price,
-                    ServiceName = grb.Key.ServiceName,
-                    CustomerName = grb.Key.CustomerName,
-                    CustomerId = grb.Key.CustomerId,
-                    ServiceId = grb.Key.ServiceId,
-                    Quantity = grb.Count(),
-                    TotalAmount = grb.Key.Price * grb.Count(),
-                    Status = grb.Key.Status,
-                    RoomBookingDetailId = grb.Key.RoomBookingDetailId,
-                    Id = result.Data!.Where(x => x.CustomerId == grb.Key.CustomerId).Select(x => x.Id).FirstOrDefault(),
-                    CreatedTime = result.Data!.Where(x => x.CustomerId == grb.Key.CustomerId).Select(x => x.CreatedTime).FirstOrDefault(),
-
-                }).ToList();
+                    var serviceOrderDetail = _appReadOnlyDbContext.ServiceOrderDetails.Where(x => x.ServiceOrderId == item.Id && !x.Deleted).ToList();
+                    foreach (var services in serviceOrderDetail)
+                    {
+                        decimal servicePrice = services.Price * (decimal)services.Amount;
+                        totalServicePrice += servicePrice;
+                    }
+                    item.TotalPrice = totalServicePrice;
+                    item.TotalAmount = item.TotalPrice * (decimal)item.Quantity; 
+                }
                 return RequestResult<PaginationResponse<ServiceOrderDTO>>.Succeed(new PaginationResponse<ServiceOrderDTO>()
                 {
                     PageNumber = request.PageNumber,
                     PageSize = request.PageSize,
                     HasNext = result.HasNext,
-                    Data = lstTepRests
+                    Data = result.Data
                 });
             }
             catch (Exception e)

@@ -26,6 +26,7 @@ namespace BaseSolution.Application.DataTransferObjects.Roombooking
         public int TotalService { get; set; } // tổng số lượng của từng dịch vụ 
         public string NameService { get; set; }
         public decimal TotalAmount { get; set; }
+        public decimal TotalPrice { get; set; }
         public decimal PrePaid { get; set; } 
         public DateTimeOffset CreatedTime { get; set; }
 

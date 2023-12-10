@@ -112,7 +112,7 @@
         var roomBookings = await _roomBookingRepo.GetRoomBookingByIdCustomerAsync(customerId);
         foreach (var roomBooking in roomBookings)
         {
-            if (roomBooking.StatusRoom == RoomStatus.Occupied || roomBooking.StatusRoom == RoomStatus.AwaitingConfirmation)
+            if (roomBooking.StatusRoom == RoomStatus.Reserved || roomBooking.StatusRoom == RoomStatus.AwaitingConfirmation)
             {
                 _roomBookingVM.Data.Add(roomBooking);
             }

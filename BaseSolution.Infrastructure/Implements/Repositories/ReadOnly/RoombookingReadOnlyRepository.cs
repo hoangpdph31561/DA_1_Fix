@@ -118,7 +118,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
 
                 if (!string.IsNullOrWhiteSpace(request.SearchString))
                 {
-                    query = query.Where(x => x.NameCustomer.Contains(request.SearchString!));
+                    query = query.Where(x => x.NameRoom.Contains(request.SearchString!));
                 }
                 var result = await query.PaginateAsync(request, cancellationToken);
 

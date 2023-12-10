@@ -47,6 +47,7 @@
                                 <MudTh>@context.BookingType</MudTh>
                                 <MudTh>@context.TotalService <MudChip Icon="@Icons.Material.Filled.ListAlt" OnClick="@(() => OpenService(context.RoomBookingDetailId,context.CustomerId))"></MudChip></MudTh>
                                 <MudTh>@context.TotalAmount</MudTh>
+
                                 <MudTd><BadgeRoomStatus Status="@context.StatusRoom"></BadgeRoomStatus></MudTd>
                                 <MudTd>
                                     <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@(() => OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>

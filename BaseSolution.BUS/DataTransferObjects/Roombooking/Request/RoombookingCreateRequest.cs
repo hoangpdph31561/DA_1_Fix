@@ -13,6 +13,7 @@ namespace BaseSolution.Application.DataTransferObjects.Roombooking.Request
         public string CodeBooking { get; set; }
         public DateTimeOffset CheckInBooking { get; set; }
         public DateTimeOffset CheckOutBooking { get; set; }
+        public decimal Price { get; set; }
 
 
         public class RoomBookingValication : AbstractValidator<RoombookingCreateRequest>

@@ -91,6 +91,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                             ServiceOrderId = serviceOrderId,
                             Amount = item.Amount,
                             CreatedTime = DateTimeOffset.UtcNow,
+                            Price = _appReadWriteDbContext.ServiceOrderDetails.FirstOrDefault(x => x.ServiceId == item.ServiceId)!.Price
                         };
                         await _appReadWriteDbContext.ServiceOrderDetails.AddAsync(entity);
                     }

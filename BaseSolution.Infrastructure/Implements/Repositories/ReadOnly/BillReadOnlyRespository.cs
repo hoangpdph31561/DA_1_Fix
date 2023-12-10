@@ -235,7 +235,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
 
                 if (!string.IsNullOrWhiteSpace(request.SearchString))
                 {
-                    query = query.Where(x => x.CustomerName == request.SearchString);
+                    query = query.Where(x => x.CustomerName.Contains(request.SearchString));
                 }
                 var result = await query.Where(x => x.StatusRoomBooking == EntityStatus.InActive).PaginateAsync(request, cancellationToken);
 
@@ -279,7 +279,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
 
                 if (!string.IsNullOrWhiteSpace(request.SearchString))
                 {
-                    query = query.Where(x => x.CustomerName == request.SearchString);
+                    query = query.Where(x => x.CustomerName.Contains(request.SearchString));
                 }
                 var result = await query.Where(x => x.StatusServicerOrder == EntityStatus.InActive && x.RoomBookingDetailId == null).PaginateAsync(request, cancellationToken);
                 foreach (var item in result.Data!)

@@ -37,7 +37,7 @@
         if (_lstBillStatisticDto != null)
         {
             var s1 = _lstBillStatisticDto.Select(gs => gs.Month).ToList();
-            var s2 = _lstBillStatisticDto.Select(gs => gs.TotalAmountForMonth).ToList();
+            var s2 = _lstBillStatisticDto.Select(gs => gs.TotalAll).ToList();
             await jsRuntime.InvokeVoidAsync("createBillStatistic", labels, s1, s2);
         }
     }

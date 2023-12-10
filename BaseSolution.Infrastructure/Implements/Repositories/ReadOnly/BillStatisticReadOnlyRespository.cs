@@ -28,14 +28,23 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             try
             {
                 var query = await _dbContext.Bills.Where(x => x.Status != EntityStatus.Deleted).ProjectTo<BillStatisticDto>(_mapper.ConfigurationProvider).PaginateAsync(request, cancellationToken);
+
                 List<BillStatisticDto> lstRests = query.Data!.ToList();
 
                 foreach (var item in lstRests)
                 {
-                    item.RoomAmount = (float)item.RoomPrice * item.TotalRoom;
-                    item.ServiceAmount = (float)item.ServicePrice * item.TotalService;
-                    item.TotalAmount = item.ServiceAmount + (float)item.RoomPrice;
+                    var serviceOrderDetail = _dbContext.ServiceOrderDetails
+                        .Where(x => x.ServiceOrderId == item.ServiceOrderId && !x.Deleted)
+                        .ToList();
+
+                    item.TotalAmountForService = serviceOrderDetail.Sum(s => s.Price * (decimal)s.Amount);
+                    item.ServiceAmountForRoom = item.TotalAmountForService;
+
+                    item.RoomAmount = UtilityExtensions.TinhTien(item.CheckInReality, item.CheckOutReality, item.RoomPrice, item.PrePaid);
+                    item.TotalAmount = item.ServiceAmountForRoom + item.RoomAmount;
+                    item.TotalAll = item.TotalAmount + item.TotalAmountForService;
                 }
+
                 List<BillStatisticDto> lstTepRests = null;
                 List<BillStatisticDto> totalAmountForMonth = null;
 
@@ -44,35 +53,20 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
                     lstTepRests = lstRests.GroupBy(c => new
                     {
                         c.Month,
-                        c.RoomPrice,
-                        c.ServicePrice,
-                        c.TotalService,
-                        c.TotalRoom,
-                        c.ServiceAmount,
-                        c.TotalAmount,
-                        c.RoomAmount
+                        c.TotalAll,
                     })
               .Select(gcs => new BillStatisticDto()
               {
                   Month = gcs.Key.Month,
-                  RoomPrice = gcs.Key.RoomPrice,
-                  ServicePrice = gcs.Key.ServicePrice,
-                  TotalService = gcs.Key.TotalService,
-                  TotalRoom = gcs.Key.TotalRoom,
-                  ServiceAmount = gcs.Key.ServiceAmount,
-                  TotalAmount = gcs.Key.TotalAmount,
-                  RoomAmount = gcs.Key.RoomAmount,
-                  TotalAmountForMonth = (int)gcs.Sum(x => x.TotalAmount),
-              }).OrderBy(x => x.Month).ToList();
-                
+                  TotalAll = gcs.Key.TotalAll
+              }).ToList();
 
                      totalAmountForMonth = lstTepRests.GroupBy(x => x.Month)
                                     .Select(g => new BillStatisticDto
                                     {
                                         Month = g.Key,
-                                        TotalAmountForMonth = g.Sum(x => x.TotalAmountForMonth)
+                                        TotalAll = g.Sum(x => x.TotalAll)
                                     }).ToList();
-
 
                 }
                 return RequestResult<List<BillStatisticDto>>.Succeed(totalAmountForMonth);

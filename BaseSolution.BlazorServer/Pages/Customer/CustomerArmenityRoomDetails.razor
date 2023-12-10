@@ -12,7 +12,7 @@
         }
         else
         {
-            <MudTable Items="lstAmenityRoomDetail">
+            <MudTable Items="lstAmenityRoomDetail" Style="height: 40vh; overflow: auto;" Hover="true">
                 <HeaderContent>
                     <MudTh>Tên tiện ích</MudTh>
                     <MudTh>Số lượng của tiện ích</MudTh>
@@ -21,8 +21,7 @@
                     <MudTd>@context.NameOfAmenity</MudTd>
                     <MudTd>@context.Amount</MudTd>
                 </RowTemplate>
-                
-                </MudTable>
+            </MudTable>
         }
     </DialogContent>
     <DialogActions>
@@ -57,7 +56,10 @@
     private RoomTypeDTO? _roomTypeInfo;
     private PaginationResponse<AmenityRoomDetailDTO> _amenityRoomDetail;
     private List<AmenityRoomDetailDTO>? lstAmenityRoomDetail;
-    private ViewAmenityRoomDetailWithPaginationRequest amenityRoomDetailRequest = new();
+    private ViewAmenityRoomDetailWithPaginationRequest amenityRoomDetailRequest = new()
+    {
+            PageSize = int.MaxValue - 1,
+    };
     #endregion
     protected async override Task OnInitializedAsync()
     {
@@ -68,7 +70,7 @@
         _roomTypeInfo = await roomTypeRespo.GetRoomTypeById(idRoomType);
         amenityRoomDetailRequest.RoomTypeId = idRoomType;
         _amenityRoomDetail = await amenityRoomDetailRepo.GetAllAmentityRoomDetail(amenityRoomDetailRequest);
-        lstAmenityRoomDetail = _amenityRoomDetail.Data?
+        lstAmenityRoomDetail = _amenityRoomDetail.Data!
          .GroupBy(a => a.NameOfAmenity) // Nhóm các tiện ích theo tên
          .Select(g => g.First()) // Chỉ lấy bản ghi đầu tiên trong mỗi nhóm
          .ToList();

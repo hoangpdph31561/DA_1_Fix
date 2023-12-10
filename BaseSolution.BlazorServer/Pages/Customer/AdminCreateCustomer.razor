@@ -48,21 +48,31 @@
         );
         if (confirm == true)
         {
-            _customerCreate.Status = EntityStatus.Active;
-            var result = await customerRepo.CreateCustomer(_customerCreate);
-            if (result == true)
+            var checkIdenAndEmail = await customerRepo.GetIdentificationNumber(_customerCreate.IdentificationNumber);
+            var checkEmailExist = await customerRepo.GetEmailAsync(_customerCreate.Email);
+            if (checkIdenAndEmail.IdentificationNumber == "" && checkEmailExist.Email == "")
             {
-                MudDialog.Close(DialogResult.Ok(true));
-                _snackbar.Add("Thêm thành công", Severity.Success);
+                _customerCreate.Status = EntityStatus.Active;
+                var result = await customerRepo.CreateCustomer(_customerCreate);
+                if (result == true)
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    _snackbar.Add("Thêm thành công", Severity.Success);
+                }
+                else
+                {
+                    OnClickCancel();
+                    _snackbar.Add
+                    (
+                        "Thêm thất bại",
+                         Severity.Error
+                    );
+                }
             }
             else
             {
-                OnClickCancel();
-                _snackbar.Add
-                (
-                    "Thêm thất bại",
-                     Severity.Error
-                );
+
+                _snackbar.Add("Mã định danh và Email là duy nhất của mỗi người. Vui lòng nhập lại!", Severity.Info);
             }
             Reset();
         }

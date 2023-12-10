@@ -20,7 +20,7 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             string url = $"/api/Customers?PageNumber={request.PageNumber}&PageSize={request.PageSize}";
             if (!String.IsNullOrEmpty(request.Name))
             {
-                url = $"/api/Customers?Name={request.Name}&PageNumber={request.Name}&PageNumber={request.PageNumber}&PageSize={request.PageSize}";
+                url = $"/api/Customers?Name={request.Name}&PageNumber={request.PageNumber}&PageSize={request.PageSize}";
             }
             var result = await _httpClient.GetFromJsonAsync<PaginationResponse<CustomerDTO>>(url);
             return result;

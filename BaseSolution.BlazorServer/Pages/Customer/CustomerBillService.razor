@@ -23,6 +23,8 @@
                     <HeaderContent>
                         <MudTh>STT</MudTh>
                         <MudTh>Ngày xuất</MudTh>
+                        <MudTh>Tên dịch vụ</MudTh>
+                        <MudTh>Số lượng</MudTh>
                         <MudTh>Tổng tiền</MudTh>
 
                     </HeaderContent>
@@ -30,6 +32,7 @@
                         <MudTd>@(_lstBill.IndexOf(context) + 1)</MudTd>
                         <MudTd>@context.CreatedTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
                             <MudTd>@context.ServiceName</MudTd>
+                            <MudTd>@context.Quantity</MudTd>
                             <MudTd>@context.TotalAmount </MudTd>
 
                         </RowTemplate>
@@ -73,7 +76,7 @@
 
         foreach (var bill in bills)
         {
-            if (bill.RoomBookingId != null)
+            if (bill.ServiceOrderId != Guid.Empty)
             {
                 var billRoom = await billRepo.GetBillByIdForService(bill.Id);
                 _billVM.Data.Add(billRoom);

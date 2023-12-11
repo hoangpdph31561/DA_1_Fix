@@ -95,7 +95,7 @@
                 CheckOutBooking = (DateTimeOffset)checkOut!,
             };
         _roomDetailVM = await roomDetailRespo.GetAllRoomDetailsByStatus(roomDetail);
-        _lstRoomDetail = _roomDetailVM.Data!.ToList();
+        _lstRoomDetail = _roomDetailVM.Data!.Where(x => x.Status == RoomStatus.Vacant).ToList();
         _lstRoomDetail = _lstRoomDetail.Where(r => r.RoomTypeId == idRoomType).ToList();
         StateHasChanged();
 

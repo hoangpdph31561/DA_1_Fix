@@ -58,7 +58,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 var lstEsists = await _appReadWriteDbContext.ServiceOrderDetails.Where(x => x.ServiceOrderId == serviceOrderId && !x.Deleted).ToListAsync(cancellationToken);
                 List<ServiceOrderCreateUpdateDeleteRequest> lstCreate = new();
                 List<ServiceOrderCreateUpdateDeleteRequest> lstUpdate = new();
-               // List<ServiceOrderCreateUpdateDeleteRequest> lstDelete = new();
+               List<ServiceOrderCreateUpdateDeleteRequest> lstDelete = new();
                 foreach (var item in request)
                 {
                     if (!lstEsists.Exists(x => x.ServiceId == item.ServiceId))
@@ -70,17 +70,17 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                         lstUpdate.Add(item); // NẾU ĐÃ TỒN TẠI RỒI TRONG BẢNG SERVICEORDERDETAIL , NHƯNG SỐ LƯỢNG THAY ĐỔI => UPDATE
                     }
                 }
-                //foreach (var item in lstEsists)
-                //{
-                //    if (!request.Exists(x => x.ServiceId == item.ServiceId)) // NẾU KHÔNG TỒN TẠI ServiceId TRONG BẢNG ServiceOrderDetails
-                //    {
-                //        lstDelete.Add(new ServiceOrderCreateUpdateDeleteRequest
-                //        {
-                //            ServiceId = item.ServiceId,
-                //            Amount = item.Amount,
-                //        });
-                //    }
-                //}
+                foreach (var item in lstEsists)
+                {
+                    if (!request.Exists(x => x.ServiceId == item.ServiceId)) // NẾU KHÔNG TỒN TẠI ServiceId TRONG BẢNG ServiceOrderDetails
+                    {
+                        lstDelete.Add(new ServiceOrderCreateUpdateDeleteRequest
+                        {
+                            ServiceId = item.ServiceId,
+                            Amount = item.Amount,
+                        });
+                    }
+                }
                 if (lstCreate.Any())
                 {
                     foreach (var item in lstCreate)
@@ -91,6 +91,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                             ServiceOrderId = serviceOrderId,
                             Amount = item.Amount,
                             CreatedTime = DateTimeOffset.UtcNow,
+                            Price = _appReadWriteDbContext.ServiceOrderDetails.FirstOrDefault(x => x.ServiceId == item.ServiceId)!.Price
                         };
                         await _appReadWriteDbContext.ServiceOrderDetails.AddAsync(entity);
                     }
@@ -105,17 +106,17 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                         _appReadWriteDbContext.ServiceOrderDetails.Update(update);
                     }
                 }
-                //if (lstDelete.Any())
-                //{
-                //    foreach (var item in lstDelete)
-                //    {
-                //        var delete = await _appReadWriteDbContext.AmenityRoomDetails.FirstOrDefaultAsync(x => x.RoomTypeId == roomTypeId && x.AmenityId == item.AmenityId && !x.Deleted);
-                //        delete!.Status = EntityStatus.Deleted;
-                //        delete.Deleted = true;
-                //        delete.DeletedTime = DateTimeOffset.UtcNow;
-                //        _appReadWriteDbContext.AmenityRoomDetails.Update(delete);
-                //    }
-                //}
+                if (lstDelete.Any())
+                {
+                    foreach (var item in lstDelete)
+                    {
+                        var delete = await _appReadWriteDbContext.ServiceOrderDetails.FirstOrDefaultAsync(x => x.ServiceOrderId == serviceOrderId && x.ServiceId == item.ServiceId && !x.Deleted);
+                        delete!.Status = EntityStatus.Deleted;
+                        delete.Deleted = true;
+                        delete.DeletedTime = DateTimeOffset.UtcNow;
+                        _appReadWriteDbContext.ServiceOrderDetails.Update(delete);
+                    }
+                }
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
                 return RequestResult<int>.Succeed(1);
             }

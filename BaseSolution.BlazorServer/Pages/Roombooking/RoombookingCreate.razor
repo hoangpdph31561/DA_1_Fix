@@ -176,13 +176,13 @@
                     return;
                 }
 
-
                 roomBookingCreateRequest.RoomDetailId = Guid.Parse(roomDetailId);
                 roomBookingCreateRequest.CustomerId = Guid.Parse(customerId);
                 roomBookingCreateRequest.BookingType = BookingType.Offline;
                 roomBookingCreateRequest.CodeBooking = UtilityExtentions.GenerateRandomString(6);
                 roomBookingCreateRequest.CheckOutBooking = (DateTimeOffset)checkOut;
                 roomBookingCreateRequest.CheckInBooking = (DateTimeOffset)checkIn;
+                roomBookingCreateRequest.Price = lstRoomDetails.FirstOrDefault(x => x.Id == roomBookingCreateRequest.RoomDetailId)!.Price;
 
                 if (roomBookingCreateRequest.RoomDetailId == Guid.Empty || roomBookingCreateRequest.CustomerId == Guid.Empty || checkOut == null || checkIn == null)
                 {

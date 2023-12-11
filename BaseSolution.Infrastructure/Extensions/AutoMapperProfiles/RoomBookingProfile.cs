@@ -47,7 +47,9 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
                          CheckOutBooking = src.CheckOutBooking,
                          CheckInReality = src.CheckInBooking,
                          CheckOutReality =  src.CheckOutBooking,
-                         RoomBookingId = src.Id
+                         RoomBookingId = src.Id,
+                         Price = src.Price
+
                      }
                 }))
                 .ForMember(des => des.CustomerId,opt => opt.MapFrom(src => src.CustomerId))

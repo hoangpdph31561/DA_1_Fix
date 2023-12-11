@@ -68,6 +68,7 @@
     private PaginationResponse<RoomBookingDto> roomBookingVM;
 
     DateTime? ngayđat;
+    DateTime now = DateTime.Now;
     private ServiceOrderCreateRequest serviceOderRequest = new();
     private ViewServiceWithPaginationRequest serviceViewRequest = new();
     private PaginationResponse<CustomerDTO> CustomerVM;
@@ -101,7 +102,7 @@
         lstService = await serviceRespo.GetServices(serviceViewRequest);
         _isLoadingList = false;
     }
-   
+
     private void OnClickCancel()
     {
         MudDialog.Cancel();
@@ -123,9 +124,16 @@
         );
         if (confirm == true)
         {
-            serviceOderRequest.CustomerId = Guid.Parse(customerId);
-            serviceOderRequest.ServiceId = Guid.Parse(serviceId);
-            serviceOderRequest.CreatedTime = (DateTimeOffset)ngayđat;
+            if (ngayđat < now)
+            {
+                _snackbar.Add("Ngày không hợp lệ", Severity.Error);
+                return;
+            }
+           
+                serviceOderRequest.CustomerId = Guid.Parse(customerId);
+                serviceOderRequest.ServiceId = Guid.Parse(serviceId);
+                serviceOderRequest.CreatedTime = (DateTimeOffset)ngayđat;
+                serviceOderRequest.Price = lstService.FirstOrDefault(x => x.Id == serviceOderRequest.ServiceId)!.Price;
             var result = await ServiceOderRepo.CreateNewService(serviceOderRequest);
             if (result == true)
             {

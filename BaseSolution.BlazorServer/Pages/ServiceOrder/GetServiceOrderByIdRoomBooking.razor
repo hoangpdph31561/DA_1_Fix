@@ -3,6 +3,7 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Service;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceOrder;
+@using BaseSolution.BlazorServer.Pages.ServiceOrderDetail;
 @using BaseSolution.BlazorServer.Respository.Interfaces
 <MudDialog>
     <DialogContent>
@@ -48,6 +49,9 @@
     [Parameter]
     public Guid CustomerId { get; set; }
 
+    [Parameter]
+    public Guid ServiceOrderId { get; set; }
+
 
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
@@ -82,10 +86,9 @@
     }
     public async Task OpenAdd()
     {
-        var parameters = new DialogParameters<ServiceOrderCreateForRoomBooking>();
-        parameters.Add(x => x.idCustomer, CustomerId);
-        parameters.Add(x => x.idroomBookingDetail, idroomBookingDetail);
-        var dialog = await _dialogService.ShowAsync<ServiceOrderCreateForRoomBooking>("Thêm dịch vụ", parameters);
+        var parameters = new DialogParameters<ServiceOrderDetailView>();
+        parameters.Add(x => x.idServiceOrder, ServiceOrderId);
+        var dialog = await _dialogService.ShowAsync<ServiceOrderDetailView>("Thêm dịch vụ", parameters);
         var result = await dialog.Result;
 
         if (!result.Canceled)

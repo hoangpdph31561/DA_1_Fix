@@ -36,7 +36,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
         {
             try
             {
-                var query = _ServiceEntities.AsNoTracking().Where(x => !x.Deleted && !x.IsRoomBookingNeed).ProjectTo<ServiceDTO>(_mapper.ConfigurationProvider);
+                var query = _ServiceEntities.AsNoTracking().Where(x => !x.Deleted).ProjectTo<ServiceDTO>(_mapper.ConfigurationProvider);
 
                 var result = await query.PaginateAsync(request, cancellationToken);
               

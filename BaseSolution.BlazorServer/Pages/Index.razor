@@ -5,6 +5,6 @@
     NavigationManager navigation { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        navigation.NavigateTo("/customer/RoomType"); // chuyển hướng đến trang login đầu tiên
+        navigation.NavigateTo("/customer/RoomType",forceLoad: true); // chuyển hướng đến trang login đầu tiên
     }
 }

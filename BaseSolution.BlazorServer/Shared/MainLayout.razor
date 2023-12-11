@@ -1,5 +1,11 @@
 ﻿@using BaseSolution.BlazorServer.Extensions;
+@using System.Security.Claims;
+@using BaseSolution.BlazorServer.Pages.User
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 @inherits LayoutComponentBase
+@inject NavigationManager _navManager;
+@inject ProtectedSessionStorage _session;
+@inject AuthenticationStateProvider _authProvider;
 
 <MudThemeProvider Theme="_customTheme" />
 <MudDialogProvider />
@@ -8,14 +14,44 @@
     <MudAppBar Color="Color.Info" Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudSpacer />
-        <div class="col-auto">
-            <div>
-                <MudMenu Label="Đăng nhập" Variant="Variant.Filled" Color="Color.Primary">
-                    <MudMenuItem Href="/login">Quản trị </MudMenuItem>
-                    <MudMenuItem Href="/login-customer">Khách hàng</MudMenuItem>
-                </MudMenu>
+        @if (_dRole =="")
+        {
+            <div class="col-auto">
+                <div>
+                    <MudMenu Label="Đăng nhập" Variant="Variant.Filled" Color="Color.Primary">
+                        <MudMenuItem Href="/login">Quản trị </MudMenuItem>
+                        <MudMenuItem Href="/login-customer">Khách hàng</MudMenuItem>
+                    </MudMenu>
+                </div>
             </div>
-        </div>
+        }
+        else
+        {
+
+            <MudAvatar @onclick="@( async() => await OpenDetail())">
+                        <div>@(_dName.Length != 0 ? _dName[0].ToString() : "?")</div>
+            </MudAvatar>
+            <div class="col-auto">
+                
+                <div class="row">
+                    <MudText Typo="Typo.subtitle2" Class="text-truncate" Style="max-width:14rem" title="@_dNameUser">@_dNameUser</MudText>
+                </div>
+                <div class="row">
+                    @{
+                        var roleDisplay = "";
+                        var listRoleNames = authUser.FindAll(ClaimTypes.Role).Select(x => x.Value).ToList();
+                        foreach (var i in listRoleNames)
+                        {
+                            if (listRoleNames.IndexOf(i) > 0) roleDisplay += ", ";
+                            roleDisplay += i;
+                        }
+                    }
+                    <MudText Typo="Typo.caption" Class="text-truncate" Style="max-width:14rem" title="@roleDisplay">@roleDisplay</MudText>
+                  
+                </div>
+            </div>
+        }
+
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
         <MudDrawerHeader>
@@ -55,4 +91,36 @@
             },
             Typography = typo,
         };
+}
+@code {
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    bool _drawerCollapse = true;
+    bool _isMini;
+    bool openDetail = false;
+    private ClaimsPrincipal? authUser = new();
+
+    private string _dName = "";
+    private string _dRole = "";
+    private string _dNameUser = "";
+    private Guid _dUserId = Guid.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await _authProvider.GetAuthenticationStateAsync();
+        authUser = authState.User;
+        _dName = authUser.FindAll(ClaimTypes.Name).Select(c => c.Value).FirstOrDefault() ?? "<N/A>";
+        _dRole = authUser.FindAll(ClaimTypes.Role).Select(c => c.Value).FirstOrDefault() ?? "";
+        _dUserId = Guid.Parse(authUser.FindAll("Id").Select(c => c.Value).FirstOrDefault() ?? Guid.Empty.ToString());
+        _dNameUser = authUser.FindAll("Ten").Select(c => c.Value).FirstOrDefault() ?? "";
+    }
+
+    private async Task OpenDetail()
+    {
+        var parameters = new DialogParameters<UserInformation>();
+        parameters.Add(x => x.UserId, _dUserId);
+        var dialog = await _dialogService.ShowAsync<UserInformation>("Thông tin cá nhân", parameters);
+        var result = await dialog.Result;
+    }
+
 }

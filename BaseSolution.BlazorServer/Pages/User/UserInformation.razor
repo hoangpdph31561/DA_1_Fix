@@ -27,9 +27,9 @@
 
                                         <MudTextField @bind-Value="userRequestUpdate.Name" For="@(() => userRequestUpdate.Name)" Style="font-size: 24px; label-lg;" Label="Tên" ReadOnly="true"></MudTextField>
 
-                                        <MudTextField @bind-Value="userRequestUpdate.PhoneNumber" For="@(() => userRequestUpdate.PhoneNumber)" Style="font-size: 24px; label-lg;" Label="Số điện thoại"></MudTextField>
+                                        <MudTextField @bind-Value="userRequestUpdate.PhoneNumber" For="@(() => userRequestUpdate.PhoneNumber)" Style="font-size: 24px; label-lg;" Label="Số điện thoại" ReadOnly="true"></MudTextField>
 
-                                        <MudTextField @bind-Value="userRequestUpdate.Email" For="@(() => userRequestUpdate.Email)" Style="font-size: 24px; label-lg;" Label="Email"></MudTextField>
+                                        <MudTextField @bind-Value="userRequestUpdate.Email" For="@(() => userRequestUpdate.Email)" Style="font-size: 24px; label-lg;" Label="Email" ReadOnly="true"></MudTextField>
 
                                     </MudPaper>
                                 </MudForm>
@@ -41,7 +41,6 @@
                                 }
                                 else
                                 {
-                                    <MudButton OnClick="@(async() => await Update())">Lưu</MudButton>
                                     <MudButton OnClick="OnClickCancel">Hủy</MudButton>
 
                                 }

@@ -7,28 +7,33 @@
 @using BaseSolution.BlazorServer.Respository.Interfaces;
 <MudDialog>
     <DialogContent>
-
-        <MudForm Model="userRequest" @ref="@_form" @bind-IsValid="@_formIsValid">
+        @if(isLoading)
+        {
+            <LoadingIndicator/>
+        }
+        else
+        {
+            <MudForm Model="userRequest" @ref="@_form" @bind-IsValid="@_formIsValid">
                 <MudPaper Width="100%" Elevation="0">
                     <MudGrid>
                         <MudItem xs="12" sm="6">
-                        <MudTextField @bind-Value="userRequest.Email" For="@(() => userRequest.Email)" Label="Email"></MudTextField>
+                            <MudTextField @bind-Value="userRequest.Email" For="@(() => userRequest.Email)" Label="Email"></MudTextField>
                         </MudItem>
                         <MudItem xs="12" sm="6">
-                        <MudSelect T="Guid" Label="Chức vụ" AnchorOrigin="Origin.BottomCenter" @bind-Value="userRequest.UserRoleId" For="@(() => userRequest.UserRoleId)">
-                            @foreach (var item in lstRole)
-                            {
-                                <MudSelectItem Value="@item.Id">@item.RoleCode</MudSelectItem>
-                            }
+                            <MudSelect T="Guid" Label="Chức vụ" AnchorOrigin="Origin.BottomCenter" @bind-Value="userRequest.UserRoleId" For="@(() => userRequest.UserRoleId)">
+                                @foreach (var item in lstRole)
+                                {
+                                    <MudSelectItem Value="@item.Id">@item.RoleCode</MudSelectItem>
+                                }
                             </MudSelect>
                         </MudItem>
                     </MudGrid>
                     <MudGrid>
                         <MudItem xs="12" sm="6">
-                        <MudTextField @bind-Value="userRequest.PhoneNumber" For="@(() => userRequest.PhoneNumber)" Label="Số điện thoại"></MudTextField>
+                            <MudTextField @bind-Value="userRequest.PhoneNumber" For="@(() => userRequest.PhoneNumber)" Label="Số điện thoại"></MudTextField>
                         </MudItem>
                         <MudItem xs="12" sm="6">
-                        <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="userRequest.Status" For="@(() => userRequest.Status)">
+                            <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="userRequest.Status" For="@(() => userRequest.Status)">
                                 <MudSelectItem Value="EntityStatus.Active">Hoạt động</MudSelectItem>
                                 <MudSelectItem Value="EntityStatus.InActive">Không hoạt động</MudSelectItem>
                                 <MudSelectItem Value="EntityStatus.Pending">Chờ</MudSelectItem>
@@ -41,9 +46,11 @@
                     </MudGrid>
                 </MudPaper>
             </MudForm>
+        }
+        
     </DialogContent>
     <DialogActions>
-        @if (_userDto == null)
+        @if (_userDto == null || isLoading)
         {
             <MudButton OnClick="OnClickCancel">Hủy</MudButton>
         }
@@ -80,6 +87,7 @@
     private UserHotelDTO _userDto;
     private bool _formIsValid;
     MudForm _form;
+    private bool isLoading = true;
     #endregion
     #region Code xử lý
     protected async override Task OnInitializedAsync()
@@ -98,6 +106,7 @@
         userRequest.Email = _userDto.Email;
         userRequest.PhoneNumber = _userDto.PhoneNumber;
         userRequest.UserRoleId = _userDto.UserRoleId;
+        isLoading = false;
     }
     private void OnClickCancel()
     {

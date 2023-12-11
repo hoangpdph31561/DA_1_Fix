@@ -30,7 +30,7 @@
                         </MudItem>
 
                         <MudItem xs="12" sm="6">
-                            <MudSelect T="string" Label="Chức vụ" AnchorOrigin="Origin.BottomCenter" @bind-Value="@_selectedRoleId" For="@(() => _selectedRoleId)" Class="mb-2">
+                            <MudSelect T="string"  Label="Chức vụ" AnchorOrigin="Origin.BottomCenter" @bind-Value="@_selectedRoleId" For="@(() => _selectedRoleId)" Class="mb-2">
                                 @foreach (var item in lstRole)
                                 {
                                     <MudSelectItem Value="@item.Id.ToString()">@item.RoleCode</MudSelectItem>
@@ -116,6 +116,14 @@
                 _snackbar.Add
                 (
                     "Thêm thất bại do trùng tên tài khoản người dùng",
+                     Severity.Error
+                );
+            }
+            else if (_selectedRoleId == null)
+            {
+                _snackbar.Add
+                (
+                    "Chưa chọn chức vụ",
                      Severity.Error
                 );
             }

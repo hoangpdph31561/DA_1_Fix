@@ -36,7 +36,7 @@
                         <MudItem xs="8">
                             <MudGrid>
                                 <MudItem xs="6">
-                                    <MudSelect T="Guid" @bind-Value="idBuilding" Label="Tòa nhà" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                    <MudSelect T="Guid" @bind-Value="idBuilding" Label="Tòa nhà" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="HandleBuildingValueChanged">
                                         @if (idBuilding == Guid.Empty)
                                         {
                                             <MudSelectItem Value="Guid.Empty">Không có tòa nào</MudSelectItem>
@@ -99,7 +99,7 @@
                     </MudGrid>
                     <MudGrid>
                         <MudItem xs="6">
-                            <MudNumericField @bind-Value="roomDetailUpdateRequest.Price" For="@(() => roomDetailUpdateRequest.Price)" Label="Giá phòng" T="decimal" Min="100000"></MudNumericField>
+                            <MudNumericField @bind-Value="roomDetailUpdateRequest.Price" For="@(() => roomDetailUpdateRequest.Price)" Step="1000" Label="Giá phòng" T="decimal" Min="100000"></MudNumericField>
                         </MudItem>
                         <MudItem xs="6">
                             <MudSelect T="RoomStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="roomDetailUpdateRequest.Status" For="@(() => roomDetailUpdateRequest.Status)">
@@ -185,6 +185,7 @@
     #region Code xử lý
     private async Task LoadData()
     {
+        isLoadingList = true;
         floorRequest.BuildingId = idBuilding;
         floorVM = await floorRespo.GetAllFloors(floorRequest);
         lstFloor = floorVM.Data!.Where(x => x.Status == EntityStatus.Active).ToList();
@@ -209,6 +210,14 @@
         imageURL = roomDetailUpdateRequest.Images[0];
         isLoadingList = false;
     }
+    private async Task HandleBuildingValueChanged(IEnumerable<Guid> values )
+    {
+        isLoadingList = true;
+        idBuildingCurrent = values.First();
+        await LoadData();
+        isLoadingList = false;
+    }
+
     private bool CheckChangeData()
     {
         return roomDetailInfo!.Name != roomDetailUpdateRequest.Name || roomDetailInfo.Status != roomDetailUpdateRequest.Status || roomDetailInfo.FloorId != idFloor || roomDetailInfo.RoomTypeId != roomDetailUpdateRequest.RoomTypeId || roomDetailInfo.Price != roomDetailUpdateRequest.Price || roomDetailInfo.MaxPeopleStay != roomDetailUpdateRequest.MaxPeopleStay || roomDetailInfo.Description != roomDetailUpdateRequest.Description || roomDetailInfo.RoomSize != roomDetailUpdateRequest.RoomSize || CompareList(roomDetailInfo.Images,roomDetailUpdateRequest.Images);
@@ -224,16 +233,7 @@
         idFloor = roomDetailInfo.FloorId;
         await LoadData();
     }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if(idBuilding != idBuildingCurrent)
-        {
-            isLoadingList = true;
-            idBuildingCurrent = idBuilding;
-            await LoadData();
-            StateHasChanged();
-        }
-    }
+    
     private async Task Reset()
     {
         isLoadingList = true;
@@ -268,14 +268,7 @@
             roomDetailUpdateRequest.Images.Clear();
             roomDetailUpdateRequest.Images.Add(imageURL);
             roomDetailUpdateRequest.FloorId = idFloor;
-            var floorInfo = await floorRespo.GetFloorById(idFloor);
-            if(floorInfo.NumberOfRoom == floorInfo.NumberOfRoomRent && CheckChangeData())
-            {
-                MudDialog.Close(DialogResult.Ok(true));
-                snackbar.Add("Tầng đã đạt tối đa phòng cho thuê", Severity.Warning);
-                return;
-
-            }
+            
             var result = await roomDetailRespo.UpdateRoomDetail(roomDetailUpdateRequest);
             if (result)
             {

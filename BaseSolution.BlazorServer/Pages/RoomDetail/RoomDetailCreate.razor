@@ -34,7 +34,7 @@
                         <MudItem xs="8">
                             <MudGrid>
                                 <MudItem xs="6">
-                                    <MudSelect T="Guid" @bind-Value="idBuilding" Label="Tòa nhà" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                    <MudSelect T="Guid" @bind-Value="idBuilding" Label="Tòa nhà" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="HandleBuildingValueChanged">
                                         @if (idBuilding == Guid.Empty)
                                         {
                                             <MudSelectItem Value="Guid.Empty">Không có tòa nào</MudSelectItem>
@@ -98,7 +98,7 @@
                             <MudNumericField @bind-Value="createRoomDetailRequest.MaxPeopleStay" For="@(() => createRoomDetailRequest.MaxPeopleStay)" Label="Số người tối đa" T="int" Min="1"></MudNumericField>
                         </MudItem>
                         <MudItem xs="4">
-                            <MudNumericField @bind-Value="createRoomDetailRequest.Price" For="@(() => createRoomDetailRequest.Price)" Label="Giá phòng" T="decimal" Min="100000"></MudNumericField>
+                            <MudNumericField @bind-Value="createRoomDetailRequest.Price" For="@(() => createRoomDetailRequest.Price)" Step="1000" Label="Giá phòng" T="decimal" Min="100000"></MudNumericField>
                         </MudItem>
                     </MudGrid>
 
@@ -215,15 +215,12 @@
             }
         }
     }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private async Task HandleBuildingValueChanged(IEnumerable<Guid> values)
     {
-        if(idBuilding != idBuildingCurrent)
-        {
-            isLoadingList = true;
-            idBuildingCurrent = idBuilding;
-            await LoadData();
-            StateHasChanged();
-        }
+        isLoadingList = true;
+        idBuildingCurrent = values.First();
+        await LoadData();
+        isLoadingList = false;
     }
     private void OnClickCancel()
     {

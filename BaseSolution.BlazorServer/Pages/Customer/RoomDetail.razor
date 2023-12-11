@@ -156,7 +156,7 @@
         {
             PageSize = int.MaxValue - 1
         };
-    private PaginationResponse<BuildingDTO> _buildingVM;
+    private PaginationResponse<BuildingDTO> _buildingVM = new();
     private PaginationResponse<FloorDTO> _floorVM;
     private PaginationResponse<RoomTypeDTO> _roomTypeVM;
     private List<BuildingDTO> _lstBuilding;

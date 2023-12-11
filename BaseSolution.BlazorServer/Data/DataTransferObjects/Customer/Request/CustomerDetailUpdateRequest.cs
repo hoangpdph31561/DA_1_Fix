@@ -10,8 +10,8 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
         public string Name { get; set; } = string.Empty;
         [Required(ErrorMessage = "Mã định danh không được để trống")]
         public string IdentificationNumber { get; set; } = string.Empty;
-        [Required(ErrorMessage = "Email không được để trống")]
-        [RegularExpression(@"^\S+@\S+\.\S+$", ErrorMessage = "Vui lòng nhập đúng định dạng email.")]
+        [Required(ErrorMessage = "Trường này không được để trống")]
+        [EmailAddress(ErrorMessage = "Vui lòng nhập địa chỉ email đúng định dạng")]
         public string Email { get; set; } = string.Empty;
         [Required(ErrorMessage = "Số điện thoại không được để trống")]
         [RegularExpression(@"^\d+$", ErrorMessage = "Vui lòng nhập số điện thoại hợp lệ.")]

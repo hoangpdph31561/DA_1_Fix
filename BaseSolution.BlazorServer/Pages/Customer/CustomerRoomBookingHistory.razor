@@ -83,7 +83,7 @@
                 _roomBookingVM.Data.Add(roomBooking);
             }
         }
-        _lstRoomBooking = _roomBookingVM.Data!.ToList();
+        _lstRoomBooking = _roomBookingVM.Data!.OrderByDescending(x => x.CreatedTime).ToList();
         _isLoadingList = false;
         _isLoadingAll = false;
     }

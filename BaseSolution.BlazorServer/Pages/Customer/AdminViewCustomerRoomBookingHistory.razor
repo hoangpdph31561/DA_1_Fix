@@ -72,7 +72,7 @@
         _roomBookingVM.Data = roomBookings.Data
         .Where(x => x.Status == EntityStatus.Deleted
         || x.Status == EntityStatus.InActive).ToList();
-        _lstRoomBooking = _roomBookingVM.Data!.ToList();
+        _lstRoomBooking = _roomBookingVM.Data!.OrderByDescending(x => x.CreatedTime.Day).ToList();
         _isLoadingList = false;
         _isLoadingAll = false;
     }

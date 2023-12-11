@@ -1,75 +1,274 @@
-﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Bill
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Bill.Request
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBooking.Request
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomBookingDetail.Request
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail.Request
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomType.Request
 @using BaseSolution.BlazorServer.Respository.Interfaces
 @page "/customer/PersonalInformation"
 @inject IdCustomer idCustomer
 
-<CustomListDisplayP2 Label="@("Hồ sơ")" IsLoading="_isLoadingAll" HideSearch="true">
-    <BodyContent>
-        <MudPaper Elevation="0" Class="custom-list-display-border">
-            @if (_isLoadingList)
-            {
-                <MudProgressLinear Color="Color.Primary" Indeterminate="true"></MudProgressLinear>
-            }
-            else
-            {
-                <MudGrid>
+<MudTabs Rounded="true">
+    <ChildContent>
 
-                    <MudItem xs="12" md="6" Class="d-flex justify-center align-center">
-                        <MudPaper Style="font-size:40px" Elevation="0">
-                            <div class="mud-theme-primary pa-16  flex; align-items: center; justify-content: center "> @(_customerInfo?.Name?.Length > 0 ? _customerInfo.Name.Substring(0, 1) : string.Empty)</div>
-                        </MudPaper>
-                    </MudItem>
-                    <MudItem xs="12" md="4">
-                        <MudPaper Class="pa-4 mt-6 mt-lg-16" >
-                            <MudCard Class="p-3" Elevation="0">
-                                <MudCardContent>
-                                    <MudForm Model="customerUpdateRequest" @ref="@_form" @bind-IsValid="@_formIsValid">
-                                        <MudPaper Width="100%" Elevation="0">
+        <MudTabPanel Text="Hồ sơ"> 
+            <MudPaper Elevation="0" Class="custom-list-display-border pa-2">
+                @if (_isLoadingList)
+                {
+                    <MudProgressLinear Color="Color.Primary" Indeterminate="true"></MudProgressLinear>
+                }
+                else
+                {
+                    <MudGrid>
 
-                                            <MudTextField @bind-Value="customerUpdateRequest.Name" For="@(() => customerUpdateRequest.Name)" Style="font-size: 24px; label-lg;" Label="Tên"></MudTextField>
+                        <MudItem xs="12" md="6" Class="d-flex justify-center align-center ">
+                            <MudPaper Style="font-size:40px" Elevation="0">
+                                <div class="mud-theme-primary pa-16  flex; align-items: center; justify-content: center "> @(_customerInfo?.Name?.Length > 0 ? _customerInfo.Name.Substring(0, 1) : string.Empty)</div>
+                            </MudPaper>
+                        </MudItem>
+                        <MudItem xs="12" md="4">
+                            <MudPaper Class="pa-4 mt-6 mt-lg-16">
+                                <MudCard Class="p-3" Elevation="0">
+                                    <MudCardContent>
+                                        <MudForm Model="customerUpdateRequest" @ref="_form" @bind-IsValid="_formIsValid">
+                                            <MudPaper Width="100%" Elevation="0">
 
-                                            <MudTextField @bind-Value="customerUpdateRequest.IdentificationNumber" For="@(() => customerUpdateRequest.IdentificationNumber)" Style="font-size: 24px; label-lg;" Label="Mã định danh"></MudTextField>
+                                                <MudTextField @bind-Value="customerUpdateRequest.Name" For="@(() => customerUpdateRequest.Name)" Style="font-size: 24px;" Label="Tên"></MudTextField>
 
-                                            <MudTextField @bind-Value="customerUpdateRequest.PhoneNumber" For="@(() => customerUpdateRequest.PhoneNumber)" Style="font-size: 24px; label-lg;" Label="Số điện thoại"></MudTextField>
+                                                <MudTextField @bind-Value="customerUpdateRequest.IdentificationNumber" For="@(() => customerUpdateRequest.IdentificationNumber)" Style="font-size: 24px;" Label="Mã định danh"></MudTextField>
 
-                                            <MudTextField @bind-Value="customerUpdateRequest.Email" For="@(() => customerUpdateRequest.Email)" Style="font-size: 24px; label-lg;" Label="Email"></MudTextField>
+                                                <MudTextField @bind-Value="customerUpdateRequest.PhoneNumber" For="@(() => customerUpdateRequest.PhoneNumber)" Style="font-size: 24px;" Label="Số điện thoại"></MudTextField>
 
-                                        </MudPaper>
-                                    </MudForm>
-                                </MudCardContent>
-                                <MudCardActions Class="d-flex justify-center align-right pl-16">
-                                    @if (_customerInfo == null)
-                                    {
-                                        <MudButton OnClick="OnClickCancel">Hủy</MudButton>
-                                    }
-                                    else
-                                    {
-                                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(async() => await Update())">Lưu</MudButton>
-                                    }
-                                </MudCardActions>
-                                    @* <MudDivider /> *@
+                                                <MudTextField @bind-Value="customerUpdateRequest.Email" For="@(() => customerUpdateRequest.Email)" Style="font-size: 24px;" Label="Email"></MudTextField>
+
+                                            </MudPaper>
+                                        </MudForm>
+                                    </MudCardContent>
+                                    <MudCardActions Class="d-flex justify-center align-center ">
+                                        @if (_customerInfo == null)
+                                        {
+                                            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+                                        }
+                                        else
+                                        {
+                                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(async() => await Update())">Lưu</MudButton>
+                                        }
+                                    </MudCardActions>
                                 </MudCard>
                             </MudPaper>
                         </MudItem>
-                    
                     </MudGrid>
+                }
+            </MudPaper>
+        </MudTabPanel> 
+        <MudTabPanel Text="Đặt phòng">
+            
+            <MudPaper Elevation="0" Class="custom-list-display-border pa-3">
+                @if (_isLoadingList)
+                {
+                    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="m-3" />
+                }
+                else
+                {
+                    <MudSpacer />
+                    <MudTable Items="@_RoomTypeVM.Data" Style="position:relative;" Elevation="0">
+                        <HeaderContent>
+                            <MudTh>STT</MudTh>
+                            <MudTh>Tên loại phòng</MudTh>
+                            <MudTh>Số lượng tiện ích </MudTh>
+                            <MudTh>Số lượng phòng</MudTh>
+                            <MudTh>Hành động</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd>@(_lstRoomType.IndexOf(context) + 1)</MudTd>
+                            <MudTd>@context.Name</MudTd>
+                                <MudTd>@context.NumberOfAmenities <MudChip Icon="@Icons.Material.Filled.ListAlt" OnClick="@(() => OpenAmenity(context.Id))"></MudChip></MudTd>
+                            <MudTd>@context.AmountOfRoomType</MudTd>
+                                <MudTd>
+                                    <MudChip Color="Color.Primary" OnClick="@(() => OpenDetail(context.Id))" Disabled="@_isDisableControls">Đặt phòng</MudChip>
+                                </MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    <CustomPagination Class="my-1" HasNext="@_RoomTypeVM.HasNext" OnPageChange="@(async e => await OnPaginationButtonClick(e))" CurrentPageNumber="@_RoomTypeVM.PageNumber"></CustomPagination>
+                    <MudDivider />
+                }
+            </MudPaper>
+        </MudTabPanel>
+        <MudTabPanel Text="Thông tin đặt phòng">
+            <MudPaper Elevation="0" Class="custom-list-display-border">
+                @if (_lstRoomBookingCustomer == null)
+                {
+                    <MudText>Không có phòng</MudText>
+                }
+                @if (_isLoadingList)
+                {
+                    <MudProgressLinear Color="Color.Primary" Indeterminate="true"></MudProgressLinear>
+                }
+                else
+                {
+                    <MudCard Class="p-3" Elevation="0">
+                        <MudTable Items="@_roomBookingCustomerVM.Data">
+                            <HeaderContent>
+                                <MudTh>STT</MudTh>
+                                <MudTh>Thời gian đặt</MudTh>
+                                <MudTh>Loại phòng</MudTh>
+                                <MudTh>Kiểu đặt phòng</MudTh>
+                                <MudTh>Thanh toán trước</MudTh>
+                                <MudTh>Giá phòng</MudTh>
+                                <MudTh>Trạng thái</MudTh>
+                                <MudTh>Hành động</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd>@(_lstRoomBookingCustomer.IndexOf(context) + 1)</MudTd>
+                                <MudTd>@context.CreatedTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
+                                    <MudTd>@context.NameRoomType</MudTd>
+                                    <MudTd>@context.BookingType</MudTd>
+                                    <MudTd>@context.PrePaid VNĐ</MudTd>
+                                <MudTd>@context.RoomPrice VNĐ</MudTd>
+                                <MudTd><BadgeRoomStatus Status="@context.StatusRoom"></BadgeRoomStatus></MudTd>
+                                @if (context.StatusRoom == RoomStatus.AwaitingConfirmation)
+                                {
+                                    <MudTd>
+                                        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="(async () => await CancelBooking(context.Id))">Hủy</MudButton>
+                                    </MudTd>
+                                }
+                                else
+                                {
+                                    <MudTd></MudTd>
+                                }
+                            </RowTemplate>
+                        </MudTable>
+                        <MudDivider />
+                        <CustomPagination Class="my-1" HasNext="@_roomBookingCustomerVM.HasNext" OnPageChange="@(async e=> await  OnPaginationRoomBooking(e))" CurrentPageNumber="_roomBookingCustomerVM.PageNumber"></CustomPagination>
+                    </MudCard>
+                }
+            </MudPaper>
+        </MudTabPanel>
+        <MudTabPanel Text="Lịch sử dặt phòng">
+            <MudPaper Elevation="0" Class="custom-list-display-border">
+                @if (_isLoadingAll)
+                {
+                    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="m-3" />
+                }
+                else
+                {
+                    <MudCard Class="p-3" Elevation="0">
+                        <MudTable Items="@_roomBookingHistoryVM.Data">
+                            <HeaderContent>
+                                <MudTh>STT</MudTh>
+                                <MudTh>Thông tin phòng</MudTh>
+                                <MudTh>Ngày đặt</MudTh>
+                                <MudTh>Checkin</MudTh>
+                                <MudTh>Checkout</MudTh>
+                                <MudTh>Thanh toán trước</MudTh>
+                                <MudTh>Giá phòng</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd>@(_lstRoomBookingHistory.IndexOf(context) + 1)</MudTd>
+                                <MudTd>@context.NameBuilding - @context.NameFloor - @context.NameRoom</MudTd>
+                                    <MudTd>@context.CreatedTime.ToString("hh:mm dd/MM/yyyy")</MudTd>
+                                    <MudTd>@context.CheckInBooking.ToString("hh:mm dd/MM/yyyy")</MudTd>
+                                    <MudTh>@context.CheckOutBooking.ToString("hh:mm dd/MM/yyyy")</MudTh>
+                                    <MudTh>@context.PrePaid VNĐ</MudTh>
+                                <MudTh>@context.RoomPrice VNĐ</MudTh>
+                            </RowTemplate>
+                        </MudTable>
+                        <MudDivider />
+                        <CustomPagination Class="my-1" HasNext="@_roomBookingHistoryVM.HasNext" OnPageChange="@(async e=> await  OnPaginationRoomBookingHistory(e))" CurrentPageNumber="_roomBookingHistoryVM.PageNumber"></CustomPagination>
+                    </MudCard>
+                }
+            </MudPaper>
+        </MudTabPanel>
+        <MudTabPanel Text="Xem hoá đơn phòng">
+            <MudPaper Elevation="0">
+                @if (_isLoadingList)
+                {
+                    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="m-3" />
+                }
+                else
+                {
+                    <MudTable Items="@_billVM.Data" Style="position: relative;" Elevation="0">
+                        <HeaderContent>
+                            <MudTh>STT</MudTh>
+                            <MudTh>Ngày xuất</MudTh>
+                            <MudTh>Tên phòng</MudTh>
+                            <MudTh>Giá phòng</MudTh>
+                            <MudTh>Tổng tiền</MudTh>
 
-            }
-        </MudPaper>
-    </BodyContent>
-</CustomListDisplayP2>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd>@(_lstBill.IndexOf(context) + 1)</MudTd>
+                            <MudTd>@context.CreatedTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
+                                <MudTd>@context.RoomName</MudTd>
+                                <MudTd>@context.RoomPrice VNĐ</MudTd>
+                            <MudTd>@context.TotalAmount VNĐ</MudTd>
+
+                        </RowTemplate>
+                    </MudTable>
+                    <CustomPagination Class="my-1" HasNext="@_billVM.HasNext" OnPageChange="@(async e=> await  OnPaginationBillRoom(e))" CurrentPageNumber="@_billVM.PageNumber"></CustomPagination>
+                }
+            </MudPaper>
+        </MudTabPanel>
+        <MudTabPanel Text="Hoá đơn dịch vụ">
+            <MudPaper Elevation="0">
+                @if (_isLoadingList)
+                {
+                    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="m-3" />
+                }
+                else
+                {
+                    <MudTable Items="@_billServiceVM.Data" Style="position: relative;" Elevation="0">
+                        <HeaderContent>
+                            <MudTh>STT</MudTh>
+                            <MudTh>Ngày xuất</MudTh>
+                            <MudTh>Tên dịch vụ</MudTh>
+                            <MudTh>Số lượng</MudTh>
+                            <MudTh>Tổng tiền</MudTh>
+
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd>@(_lstBillService.IndexOf(context) + 1)</MudTd>
+                            <MudTd>@context.CreatedTime.DateTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
+                                <MudTd>@context.ServiceName</MudTd>
+                                <MudTd>@context.Quantity</MudTd>
+                                <MudTd>@context.TotalAmount VNĐ</MudTd>
+
+                        </RowTemplate>
+                    </MudTable>
+                    <CustomPagination Class="my-1" HasNext="@_billVM.HasNext" OnPageChange="@(async e=> await  OnPaginationBillService(e))" CurrentPageNumber="@_billVM.PageNumber"></CustomPagination>
+                }
+            </MudPaper>
+        </MudTabPanel>
+    </ChildContent>
+</MudTabs>
 @code {
+    #region Đặt phòng
+    [Inject]
+    public IRoomTypeRespo _roomTypeRepo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    private Guid _idRoomType = Guid.Empty;
+    private Guid _idRoomDetail = Guid.Empty;
+    private PaginationResponse<RoomTypeDTO> _RoomTypeVM;
+    private List<RoomTypeDTO> _lstRoomType;
+    private ViewRoomTypeWithPaginationRequest _roomTypeRequest = new();
+    private PaginationResponse<RoomDetailDTO> _roomDetailslVM;
+    private List<RoomDetailDTO> _lstRoomDetail;
+    #endregion
+    #region Hồ sơ
     [Parameter]
     public Guid customerId { get; set; }
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
     [Inject]
     public ICustomerRepo customerRepo { get; set; }
-    [Inject]
-    public IDialogService _dialogService { get; set; }
-    [Inject]
-    public ISnackbar _snackbar { get; set; }
     private CustomerDTO customerVM;
     private CustomerDTO _customerInfo;
     private bool _isLoadingAll = true;
@@ -80,13 +279,34 @@
     MudForm _form;
     private ViewCustomerWithPaginationRequest customerRequest = new();
     private CustomerDetailUpdateRequest customerUpdateRequest = new();
-
+    #endregion
+    #region Thông tin đặt phòng
+    [Inject]
+    public IRoomBookingRespo _roomBookingRepo { get; set; }
+    [Inject]
+    public IRoomBookingDetailRepo _roomBookingDetailRepo { get; set; }
+    [Inject]
+    public IRoomDetailRespo _roomDetailRepo { get; set; }
+    private PaginationResponse<RoomBookingDto> _roomBookingVM;
+    private List<RoomBookingDto> _lstRoomBooking;
+    private ViewRoombookingPaginationRequest _roomBookingRequest = new();
+    private RoomBookingDeleteRequest _roomBookingDelete = new();
+    private RoomDetailUpdateStatusRequest _updateRoomDetailStatus = new();
+    private RoomBookingDetailDeleteRequest _deleteRoomBookingDetail = new();
+    private RoomBookingUpdateStatusRequest _updateRoomBookingStatus = new();
+    #endregion
     protected override async Task OnInitializedAsync()
     {
         customerId = IdCustomer.Instance.Id;
-        await LoadData();
+        await LoadDataPersonal();
+        await LoadDataRoomType();
+        await LoadDataRoomBooking();
+        await LoadDataRoomBookingHistory();
+        await LoadDataBillRoom();
+        await LoadDataBillService();
     }
-    private async Task LoadData()
+    #region Cá nhân
+    private async Task LoadDataPersonal()
     {
         try
         {
@@ -151,6 +371,216 @@
     }
     private async Task Reset()
     {
-        await LoadData();
+        await LoadDataPersonal();
     }
+    #endregion
+    #region Loại phòng
+    private async Task LoadDataRoomType()
+    {
+        _RoomTypeVM = await _roomTypeRepo.GetAllRoomTypes(_roomTypeRequest);
+        _lstRoomType = _RoomTypeVM.Data!.Where(x => x.Status == EntityStatus.Active).ToList();
+        _isLoadingList = false;
+        _isLoadingAll = false;
+    }
+    private async Task OpenDetail(Guid _idRoomType)
+    {
+        var parameters = new DialogParameters<CustomerRoomDetail>();
+        parameters.Add(x => x.idRoomType, _idRoomType);
+        var dialog = await _dialogService.ShowAsync<CustomerRoomDetail>("Danh sách phòng có thể đặt", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadDataRoomType();
+        }
+    }
+    private async Task OpenAmenity(Guid _idRoomType)
+    {
+        var parameters = new DialogParameters<CustomerArmenityRoomDetails>();
+        parameters.Add(x => x.idRoomType, _idRoomType);
+        var dialog = await _dialogService.ShowAsync<CustomerArmenityRoomDetails>("Danh sách tiện ích", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadDataRoomType();
+        }
+    }
+
+    private async Task OnPaginationButtonClick(int pageNumber)
+    {
+        if (_isDisableControls) return;
+        _isLoadingList = true;
+        _roomTypeRequest.PageNumber = pageNumber;
+        await LoadDataRoomType();
+    }
+    #endregion
+    #region RoomBooking
+    private PaginationResponse<RoomBookingDto> _roomBookingCustomerVM;
+    private List<RoomBookingDto> _lstRoomBookingCustomer;
+    private async Task LoadDataRoomBooking()
+    {
+        _roomBookingCustomerVM = new PaginationResponse<RoomBookingDto>
+            {
+                Data = new List<RoomBookingDto>()
+            };
+
+        var roomBookings = await _roomBookingRepo.GetRoomBookingByIdCustomerAsync(customerId);
+        foreach (var roomBooking in roomBookings)
+        {
+            if (roomBooking.StatusRoom == RoomStatus.Reserved || roomBooking.StatusRoom == RoomStatus.AwaitingConfirmation)
+            {
+                _roomBookingCustomerVM.Data.Add(roomBooking);
+            }
+        }
+        _lstRoomBookingCustomer = _roomBookingCustomerVM.Data!.ToList();
+        _isLoadingAll = false;
+        _isLoadingList = false;
+    }
+
+    private async Task OnPaginationRoomBooking(int pageNumber)
+    {
+        if (_isDisableControls) return;
+        _isLoadingList = true;
+        _roomBookingRequest.PageNumber = pageNumber;
+        await LoadDataRoomBooking();
+    }
+    private async Task OnSearch(string? searchString)
+    {
+        _isLoadingAll = true;
+        _roomBookingRequest.PageNumber = 1;
+        _roomBookingRequest.SearchString = searchString;
+        await LoadDataRoomBooking();
+    }
+    private async Task CancelBooking(Guid idRoomBooking)
+    {
+        var confirm = await _dialogService.ShowMessageBox
+      (
+          "Thông báo",
+          "Xác nhận hủy?",
+          "Xác nhận",
+          cancelText: "Hủy"
+      );
+        if (confirm == true)
+        {
+            _updateRoomBookingStatus.Id = idRoomBooking;
+            _updateRoomBookingStatus.Status = EntityStatus.InActive;
+            var updateRoomBooking = await _roomBookingRepo.UpdateStatusRoomBooking(_updateRoomBookingStatus);
+
+            _roomBookingDelete.Id = idRoomBooking;
+            var deleteRoomBooking = await _roomBookingRepo.DeleteRoomBooking(_roomBookingDelete);
+
+            var getRoomBookingDetail = await _roomBookingDetailRepo.GetRoomBookingDetailByRoomBookingId(idRoomBooking);
+            _deleteRoomBookingDetail.Id = getRoomBookingDetail.Id;
+            var deleteRoomBookingDetail = await _roomBookingDetailRepo.DeleteRoomBookingDetail(_deleteRoomBookingDetail);
+
+            _updateRoomDetailStatus.Id = getRoomBookingDetail.RoomDetailId;
+            _updateRoomDetailStatus.Status = RoomStatus.Vacant;
+            var updateRoomDetail = await _roomDetailRepo.UpdateRoomDetailStatus(_updateRoomDetailStatus);
+            _snackbar.Add("Đã huỷ đặt phòng!", Severity.Success);
+        }
+    }
+    #endregion
+
+    #region Lịch sử đặt phòng
+    private PaginationResponse<RoomBookingDto> _roomBookingHistoryVM;
+    private List<RoomBookingDto> _lstRoomBookingHistory;
+    private async Task LoadDataRoomBookingHistory()
+    {
+        _roomBookingHistoryVM = new PaginationResponse<RoomBookingDto>
+            {
+                Data = new List<RoomBookingDto>()
+            };
+
+        var roomBookings = await _roomBookingRepo.GetRoomBookingByIdCustomerAsync(customerId);
+        foreach (var roomBooking in roomBookings)
+        {
+            if (roomBooking.Status == EntityStatus.Deleted || roomBooking.Status == EntityStatus.InActive)
+            {
+                _roomBookingHistoryVM.Data.Add(roomBooking);
+            }
+        }
+        _lstRoomBookingHistory = _roomBookingHistoryVM.Data!.OrderByDescending(x => x.CreatedTime).ToList();
+        _isLoadingList = false;
+        _isLoadingAll = false;
+    }
+    private async Task OnPaginationRoomBookingHistory(int pageNumber)
+    {
+        if (_isDisableControls) return;
+        _isLoadingList = true;
+        _roomBookingRequest.PageNumber = pageNumber;
+        await LoadDataRoomBookingHistory();
+    }
+    #endregion
+
+    #region Hóa đơn phòng
+    [Inject]
+    public IBillRespo billRepo { get; set; }
+    private ViewBillWithPaginationRequest billRequest = new();
+    private List<BillDtoForRoom> _lstBill;
+    private PaginationResponse<BillDtoForRoom> _billVM;
+    private Guid _idBill = Guid.Empty;
+
+    private async Task LoadDataBillRoom()
+    {
+        _billVM = new PaginationResponse<BillDtoForRoom>
+            {
+                Data = new List<BillDtoForRoom>()
+            };
+
+        var bills = await billRepo.GetBillByIdCustomer(customerId);
+
+        foreach (var bill in bills)
+        {
+            if (bill.RoomBookingId != null)
+            {
+                var billRoom = await billRepo.GetBillByIdForRoom(bill.Id);
+                _billVM.Data.Add(billRoom);
+            }
+        }
+        _lstBill = _billVM.Data.ToList();
+        _isLoadingAll = false;
+        _isLoadingList = false;
+    }
+
+    private async Task OnPaginationBillRoom(int pageNumber)
+    {
+        if (_isDisableControls) return;
+        _isLoadingAll = true;
+        billRequest.PageNumber = pageNumber;
+        await LoadDataBillRoom();
+    }
+    #endregion
+
+    #region Hóa đơn dịch vụ
+    private List<BillDtoForService> _lstBillService;
+    private PaginationResponse<BillDtoForService> _billServiceVM;
+    private async Task LoadDataBillService()
+    {
+        _billServiceVM = new PaginationResponse<BillDtoForService>
+            {
+                Data = new List<BillDtoForService>()
+            };
+
+        var bills = await billRepo.GetBillByIdCustomer(customerId);
+
+        foreach (var bill in bills)
+        {
+            if (bill.ServiceOrderId != Guid.Empty)
+            {
+                var billRoom = await billRepo.GetBillByIdForService(bill.Id);
+                _billServiceVM.Data.Add(billRoom);
+            }
+        }
+        _lstBillService = _billServiceVM.Data.ToList();
+        _isLoadingAll = false;
+        _isLoadingList = false;
+    }
+
+    private async Task OnPaginationBillService(int pageNumber)
+    {
+        if (_isDisableControls) return;
+        _isLoadingAll = true;
+        billRequest.PageNumber = pageNumber;
+        await LoadDataBillService();
+    }
+    #endregion
 }

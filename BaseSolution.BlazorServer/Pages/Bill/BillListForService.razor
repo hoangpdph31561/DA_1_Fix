@@ -38,8 +38,8 @@
                             <MudTd>@(lstBill.IndexOf(context) + 1)</MudTd>
                                 <MudTd>@context.Id</MudTd>
                                 <MudTd>@context.CustomerName</MudTd>
-                                <MudTd>@context.CreatedTime.DateTime</MudTd>
-                                <MudTh>@context.TotalAmount</MudTh>
+                                <MudTd>@context.CreatedTime.DateTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
+                                <MudTh>@context.TotalAmount VNĐ</MudTh>
                                 <MudTd>
                                     <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@(() => OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
                                 </MudTd>

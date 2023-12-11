@@ -47,8 +47,8 @@
                                 <MudTd>@context.CheckOutBooking.ToString("HH:mm dd/MM/yyyy")</MudTd>
                                 <MudTd>@context.NameRoomType</MudTd>
                                 <MudTd>@context.BookingType</MudTd>
-                                <MudTd>@context.PrePaid</MudTd>
-                                <MudTd>@context.RoomPrice</MudTd>
+                                <MudTd>@context.PrePaid VNĐ</MudTd>
+                                <MudTd>@context.RoomPrice VNĐ</MudTd>
                                 <MudTd><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTd>
                                 <MudTd>
                                     <MudChip Icon="@Icons.Material.Filled.Add" Color="Color.Success" OnClick="@(() => ConfirmRoomBooking(context.Id))">Duyệt</MudChip>

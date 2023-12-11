@@ -37,11 +37,11 @@
                         <RowTemplate>
                             <MudTd>@(_lstRoomBooking.IndexOf(context) + 1)</MudTd>
                             <MudTd>@context.NameCustomer</MudTd>
-                                <MudTd>@context.CreatedTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
+                                <MudTd>@context.CreatedTime.DateTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
                                 <MudTd>@context.NameRoomType</MudTd>
                                 <MudTh>@context.BookingType</MudTh>
-                                <MudTh>@context.PrePaid</MudTh>
-                                <MudTh>@context.RoomPrice</MudTh>
+                                <MudTh>@context.PrePaid VNĐ</MudTh>
+                                <MudTh>@context.RoomPrice VNĐ</MudTh>
                                 <MudTh><BadgeRoomStatus Status="@context.StatusRoom"></BadgeRoomStatus></MudTh>
                             </RowTemplate>
                         </MudTable>

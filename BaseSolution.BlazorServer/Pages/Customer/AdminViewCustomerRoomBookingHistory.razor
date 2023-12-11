@@ -22,6 +22,7 @@
                             <MudTh>STT</MudTh>
                             <MudTh>Tên khách</MudTh>
                             <MudTh>Thông tin phòng</MudTh>
+                            <MudTh>Ngày đặt</MudTh>
                             <MudTh>Checkin</MudTh>
                             <MudTh>Checkout</MudTh>
                             <MudTh>Thanh toán trước</MudTh>
@@ -31,10 +32,11 @@
                             <MudTd>@(_lstRoomBooking.IndexOf(context) + 1)</MudTd>
                             <MudTd>@context.NameCustomer</MudTd>
                             <MudTd>@context.NameBuilding - @context.NameFloor - @context.NameRoom</MudTd>
-                                <MudTd>@context.CheckInBooking.ToString("dd/MM/yyyy")</MudTd>
-                                <MudTh>@context.CheckOutBooking.ToString("dd/MM/yyyy")</MudTh>
-                                <MudTh>@context.PrePaid</MudTh>
-                                <MudTh>@context.RoomPrice</MudTh>
+                            <MudTd>@context.CreatedTime.ToString("hh:mm dd/MM/yyyy")</MudTd>
+                            <MudTd>@context.CheckInBooking.ToString("hh:mm dd/MM/yyyy")</MudTd>
+                            <MudTh>@context.CheckOutBooking.ToString("hh:mm dd/MM/yyyy")</MudTh>
+                            <MudTh>@context.PrePaid VNĐ</MudTh>
+                            <MudTh>@context.RoomPrice VNĐ</MudTh>
                             </RowTemplate>
                         </MudTable>
                         <MudDivider />
@@ -70,7 +72,7 @@
         _roomBookingVM.Data = roomBookings.Data
         .Where(x => x.Status == EntityStatus.Deleted
         || x.Status == EntityStatus.InActive).ToList();
-        _lstRoomBooking = _roomBookingVM.Data!.ToList();
+        _lstRoomBooking = _roomBookingVM.Data!.OrderByDescending(x => x.CreatedTime.Day).ToList();
         _isLoadingList = false;
         _isLoadingAll = false;
     }

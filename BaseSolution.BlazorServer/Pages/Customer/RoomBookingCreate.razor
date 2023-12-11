@@ -26,10 +26,11 @@
             <MudForm Model="@_roomBookingCreateRequest" @ref="_form">
                 <MudPaper Elevation="0">
                     <MudItem>
-                        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Giờ vào" DateFormat="dd/MM/yyyy" @bind-Date="checkIn" Required="true" />
+                        <MudTextField T="DateTime?" Format="s" @bind-Value="checkIn" Label="Giờ vào" InputType="InputType.DateTimeLocal" />
                     </MudItem>
+
                     <MudItem>
-                        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Giờ ra" DateFormat="dd/MM/yyyy" @bind-Date="checkOut" Required="true" />
+                        <MudTextField T="DateTime?" Format="s" @bind-Value="checkOut" Label="Giờ ra" InputType="InputType.DateTimeLocal" />
                     </MudItem>
                 </MudPaper>
             </MudForm>
@@ -76,8 +77,8 @@
     private bool _isLoadingList = true;
     MudForm _form;
 
-    DateTime? checkIn;
-    DateTime? checkOut;
+    DateTime? checkIn = DateTime.Now;
+    DateTime? checkOut = DateTime.Now;
     #endregion
     #region Code xử lý
     protected override async Task OnInitializedAsync()
@@ -170,8 +171,8 @@
                         _roomBookingCreateRequest.CustomerId = customerId;
                         _roomBookingCreateRequest.BookingType = BookingType.Online;
                         _roomBookingCreateRequest.CodeBooking = code;
-                        _roomBookingCreateRequest.CheckInBooking = (DateTime)checkIn;
-                        _roomBookingCreateRequest.CheckOutBooking = (DateTime)checkOut;
+                        _roomBookingCreateRequest.CheckInBooking = (DateTimeOffset)checkIn;
+                        _roomBookingCreateRequest.CheckOutBooking = (DateTimeOffset)checkOut;
                         var result = await roomBookingRespo.CreateRoomBooking(_roomBookingCreateRequest);
 
                         if (result.ToString() != null)
@@ -182,10 +183,10 @@
                             _roomBookingDetailUpdateRequest.Id = getId.Id;
                             _roomBookingDetailUpdateRequest.RoomBookingId = getId.RoomBookingId;
                             _roomBookingDetailUpdateRequest.Price = getPriceRoomDetail.Price;
-                            _roomBookingDetailUpdateRequest.CheckInBooking = (DateTime)checkIn;
-                            _roomBookingDetailUpdateRequest.CheckOutBooking = (DateTime)checkOut;
-                            _roomBookingDetailUpdateRequest.CheckInReality = (DateTime)checkIn;
-                            _roomBookingDetailUpdateRequest.CheckOutReality = (DateTime)checkOut;
+                            _roomBookingDetailUpdateRequest.CheckInBooking = (DateTimeOffset)checkIn;
+                            _roomBookingDetailUpdateRequest.CheckOutBooking = (DateTimeOffset)checkOut;
+                            _roomBookingDetailUpdateRequest.CheckInReality = (DateTimeOffset)checkIn;
+                            _roomBookingDetailUpdateRequest.CheckOutReality = (DateTimeOffset)checkOut;
                             _roomBookingDetailUpdateRequest.PrePaid = getPriceRoomDetail.Price * (decimal)0.3;
                             _roomBookingDetailUpdateRequest.RoomDetailId = getId.RoomDetailId;
 

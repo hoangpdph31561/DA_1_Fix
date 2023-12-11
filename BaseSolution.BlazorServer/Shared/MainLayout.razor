@@ -11,7 +11,7 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 <MudLayout>
-    <MudAppBar Color="Color.Primary" Elevation="0">
+    <MudAppBar Color="Color.Info" Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudSpacer />
         @if (_dRole =="")
@@ -76,12 +76,20 @@
 }
 
 @code {
+    private static string[] fontFamily = new[] { "Baloo 2" };
+    private static Typography typo = new Typography()
+        {
+            Default = new() { FontFamily = fontFamily },
+        };
     private MudTheme _customTheme = new()
         {
             Palette = new Palette()
             {
-                Primary = CustomPalette.MainColor
-            }
+                Primary = CustomPalette.PrimaryColor,
+                Info = CustomPalette.InfoColor,
+                
+            },
+            Typography = typo,
         };
 }
 @code {

@@ -79,7 +79,7 @@
     }
     private async Task LoginUser()
     {
-      
+
         request.UserRoleId = Guid.Parse(RoleId);
         bool loginSuccessful = false;
         foreach (var item in lstUser)
@@ -112,7 +112,14 @@
         loginVm = await loginRepo.Login(request);
         _snackbar.Add("Đăng nhập thành công", Severity.Success);
         await HandlingAuthentication();
-        navigation.NavigateTo("/statistic/roombookingstatistic"); // sau khi login xong thì muốn chuyển đến màn nào thì chuyển sang màn đó
+        if(loginVm.RoleCode == "Admin")
+        {
+            navigation.NavigateTo("/statistic/roombookingstatistic"); // sau khi login xong thì muốn chuyển đến màn nào thì chuyển sang màn đó
+        }
+        else
+        {
+            navigation.NavigateTo("/roombooking"); // sau khi login xong thì muốn chuyển đến màn nào thì chuyển sang màn đó
+        }
     }
     // Sự kiện pass word
     void ButtonTestclick()

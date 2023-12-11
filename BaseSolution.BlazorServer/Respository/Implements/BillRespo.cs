@@ -76,9 +76,9 @@ namespace BaseSolution.BlazorServer.Respository.Implements
             return result;
         }
 
-        public async Task<List<BillDtoForRoom>> GetBillByIdCustomer(Guid idCustomer)
+        public async Task<List<BillDTO>> GetBillByIdCustomer(Guid idCustomer)
         {
-            var result = await _httpClient.GetFromJsonAsync<List<BillDtoForRoom>>($"/api/Bills/{idCustomer}/details");
+            var result = await _httpClient.GetFromJsonAsync<List<BillDTO>>($"/api/Bills/{idCustomer}/details");
             return result;
         }
 

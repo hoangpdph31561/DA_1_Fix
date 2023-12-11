@@ -10,6 +10,7 @@ namespace BaseSolution.Application.DataTransferObjects.Bill
     public class BillDTO
     {
         public Guid Id { get; set; } // mã hóa đơn
+        public Guid ServiceOrderId { get; set; }
         public Guid CustomerId { get; set; }
         public Guid? RoomBookingId { get; set; }
         public string CustomerName { get; set; }
@@ -26,5 +27,8 @@ namespace BaseSolution.Application.DataTransferObjects.Bill
         public float ServiceAmount { get; set; } // ServiceAmount = TotalService x ServicePrice
         public decimal RoomPrice { get; set; }
         public float TotalAmount { get; set; } // TotalAmount = TotalService + RoomPrice
+        public DateTimeOffset CheckInReality { get; set; }
+        public DateTimeOffset CheckOutReality { get; set; }
+        public decimal PrePaid { get; set; }
     }
 }

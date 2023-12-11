@@ -10,15 +10,15 @@
         }
         else
         {
-            <MudPaper Elevation="0" Class="pa-2">
-                <MudItem>
-                    <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Giờ vào" DateFormat="dd/MM/yyyy" @bind-Date="checkIn" Required="true" />
-                </MudItem>
-                <MudItem>
-                    <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Giờ ra" DateFormat="dd/MM/yyyy" @bind-Date="checkOut" Required="true" />
-                </MudItem>
-                <MudChip Icon="@Icons.Material.Filled.Search" Color="Color.Primary" OnClick="@( async() => await FilterByTime())" Disabled="@_isDisableControls">Tìm theo thời gian</MudChip>
-            </MudPaper>
+            @* <MudPaper Elevation="0" Class="pa-2">
+        <MudItem>
+        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Giờ vào" DateFormat="dd/MM/yyyy" @bind-Date="checkIn" Required="true" />
+        </MudItem>
+        <MudItem>
+        <MudDatePicker PickerVariant="PickerVariant.Dialog" Label="Giờ ra" DateFormat="dd/MM/yyyy" @bind-Date="checkOut" Required="true" />
+        </MudItem>
+        <MudChip Icon="@Icons.Material.Filled.Search" Color="Color.Primary" OnClick="@( async() => await FilterByTime())" Disabled="@_isDisableControls">Tìm theo thời gian</MudChip>
+        </MudPaper> *@
             <MudPaper Elevation="0" Class="pa-2">
                 <MudTable Items="_lstRoomDetail">
                     <HeaderContent>
@@ -40,7 +40,7 @@
                                 <MudChip Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@( async() => await OpenAdd(context.Id))" Disabled="@_isDisableControls">Đặt phòng</MudChip>
                             </MudTh>
                         </RowTemplate>
-                       
+
                     </MudTable>
                 </MudPaper>
 
@@ -85,25 +85,20 @@
     {
         await FilterByTime();
     }
-   
+
     private async Task FilterByTime()
     {
-        if (checkIn < checkOut || checkOut < DateTime.UtcNow)
-        {
+
         var roomDetail = new ViewRoomDetailByCheckInCheckOutRequest
             {
                 CheckInBooking = (DateTimeOffset)checkIn!,
                 CheckOutBooking = (DateTimeOffset)checkOut!,
             };
         _roomDetailVM = await roomDetailRespo.GetAllRoomDetailsByStatus(roomDetail);
-        _lstRoomDetail = _roomDetailVM.Data!.ToList();
+        _lstRoomDetail = _roomDetailVM.Data!.Where(x => x.Status == RoomStatus.Vacant).ToList();
         _lstRoomDetail = _lstRoomDetail.Where(r => r.RoomTypeId == idRoomType).ToList();
         StateHasChanged();
-        }
-        else
-        {
-            _snackbar.Add("Thời gian phải hợp lệ!", Severity.Warning);
-        }
+
     }
     public async Task OpenAdd(Guid idRoomDetail)
     {

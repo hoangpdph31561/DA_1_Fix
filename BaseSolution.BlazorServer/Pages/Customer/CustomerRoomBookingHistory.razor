@@ -22,7 +22,6 @@
                     <MudTable Items="@_roomBookingVM.Data">
                         <HeaderContent>
                             <MudTh>STT</MudTh>
-                            <MudTh>Tên khách</MudTh>
                             <MudTh>Thông tin phòng</MudTh>
                             <MudTh>Checkin</MudTh>
                             <MudTh>Checkout</MudTh>
@@ -31,7 +30,6 @@
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd>@(_lstRoomBooking.IndexOf(context) + 1)</MudTd>
-                            <MudTd>@context.NameCustomer</MudTd>
                                 <MudTd>@context.NameBuilding - @context.NameFloor - @context.NameRoom</MudTd>
                                 <MudTd>@context.CheckInBooking.ToString("dd/MM/yyyy")</MudTd>
                                 <MudTh>@context.CheckOutBooking.ToString("dd/MM/yyyy")</MudTh>

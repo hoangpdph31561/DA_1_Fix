@@ -31,12 +31,12 @@
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd>@(_lstRoomBooking.IndexOf(context) + 1)</MudTd>
-                            <MudTd>@context.CreatedTime.ToString("dd/MM/yyyy")</MudTd>
-                                <MudTd>@context.NameBuilding - @context.NameFloor - @context.NameRoom</MudTd>
-                                <MudTd>@context.CheckInBooking.ToString("dd/MM/yyyy")</MudTd>
-                                <MudTh>@context.CheckOutBooking.ToString("dd/MM/yyyy")</MudTh>
-                                <MudTh>@context.PrePaid</MudTh>
-                                <MudTh>@context.RoomPrice</MudTh>
+                            <MudTd>@context.NameBuilding - @context.NameFloor - @context.NameRoom</MudTd>
+                            <MudTd>@context.CreatedTime.ToString("hh:mm dd/MM/yyyy")</MudTd>
+                                <MudTd>@context.CheckInBooking.ToString("hh:mm dd/MM/yyyy")</MudTd>
+                                <MudTh>@context.CheckOutBooking.ToString("hh:mm dd/MM/yyyy")</MudTh>
+                                <MudTh>@context.PrePaid VNĐ</MudTh>
+                            <MudTh>@context.RoomPrice VNĐ</MudTh>
                             </RowTemplate>
                         </MudTable>
                         <MudDivider />

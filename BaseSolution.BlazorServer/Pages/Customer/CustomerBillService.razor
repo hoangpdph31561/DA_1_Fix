@@ -30,10 +30,10 @@
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd>@(_lstBill.IndexOf(context) + 1)</MudTd>
-                        <MudTd>@context.CreatedTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
+                        <MudTd>@context.CreatedTime.DateTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
                             <MudTd>@context.ServiceName</MudTd>
                             <MudTd>@context.Quantity</MudTd>
-                            <MudTd>@context.TotalAmount </MudTd>
+                            <MudTd>@context.TotalAmount VNĐ</MudTd>
 
                         </RowTemplate>
                     </MudTable>

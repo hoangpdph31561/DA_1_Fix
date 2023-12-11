@@ -43,7 +43,7 @@
                                 <MudTd>@context.CustomerName</MudTd>
                                 <MudTh>@context.CreatedTime.DateTime</MudTh>
                                 <MudTh>@context.Quantity <MudChip Icon="@Icons.Material.Filled.ListAlt" OnClick="@(() => OpenService(context.Id))"></MudChip></MudTh>
-                                <MudTh>@context.TotalAmount</MudTh>
+                                <MudTh>@context.TotalAmount VNĐ</MudTh>
                                 <MudTd>
                                     <MudChip Color="Color.Primary" OnClick="@(() => Pay(context.CustomerId,context.Id))" Disabled="@_isDisableControls">Thanh toán</MudChip>
                                 </MudTd>

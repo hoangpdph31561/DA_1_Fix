@@ -28,9 +28,9 @@
                     <RowTemplate>
                         <MudTd>@(lstBill.IndexOf(context) + 1)</MudTd>
                         <MudTd>@context.CustomerName</MudTd>
-                            <MudTd>@context.CreatedTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
+                            <MudTd>@context.CreatedTime.DateTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
                             <MudTd>@context.BillType</MudTd>
-                            <MudTd>@context.TotalAmount </MudTd>
+                            <MudTd>@context.TotalAmount VNĐ</MudTd>
                             <MudTh><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTh>
                         </RowTemplate>
                     </MudTable>

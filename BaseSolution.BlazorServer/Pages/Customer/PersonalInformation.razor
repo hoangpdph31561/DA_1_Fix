@@ -3,11 +3,7 @@
 @using BaseSolution.BlazorServer.Respository.Interfaces
 @page "/customer/PersonalInformation"
 @inject IdCustomer idCustomer
-<style>
-    .label-lg {
-        font-size: 24px;
-    }
-</style>
+
 <CustomListDisplayP2 Label="@("Hồ sơ")" IsLoading="_isLoadingAll" HideSearch="true">
     <BodyContent>
         <MudPaper Elevation="0" Class="custom-list-display-border">
@@ -18,19 +14,18 @@
             else
             {
                 <MudGrid>
-                    <MudItem xs="3">
-                        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Elevation="0">
-                            <div class="mud-theme-primary pa-16 rounded-circle">@(_customerInfo?.Name?.Length > 0 ? _customerInfo.Name.Substring(0, 1) : string.Empty)</div>
+
+                    <MudItem xs="12" md="6" Class="d-flex justify-center align-center">
+                        <MudPaper Style="font-size:40px" Elevation="0">
+                            <div class="mud-theme-primary pa-16  flex; align-items: center; justify-content: center "> @(_customerInfo?.Name?.Length > 0 ? _customerInfo.Name.Substring(0, 1) : string.Empty)</div>
                         </MudPaper>
                     </MudItem>
-
-
-                    <MudItem xs="8">
-                        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Elevation="0">
+                    <MudItem xs="12" md="4">
+                        <MudPaper Class="pa-4 mt-6 mt-lg-16" >
                             <MudCard Class="p-3" Elevation="0">
                                 <MudCardContent>
                                     <MudForm Model="customerUpdateRequest" @ref="@_form" @bind-IsValid="@_formIsValid">
-                                        <MudPaper Width="120%" Elevation="0">
+                                        <MudPaper Width="100%" Elevation="0">
 
                                             <MudTextField @bind-Value="customerUpdateRequest.Name" For="@(() => customerUpdateRequest.Name)" Style="font-size: 24px; label-lg;" Label="Tên"></MudTextField>
 
@@ -43,20 +38,21 @@
                                         </MudPaper>
                                     </MudForm>
                                 </MudCardContent>
-                                <MudCardActions>
+                                <MudCardActions Class="d-flex justify-center align-right pl-16">
                                     @if (_customerInfo == null)
                                     {
                                         <MudButton OnClick="OnClickCancel">Hủy</MudButton>
                                     }
                                     else
                                     {
-                                        <MudButton OnClick="@(async() => await Update())">Lưu</MudButton>
+                                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(async() => await Update())">Lưu</MudButton>
                                     }
                                 </MudCardActions>
                                     @* <MudDivider /> *@
                                 </MudCard>
                             </MudPaper>
                         </MudItem>
+                    
                     </MudGrid>
 
             }

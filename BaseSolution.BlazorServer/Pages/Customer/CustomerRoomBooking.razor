@@ -43,10 +43,10 @@
                             <MudTd>@context.CreatedTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
                                 <MudTd>@context.NameRoomType</MudTd>
                                 <MudTd>@context.BookingType</MudTd>
-                                <MudTd>@context.PrePaid</MudTd>
-                                <MudTd>@context.RoomPrice</MudTd>
-                                <MudTd><BadgeRoomStatus Status="@context.StatusRoom"></BadgeRoomStatus></MudTd>
-                                @if (context.StatusRoom == RoomStatus.AwaitingConfirmation)
+                                <MudTd>@context.PrePaid VNĐ</MudTd>
+                            <MudTd>@context.RoomPrice VNĐ</MudTd>
+                            <MudTd><BadgeRoomStatus Status="@context.StatusRoom"></BadgeRoomStatus></MudTd>
+                            @if (context.StatusRoom == RoomStatus.AwaitingConfirmation)
                             {
                                 <MudTd>
                                     <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="(async () => await CancelBooking(context.Id))">Hủy</MudButton>
@@ -150,7 +150,7 @@
             _updateRoomBookingStatus.Id = idRoomBooking;
             _updateRoomBookingStatus.Status = EntityStatus.InActive;
             var updateRoomBooking = await _roomBookingRepo.UpdateStatusRoomBooking(_updateRoomBookingStatus);
-            
+
             _roomBookingDelete.Id = idRoomBooking;
             var deleteRoomBooking = await _roomBookingRepo.DeleteRoomBooking(_roomBookingDelete);
 

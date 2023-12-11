@@ -25,7 +25,7 @@
                                 <MudForm Model="userRequestUpdate" @ref="@_form" @bind-IsValid="@_formIsValid">
                                     <MudPaper Width="120%" Elevation="0">
 
-                                        <MudTextField @bind-Value="userRequestUpdate.Name" For="@(() => userRequestUpdate.Name)" Style="font-size: 24px; label-lg;" Label="Tên"></MudTextField>
+                                        <MudTextField @bind-Value="userRequestUpdate.Name" For="@(() => userRequestUpdate.Name)" Style="font-size: 24px; label-lg;" Label="Tên" ReadOnly="true"></MudTextField>
 
                                         <MudTextField @bind-Value="userRequestUpdate.PhoneNumber" For="@(() => userRequestUpdate.PhoneNumber)" Style="font-size: 24px; label-lg;" Label="Số điện thoại"></MudTextField>
 
@@ -86,9 +86,12 @@
         try
         {
             _userDto = await userRepo.GetUserById(UserId);
+            userRequestUpdate.Id = _userDto.Id;
             userRequestUpdate.Name = _userDto.Name;
             userRequestUpdate.Email = _userDto.Email;
             userRequestUpdate.PhoneNumber = _userDto.PhoneNumber;
+            userRequestUpdate.UserRoleId = _userDto.UserRoleId;
+            userRequestUpdate.Status = _userDto.Status;
             _isLoadingList = false;
             _isLoadingAll = false;
         }
@@ -99,7 +102,7 @@
     }
     private bool CheckChangeData()
     {
-        return _userDto.Email != userRequestUpdate.Email || _userDto.PhoneNumber != userRequestUpdate.PhoneNumber || _userDto.Name != userRequestUpdate.Name;
+        return _userDto.Email != userRequestUpdate.Email || _userDto.PhoneNumber != userRequestUpdate.PhoneNumber;
 
     }
     private async Task Update()

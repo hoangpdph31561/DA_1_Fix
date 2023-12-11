@@ -81,7 +81,6 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
             try
             {
                 var user = await GetUserByIdAsync(entity.Id, cancellationToken);
-
                 user!.UserRoleId = entity.UserRoleId;
                 user.Status = entity.Status;
                 user.PhoneNumber = entity.PhoneNumber;

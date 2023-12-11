@@ -8,7 +8,7 @@
 @attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Quản lý chức vụ</PageTitle>
-<CustomListDisplayP2 Label="@("Danh sách User ")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
+<CustomListDisplayP2 Label="@("Danh sách người dùng ")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>
         <MudChip Icon="@Icons.Material.Filled.Add" @onclick="async() => await OpenAdd()" Color="Color.Primary">Thêm</MudChip>
     </HeaderContent>

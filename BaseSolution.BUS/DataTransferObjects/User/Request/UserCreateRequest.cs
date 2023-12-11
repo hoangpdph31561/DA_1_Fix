@@ -20,7 +20,7 @@ namespace BaseSolution.Application.DataTransferObjects.User.Request
                 RuleFor(x => x.UserName).NotEmpty().WithMessage("UserName cannot be empty.");
 
                 RuleFor(x => x.PhoneNumber).NotEmpty().WithMessage("Phone number cannot be empty.")
-                                           .Matches(@"^\d{10,}$").WithMessage("Invalid phone number format.");
+                                           .Matches(@"^0\d{9,}$").WithMessage("Invalid phone number format.");
                 RuleFor(x => x.Email).NotEmpty().WithMessage("Phone number cannot be empty.")
                                           .EmailAddress(EmailValidationMode.Net4xRegex).WithMessage("Invalid email address.");
                 RuleFor(x => x.UserRoleId).NotEmpty().WithMessage("UserRoleId cannot be empty.").NotEqual(Guid.Empty).WithMessage("UserRoleId cannot be empty Guid.");

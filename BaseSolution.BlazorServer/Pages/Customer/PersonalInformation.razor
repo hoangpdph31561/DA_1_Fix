@@ -3,8 +3,12 @@
 @using BaseSolution.BlazorServer.Respository.Interfaces
 @page "/customer/PersonalInformation"
 @inject IdCustomer idCustomer
-
-<CustomListDisplayP2 Label="@("Thông tin cá nhân")" IsLoading="_isLoadingAll" HideSearch="true">
+<style>
+    .label-lg {
+        font-size: 24px;
+    }
+</style>
+<CustomListDisplayP2 Label="@("Hồ sơ")" IsLoading="_isLoadingAll" HideSearch="true">
     <BodyContent>
         <MudPaper Elevation="0" Class="custom-list-display-border">
             @if (_isLoadingList)
@@ -13,27 +17,48 @@
             }
             else
             {
-                <MudCard Class="p-3" Elevation="0">
-                    <MudTable Items="@_lstCustomers">
-                        <HeaderContent>
-                            <MudTh>Tên</MudTh>
-                            <MudTh>Mã định danh</MudTh>
-                            <MudTh>Email</MudTh>
-                            <MudTh>Số điện thoại</MudTh>
-                            <MudTh>Hành động</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd>@context.Name</MudTd>
-                            <MudTd>@context.IdentificationNumber</MudTd>
-                            <MudTd>@context.Email</MudTd>
-                            <MudTd>@context.PhoneNumber</MudTd>
-                                <MudTd>
-                                    <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@( async() => await OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
-                                </MudTd>
-                            </RowTemplate>
-                        </MudTable>
-                        <MudDivider />
-                    </MudCard>
+                <MudGrid>
+                    <MudItem xs="3">
+                        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Elevation="0">
+                            <div class="mud-theme-primary pa-16 rounded-circle">@(_customerInfo?.Name?.Length > 0 ? _customerInfo.Name.Substring(0, 1) : string.Empty)</div>
+                        </MudPaper>
+                    </MudItem>
+
+
+                    <MudItem xs="8">
+                        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Elevation="0">
+                            <MudCard Class="p-3" Elevation="0">
+                                <MudCardContent>
+                                    <MudForm Model="customerUpdateRequest" @ref="@_form" @bind-IsValid="@_formIsValid">
+                                        <MudPaper Width="120%" Elevation="0">
+
+                                            <MudTextField @bind-Value="customerUpdateRequest.Name" For="@(() => customerUpdateRequest.Name)" Style="font-size: 24px; label-lg;" Label="Tên"></MudTextField>
+
+                                            <MudTextField @bind-Value="customerUpdateRequest.IdentificationNumber" For="@(() => customerUpdateRequest.IdentificationNumber)" Style="font-size: 24px; label-lg;" Label="Mã định danh"></MudTextField>
+
+                                            <MudTextField @bind-Value="customerUpdateRequest.PhoneNumber" For="@(() => customerUpdateRequest.PhoneNumber)" Style="font-size: 24px; label-lg;" Label="Số điện thoại"></MudTextField>
+
+                                            <MudTextField @bind-Value="customerUpdateRequest.Email" For="@(() => customerUpdateRequest.Email)" Style="font-size: 24px; label-lg;" Label="Email"></MudTextField>
+
+                                        </MudPaper>
+                                    </MudForm>
+                                </MudCardContent>
+                                <MudCardActions>
+                                    @if (_customerInfo == null)
+                                    {
+                                        <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+                                    }
+                                    else
+                                    {
+                                        <MudButton OnClick="@(async() => await Update())">Lưu</MudButton>
+                                    }
+                                </MudCardActions>
+                                    @* <MudDivider /> *@
+                                </MudCard>
+                            </MudPaper>
+                        </MudItem>
+                    </MudGrid>
+
             }
         </MudPaper>
     </BodyContent>
@@ -41,6 +66,8 @@
 @code {
     [Parameter]
     public Guid customerId { get; set; }
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
     [Inject]
     public ICustomerRepo customerRepo { get; set; }
     [Inject]
@@ -48,12 +75,15 @@
     [Inject]
     public ISnackbar _snackbar { get; set; }
     private CustomerDTO customerVM;
-    private List<CustomerDTO> _lstCustomers;
+    private CustomerDTO _customerInfo;
     private bool _isLoadingAll = true;
     private bool _isLoadingList = true;
     private bool _isDisableControls = false;
     private bool closeDetail = true;
+    private bool _formIsValid;
+    MudForm _form;
     private ViewCustomerWithPaginationRequest customerRequest = new();
+    private CustomerDetailUpdateRequest customerUpdateRequest = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,9 +94,12 @@
     {
         try
         {
-
-            customerVM = await customerRepo.GetCustomerById(customerId);
-            _lstCustomers = new List<CustomerDTO> { customerVM };
+            _customerInfo = await customerRepo.GetCustomerById(customerId);
+            customerUpdateRequest.Id = _customerInfo.Id;
+            customerUpdateRequest.Name = _customerInfo.Name;
+            customerUpdateRequest.IdentificationNumber = _customerInfo.IdentificationNumber;
+            customerUpdateRequest.PhoneNumber = _customerInfo.PhoneNumber;
+            customerUpdateRequest.Email = _customerInfo.Email;
             _isLoadingList = false;
             _isLoadingAll = false;
         }
@@ -75,15 +108,53 @@
             _snackbar.Add("Không có thông tin cá nhân", Severity.Error);
         }
     }
-    private async Task OpenDetail(Guid idCustomer)
+    private bool CheckChangeData()
     {
-        var parameters = new DialogParameters<PersonalInfomationDetail>();
-        parameters.Add(x => x.idCustomer, idCustomer);
-        var dialog = await _dialogService.ShowAsync<PersonalInfomationDetail>("Thông tin cá nhân chi tiết", parameters);
-        var result = await dialog.Result;
-        if (!result.Canceled)
+        return _customerInfo!.Name != customerUpdateRequest.Name
+        || _customerInfo.IdentificationNumber != customerUpdateRequest.IdentificationNumber
+        || _customerInfo.PhoneNumber != customerUpdateRequest.PhoneNumber
+        || _customerInfo.Email != customerUpdateRequest.Email;
+    }
+    private async Task Update()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+        var confirm = await _dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận sửa thông tin cá nhân",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
         {
-            await LoadData();
+            var result = await customerRepo.UpdateDetailCustomer(customerUpdateRequest);
+            if (result)
+            {
+                if (CheckChangeData())
+                {
+
+                    _snackbar.Add("Sửa thành công", Severity.Success);
+                }
+                else
+                {
+                    OnClickCancel();
+                    _snackbar.Add("Không có thay đổi dữ liệu để cập nhật", Severity.Warning);
+                }
+            }
+            else
+            {
+                _snackbar.Add("Sửa thất bại", Severity.Error);
+            }
+            await Reset();
         }
+    }
+    private void OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+    private async Task Reset()
+    {
+        await LoadData();
     }
 }

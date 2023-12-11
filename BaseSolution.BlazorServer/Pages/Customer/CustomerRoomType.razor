@@ -72,7 +72,7 @@
     private async Task LoadData()
     {
         _RoomTypeVM = await _roomTypeRepo.GetAllRoomTypes(_roomTypeRequest);
-        _lstRoomType = _RoomTypeVM.Data!.ToList();
+        _lstRoomType = _RoomTypeVM.Data!.Where(x => x.Status == EntityStatus.Active).ToList();
         _isLoadingList = false;
         _isLoadingAll = false;
     }

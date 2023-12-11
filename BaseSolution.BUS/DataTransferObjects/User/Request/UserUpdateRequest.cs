@@ -18,7 +18,7 @@ namespace BaseSolution.Application.DataTransferObjects.User.Request
             {
                 RuleFor(x => x.PhoneNumber).NotEmpty().WithMessage("Phone number cannot be empty.")
 
-                                           .Matches(@"^0\d{9,}$").WithMessage("Invalid phone number format.");
+                                            .Matches(@"^\d+$").WithMessage("Please enter a valid phone number (digits only).");
                 RuleFor(x => x.Email).NotEmpty().WithMessage("Phone number cannot be empty.")
 
                                           .EmailAddress(EmailValidationMode.Net4xRegex).WithMessage("Invalid email address.");

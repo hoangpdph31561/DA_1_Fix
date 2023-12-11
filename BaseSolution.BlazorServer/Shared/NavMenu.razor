@@ -1,15 +1,16 @@
 ﻿@using System.Security.Claims;
+@using BaseSolution.BlazorServer.Extensions
 @inject AuthenticationStateProvider _authProvider;
 @inject NavigationManager _navManager;
 
-<MudNavMenu Color="Color.Primary">
+<MudNavMenu Color="Color.Info">
   
 
 
     @*  <MudNavLink Href="/login" Icon="@Icons.Material.Filled.MapsHomeWork">Login</MudNavLink> *@
     <AuthorizeView Roles="Admin">
         <MudNavMenu>
-            <MudNavGroup Icon="@Icons.Material.Filled.SignalCellularAlt" Title="Thống kê">
+            <MudNavGroup IconColor="Color.Primary" Icon="@Icons.Material.Filled.SignalCellularAlt" Title="Thống kê">
                 <MudNavLink Href="/statistic/roombookingstatistic">Thống kê phòng</MudNavLink>
                 <MudNavLink Href="/statistic/serviceOrderStatistic">Thống kê dịch vụ</MudNavLink>
                 <MudNavLink Href="/statistic/billstatistic">Thống kê doanh số </MudNavLink>
@@ -18,26 +19,26 @@
     </AuthorizeView>
     
     <AuthorizeView Roles="Admin">
-        <MudNavGroup Title="Hệ thống khách sạn" Icon="@Icons.Material.Filled.MapsHomeWork">
+        <MudNavGroup IconColor="Color.Primary" Title="Hệ thống khách sạn" Icon="@Icons.Material.Filled.MapsHomeWork">
             <MudNavLink Href="/building" >Danh sách tòa nhà</MudNavLink>
             <MudNavLink Href="/floorlistp2" >Danh sách tầng</MudNavLink>
             <MudNavLink Href="/amenity" >Danh sách tiện ích</MudNavLink>
         </MudNavGroup>
     </AuthorizeView>
     <AuthorizeView Roles="Admin">
-        <MudNavGroup Title="Phòng khách sạn" Icon="@Icons.Material.Filled.MeetingRoom">
+        <MudNavGroup IconColor="Color.Primary" Title="Phòng khách sạn" Icon="@Icons.Material.Filled.MeetingRoom">
             <MudNavLink Href="/roomtype" >Danh sách loại phòng</MudNavLink>
             <MudNavLink Href="/roomdetail">Danh sách phòng</MudNavLink>
         </MudNavGroup>
     </AuthorizeView>
     <AuthorizeView Roles="Admin">
-        <MudNavGroup Title="Dịch vụ khách sạn" Icon="@Icons.Material.Filled.RoomService">
+        <MudNavGroup IconColor="Color.Primary" Title="Dịch vụ khách sạn" Icon="@Icons.Material.Filled.RoomService">
             <MudNavLink Href="/servicetype" >Danh sách loại dịch vụ</MudNavLink>
             <MudNavLink Href="/service" >Danh sách dịch vụ</MudNavLink>
         </MudNavGroup>
     </AuthorizeView>
     <AuthorizeView Roles="Admin,Nhân viên">
-        <MudNavGroup Title="Đặt phòng và dịch vụ" Icon="fa-solid fa-building-user">
+        <MudNavGroup IconColor="Color.Primary" Title="Đặt phòng và dịch vụ" Icon="fa-solid fa-building-user">
             <MudNavLink Href="/roombooking" >Đặt phòng</MudNavLink>
             <MudNavLink Href="/serviceOrder">Đặt dịch vụ</MudNavLink>
             <MudNavLink Href="/admin/customerRoomBooking">Thông tin đặt phòng</MudNavLink>
@@ -48,7 +49,7 @@
     </AuthorizeView>
     <AuthorizeView Roles="Admin,Nhân viên">
         <MudNavMenu>
-            <MudNavGroup Icon="@Icons.Material.Filled.Article" Title="Hóa đơn">
+            <MudNavGroup IconColor="Color.Primary" Icon="@Icons.Material.Filled.Article" Title="Hóa đơn">
                 <MudNavLink Href="/bill/room">Hóa đơn phòng</MudNavLink>
                 <MudNavLink Href="/bill/service">Hóa đơn dịch vụ</MudNavLink>
             </MudNavGroup>
@@ -56,7 +57,7 @@
     </AuthorizeView>
     <AuthorizeView Roles="Admin,Nhân viên">
         <MudNavMenu>
-            <MudNavGroup Icon="fa-solid fa-people-group" Title="Khách hàng">
+            <MudNavGroup IconColor="Color.Primary" Icon="fa-solid fa-people-group" Title="Khách hàng">
                 <MudNavLink Href="/admin/customerList">Danh sách khách hàng</MudNavLink>
                 
             </MudNavGroup>
@@ -65,7 +66,7 @@
     @if (!_lstrole.Any(x => x == "Nhân viên"))
     {
         <MudNavMenu>
-            <MudNavGroup Icon="@Icons.Material.Filled.PeopleOutline" Title="Khách hàng">
+            <MudNavGroup IconColor="Color.Primary" Icon="@Icons.Material.Filled.PeopleOutline" Title="Khách hàng">
                 <MudNavLink Href="/customer/PersonalInformation">Thông tin cá nhân</MudNavLink>
                 <MudNavLink Href="/customer/RoomType">Đặt phòng</MudNavLink>
                 <MudNavLink Href="/customer/RoomBooking">Thông tin đặt phòng</MudNavLink>
@@ -76,12 +77,12 @@
         </MudNavMenu>
     }
     <AuthorizeView Roles="Admin">
-        <MudNavLink Href="/roleService" Icon="fa-solid fa-circle-user">Phân quyền</MudNavLink>
+        <MudNavLink IconColor="Color.Primary" Href="/roleService" Icon="fa-solid fa-circle-user">Phân quyền</MudNavLink>
     </AuthorizeView>
 
     <AuthorizeView Roles="Admin,Nhân viên">
 
-        <MudNavLink Icon="@Icons.Material.Filled.ExitToApp" IconColor="Color.Error" @onclick="@(async () => await OnClickLogOut())">
+        <MudNavLink  Icon="@Icons.Material.Filled.ExitToApp" IconColor="Color.Error" @onclick="@(async () => await OnClickLogOut())">
             Đăng xuất
         </MudNavLink>
     </AuthorizeView>
@@ -92,7 +93,9 @@
         {
             Palette = new Palette()
             {
-                Primary = "#F97E0C"
+                Info = CustomPalette.InfoColor,
+                Primary = CustomPalette.PrimaryColor,
+
             }
         };
 

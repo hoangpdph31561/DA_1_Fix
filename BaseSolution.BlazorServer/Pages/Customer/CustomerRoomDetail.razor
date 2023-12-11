@@ -76,7 +76,7 @@
     DateTime? checkIn = DateTime.Now;
     DateTime? checkOut = DateTime.Now;
     private PaginationResponse<RoomDetailDTO> _roomDetailVM = new PaginationResponse<RoomDetailDTO>();
-    private List<RoomDetailDTO>? _lstRoomDetail;
+    private List<RoomDetailDTO>? _lstRoomDetail = new();
     private ViewRoomDetailWithPaginationRequest _roomDetailRequest = new();
     bool _isDisableControls = false;
     #endregion

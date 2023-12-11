@@ -24,14 +24,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
         {
             try
             {
-                entity.Id = Guid.NewGuid();
-
-                entity.Status = entity.Status == EntityStatus.Active ? EntityStatus.Active : EntityStatus.InActive;
-                entity.CreatedTime = DateTimeOffset.Now;
-                entity.CheckOutBooking = entity.CheckOutBooking;
-                entity.CheckInBooking = entity.CheckInBooking;
-                entity.CheckInReality = entity.CheckInBooking;
-                entity.CheckOutReality = entity.CheckOutBooking;
+                entity.CreatedTime = DateTimeOffset.UtcNow;
                 await _appReadWriteDbContext.RoomBookingDetails.AddAsync(entity);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
                 return RequestResult<Guid>.Succeed(entity.Id);
@@ -60,7 +53,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 var roomBooking = await GetRoomBookingDetailByIdAsync(request.Id, cancellationToken);
                 roomBooking!.Deleted = true;
                 roomBooking.DeletedBy = request.DeletedBy;
-                roomBooking.DeletedTime = DateTimeOffset.Now;
+                roomBooking.DeletedTime = DateTimeOffset.UtcNow;
                 roomBooking.Status = EntityStatus.Deleted;
                 _appReadWriteDbContext.RoomBookingDetails.Update(roomBooking);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
@@ -87,8 +80,8 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
             {
                 var roomBookingDetail = await GetRoomBookingDetailByIdAsync(entity.Id, cancellationToken);
 
-                roomBookingDetail.CheckOutReality = entity.CheckOutReality;
-                roomBookingDetail.ModifiedTime = DateTimeOffset.Now;
+                roomBookingDetail!.CheckOutReality = entity.CheckOutReality;
+                roomBookingDetail.ModifiedTime = DateTimeOffset.UtcNow;
                 _appReadWriteDbContext.RoomBookingDetails.Update(roomBookingDetail);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
                 return RequestResult<int>.Succeed(1);
@@ -121,7 +114,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 roomBookingDetail.CheckOutBooking = request.CheckOutBooking;
                 roomBookingDetail.CheckInReality = request.CheckInBooking;
                 roomBookingDetail.CheckOutReality = request.CheckOutBooking;
-                roomBookingDetail.ModifiedTime = DateTimeOffset.Now;
+                roomBookingDetail.ModifiedTime = DateTimeOffset.UtcNow;
                 _appReadWriteDbContext.RoomBookingDetails.Update(roomBookingDetail);
                 await _appReadWriteDbContext.SaveChangesAsync(cancellationToken);
                 return RequestResult<int>.Succeed(1);

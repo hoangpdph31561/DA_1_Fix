@@ -9,7 +9,6 @@ namespace BaseSolution.Application.DataTransferObjects.Statistic.Bill
     public class BillStatisticDto
     {
         public int Month { get; set; }
-        public Guid ServiceId { get; set; }
         public int TotalServiceForRoom { get; set; } // tổng số lượng của 1 dịch vụ 
         public decimal ServicePriceForRoom { get; set; }
         public string NameServiceForRoom { get; set; }
@@ -20,7 +19,7 @@ namespace BaseSolution.Application.DataTransferObjects.Statistic.Bill
         public DateTimeOffset CheckInReality { get; set; }
         public DateTimeOffset CheckOutReality { get; set; }
         public decimal PrePaid { get; set; }
-        public Guid ServiceOrderId { get; set; }
+        public Guid? ServiceOrderId { get; set; }
         public double QuantityService { get; set; } // số lượng 
         public decimal PriceService { get; set; }
         public decimal TotalPriceForService { get; set; } // tổng tiền của từng cái 

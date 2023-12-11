@@ -8,7 +8,7 @@
     <MudPaper Elevation="0">
         <MudSelect T="string" Label="Dịch vụ" Class="mb-2"
                    AnchorOrigin="Origin.BottomCenter" @bind-Value="@serviceId" For="@(() => serviceId)">
-            @foreach (var item in lstService)
+                    @foreach (var item in lstService)
             {
                 <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
             }

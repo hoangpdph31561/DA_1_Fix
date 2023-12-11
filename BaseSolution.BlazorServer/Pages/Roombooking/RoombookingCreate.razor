@@ -166,7 +166,7 @@
                     return;
                 }
 
-                if (checkOut < DateTime.Now)
+                if (checkOut < DateTime.Now || checkIn < DateTime.Now)
                 {
                     _snackbar.Add
                    (

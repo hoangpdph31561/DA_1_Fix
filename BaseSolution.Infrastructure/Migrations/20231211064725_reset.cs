@@ -6,11 +6,61 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BaseSolution.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class reset : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+               name: "AmenityRoomDetail");
+
+            migrationBuilder.DropTable(
+                name: "Bill");
+
+            migrationBuilder.DropTable(
+                name: "Example");
+
+            migrationBuilder.DropTable(
+                name: "ServiceOrderDetail");
+
+            migrationBuilder.DropTable(
+                name: "Amenity");
+
+            migrationBuilder.DropTable(
+                name: "ServiceOrder");
+
+            migrationBuilder.DropTable(
+                name: "Service");
+
+            migrationBuilder.DropTable(
+                name: "RoomBookingDetail");
+
+            migrationBuilder.DropTable(
+                name: "ServiceType");
+
+            migrationBuilder.DropTable(
+                name: "RoomBooking");
+
+            migrationBuilder.DropTable(
+                name: "RoomDetail");
+
+            migrationBuilder.DropTable(
+                name: "Customer");
+
+            migrationBuilder.DropTable(
+                name: "User");
+
+            migrationBuilder.DropTable(
+                name: "Floor");
+
+            migrationBuilder.DropTable(
+                name: "RoomType");
+
+            migrationBuilder.DropTable(
+                name: "UserRole");
+
+            migrationBuilder.DropTable(
+                name: "Building");
             migrationBuilder.CreateTable(
                 name: "Amenity",
                 columns: table => new
@@ -61,6 +111,8 @@ namespace BaseSolution.Infrastructure.Migrations
                     IdentificationNumber = table.Column<string>(type: "varchar(max)", unicode: false, nullable: false),
                     Email = table.Column<string>(type: "varchar(max)", unicode: false, nullable: false),
                     PhoneNumber = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: false),
+                    ApprovedCode = table.Column<string>(type: "varchar(max)", unicode: false, nullable: true),
+                    ApprovedCodeExpiredTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     CustomerType = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     CreatedTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
@@ -228,7 +280,8 @@ namespace BaseSolution.Infrastructure.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Unit = table.Column<int>(type: "int", nullable: false),
+                    IsRoomBookingNeed = table.Column<bool>(type: "bit", nullable: false),
+                    Unit = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ServiceTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     CreatedTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
@@ -469,7 +522,7 @@ namespace BaseSolution.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Amount = table.Column<int>(type: "int", nullable: false),
+                    Amount = table.Column<double>(type: "float", nullable: false),
                     ServiceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ServiceOrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),

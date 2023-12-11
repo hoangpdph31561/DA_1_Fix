@@ -36,8 +36,25 @@
                         <MudItem xs="8">
                             <MudGrid>
                                 <MudItem xs="6">
-                                    <MudSelect T="Guid" @bind-Value="idBuilding" Label="Tòa nhà" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="HandleBuildingValueChanged">
-                                        @if (idBuilding == Guid.Empty)
+                                    <MudTextField @bind-Value="roomDetailUpdateRequest.Name" For="@(() => roomDetailUpdateRequest.Name)" Label="Tên phòng"></MudTextField>
+                                </MudItem>
+                                <MudItem xs="6">
+                                    <MudSelect T="RoomStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="roomDetailUpdateRequest.Status" For="@(() => roomDetailUpdateRequest.Status)">
+                                        <MudSelectItem Value="RoomStatus.Vacant">Phòng trống</MudSelectItem>
+                                        <MudSelectItem Value="RoomStatus.OutOfOrder">Không sử dụng</MudSelectItem>
+                                        <MudSelectItem Value="RoomStatus.Cleaned">Đã dọn phòng</MudSelectItem>
+                                        <MudSelectItem Value="RoomStatus.Dirty">Phòng bẩn</MudSelectItem>
+                                        <MudSelectItem Value="RoomStatus.Inspected">Đã kiểm tra</MudSelectItem>
+                                        <MudSelectItem Disabled Value="RoomStatus.Occupied">Đang thuê</MudSelectItem>
+                                         <MudSelectItem Disabled Value="RoomStatus.Reserved">Đã đặt</MudSelectItem>
+                                         <MudSelectItem Disabled Value="RoomStatus.AwaitingConfirmation">Chờ xác nhận</MudSelectItem>
+                                     </MudSelect>
+                                </MudItem>
+                            </MudGrid>
+                            <MudGrid>
+                                <MudItem xs="6">
+                                     <MudSelect T="Guid" @bind-Value="idBuilding" Label="Tòa nhà" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="HandleBuildingValueChanged">
+                                         @if (idBuilding == Guid.Empty)
                                         {
                                             <MudSelectItem Value="Guid.Empty">Không có tòa nào</MudSelectItem>
                                         }
@@ -50,6 +67,7 @@
                                         }
 
                                     </MudSelect>
+
                                 </MudItem>
                                 <MudItem xs="6">
                                     <MudSelect T="Guid" @bind-Value="idFloor" Label="Tầng" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
@@ -66,53 +84,40 @@
                                         }
 
                                     </MudSelect>
-                                </MudItem>
-                            </MudGrid>
-                            <MudGrid>
-                                <MudItem xs="6">
-                                    <MudSelect T="Guid" @bind-Value="roomDetailUpdateRequest.RoomTypeId" Label="Loại phòng" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                                        @if(lstRoomType != null)
-                                        {
 
-                                            @foreach (var item in lstRoomType)
-                                            {
-                                                <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
-                                            }
-                                        }
-                                    </MudSelect>
-                                </MudItem>
-                                <MudItem xs="6">
-                                    <MudTextField @bind-Value="roomDetailUpdateRequest.Name" For="@(() => roomDetailUpdateRequest.Name)" Label="Tên phòng"></MudTextField>
                                 </MudItem>
                             </MudGrid>
                         </MudItem>
                     </MudGrid>
 
                     <MudGrid>
-                        <MudItem xs="6">
-                            <MudNumericField @bind-Value="roomDetailUpdateRequest.RoomSize" For="@(() => roomDetailUpdateRequest.RoomSize)" Label="Diện tích phòng" Min="1" T="double"></MudNumericField>
+                        <MudItem xs="4">
+                            <MudSelect T="Guid" @bind-Value="roomDetailUpdateRequest.RoomTypeId" Label="Loại phòng" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                @if (lstRoomType != null)
+                                {
+
+                                    @foreach (var item in lstRoomType)
+                                    {
+                                        <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+                                    }
+                                }
+                            </MudSelect>
                         </MudItem>
-                        <MudItem xs="6">
+                        <MudItem xs="4">
+                            <MudNumericField @bind-Value="roomDetailUpdateRequest.RoomSize" For="@(() => roomDetailUpdateRequest.RoomSize)" Label="Diện tích phòng (mét vuông)" Min="1" T="double"></MudNumericField>
+                        </MudItem>
+                        <MudItem xs="4">
                             <MudNumericField @bind-Value="roomDetailUpdateRequest.MaxPeopleStay" For="@(() => roomDetailUpdateRequest.MaxPeopleStay)" Label="Số người tối đa" T="int" Min="1"></MudNumericField>
                         </MudItem>
                         
+                        
                     </MudGrid>
                     <MudGrid>
-                        <MudItem xs="6">
-                            <MudNumericField @bind-Value="roomDetailUpdateRequest.Price" For="@(() => roomDetailUpdateRequest.Price)" Step="1000" Label="Giá phòng" T="decimal" Min="100000"></MudNumericField>
+                        <MudItem xs="12">
+                                <MudNumericField @bind-Value="roomDetailUpdateRequest.Price" For="@(() => roomDetailUpdateRequest.Price)" Step="1000" Label="Giá phòng (đô-la)" T="decimal" Min="100000"></MudNumericField>
+                            
                         </MudItem>
-                        <MudItem xs="6">
-                            <MudSelect T="RoomStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="roomDetailUpdateRequest.Status" For="@(() => roomDetailUpdateRequest.Status)">
-                                <MudSelectItem Value="RoomStatus.Vacant">Phòng trống</MudSelectItem>
-                                <MudSelectItem Value="RoomStatus.OutOfOrder">Không sử dụng</MudSelectItem>
-                                <MudSelectItem Value="RoomStatus.Cleaned">Đã dọn phòng</MudSelectItem>
-                                <MudSelectItem Value="RoomStatus.Dirty">Phòng bẩn</MudSelectItem>
-                                <MudSelectItem  Value="RoomStatus.Inspected">Đã kiểm tra</MudSelectItem>
-                                <MudSelectItem Disabled Value="RoomStatus.Occupied">Đang thuê</MudSelectItem>
-                                <MudSelectItem Disabled Value="RoomStatus.Reserved">Đã đặt</MudSelectItem>
-                                <MudSelectItem Disabled Value="RoomStatus.AwaitingConfirmation">Chờ xác nhận</MudSelectItem>
-                            </MudSelect>
-                        </MudItem>
+                        
                     </MudGrid>
                     <MudGrid>
                         <MudItem xs="12">
@@ -262,7 +267,7 @@
             if (roomDetailInfo!.Status == RoomStatus.Occupied || roomDetailInfo.Status == RoomStatus.Reserved || roomDetailInfo.Status == RoomStatus.AwaitingConfirmation || roomDetailInfo.Status == RoomStatus.DoNotDisturb)
             {
                 MudDialog.Close(DialogResult.Ok(true));
-                snackbar.Add("Phòng đang được thuê, không sửa được", Severity.Error);
+                snackbar.Add("Phòng đang được đặt, không sửa được", Severity.Error);
                 return;
             }
             roomDetailUpdateRequest.Images.Clear();

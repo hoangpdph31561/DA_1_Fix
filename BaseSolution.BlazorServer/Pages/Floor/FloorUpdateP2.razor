@@ -28,7 +28,7 @@
                     </MudGrid>
                     <MudGrid>
                         <MudItem xs="12" sm="6">
-                            <MudNumericField T="int" @bind-Value="floorUpdateRequest.NumberOfRoom" For="@(() => floorUpdateRequest.NumberOfRoom)" Label="Số phòng cho thuê" Min="@floorInfo.NumberOfRoomRent"></MudNumericField>
+                            <MudNumericField T="int" @bind-Value="floorUpdateRequest.NumberOfRoom" For="@(() => floorUpdateRequest.NumberOfRoom)" Label="Số phòng cho thuê" Min="0"></MudNumericField>
                         </MudItem>
                         <MudItem xs="12" sm="6">
                             <MudSelect T="EntityStatus" AnchorOrigin="Origin.BottomCenter" @bind-Value="floorUpdateRequest.Status" For="@(() => floorUpdateRequest.Status)">
@@ -135,7 +135,12 @@
             if (lstRoomDetail.Any(x => x.Status == RoomStatus.Occupied || x.Status == RoomStatus.Reserved || x.Status == RoomStatus.AwaitingConfirmation || x.Status == RoomStatus.DoNotDisturb))
             {
                 MudDialog.Close(DialogResult.Ok(true));
-                snackbar.Add("Có phòng đang được thuê tại tầng này, không sửa được", Severity.Error);
+                snackbar.Add("Có phòng đang được đặt tại tầng này, không sửa được", Severity.Error);
+            }
+            else if(floorInfo!.NumberOfRoomRent > floorUpdateRequest.NumberOfRoom)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Không thể giảm số lượng phòng", Severity.Error);
             }
             else
             {

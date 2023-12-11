@@ -7,7 +7,7 @@
  @attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Danh sách dịch vụ khách sạn</PageTitle>
-<CustomListDisplayP2 Label="Danh sách dịch vụ trong khách sạn" IsLoading="lstServiceType == null" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
+<CustomListDisplayP2 Label="Danh sách dịch vụ trong khách sạn" IsLoading="lstServiceType == null || _isLoadingList" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>
          <AuthorizeView Roles="Admin"> 
         <MudChip Icon="@Icons.Material.Filled.Add" OnClick="@(async() => await OpenAdd())" Color="Color.Primary">Thêm</MudChip>

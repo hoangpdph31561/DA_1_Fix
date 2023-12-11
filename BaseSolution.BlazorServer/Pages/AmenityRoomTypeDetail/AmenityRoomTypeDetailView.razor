@@ -1,6 +1,7 @@
 ﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Amenity
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.AmenityRoomDetail
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.AmenityRoomDetail.Request
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
 @using BaseSolution.BlazorServer.Respository.Interfaces
 @attribute [Authorize(Roles = "Admin")]
 <MudDialog>
@@ -50,6 +51,8 @@
     public IDialogService dialogService { get; set; }
     [Inject]
     public ISnackbar snackbar { get; set; }
+    [Inject]
+    public IRoomDetailRespo roomDetailRespo { get; set; }
     private ViewAmenityRoomDetailWithPaginationRequest amenityRoomDetailRequest = new()
     {
             PageSize = int.MaxValue - 1,
@@ -59,6 +62,8 @@
     private List<AmenityRoomDetailInfo> lstAmenityRoomDetailSelected = new();
     private List<AmenityRoomDetailInfo> lstAmenityRoomDetailSelectedOriginal = new();
     private PaginationResponse<AmenityDTO> amenityVM;
+    private PaginationResponse<RoomDetailDTO> roomDetailVM;
+    private List<RoomDetailDTO> lstRoomDetail;
     private List<AmenityDTO> lstAmenity;
     private bool isLoadingList = true;
     private bool disableSave = true;
@@ -144,29 +149,45 @@
         );
         if (confirm == true)
         {
-            List<AmenityRoomDetailCreateUpdateDelete> lstCreateUpdateDelete = new();
-            foreach (var item in lstAmenityRoomDetailSelected)
-            {
-                if (item.IsExist)
+            roomDetailVM = await roomDetailRespo.GetAllRoomDetails(new Data.DataTransferObjects.RoomDetail.Request.ViewRoomDetailWithPaginationRequest
                 {
-                    lstCreateUpdateDelete.Add(new AmenityRoomDetailCreateUpdateDelete
-                        {
-                            RoomTypeId = idRoomType,
-                            AmenityId = item.AmenityId,
-                            Amount = item.Amount
-                        });
-                }
-            }
-            var result = await amenityRoomDetailRespo.CreateUpdateDeleteAmenityRoomDetail(lstCreateUpdateDelete);
-            if (result)
+                    PageSize = int.MaxValue - 1,
+                    RoomTypeId = idRoomType
+                });
+            lstRoomDetail = roomDetailVM.Data!.ToList();
+            if (lstRoomDetail.Any(x => x.Status == RoomStatus.Occupied || x.Status == RoomStatus.Reserved || x.Status == RoomStatus.AwaitingConfirmation || x.Status == RoomStatus.DoNotDisturb))
             {
                 MudDialog.Close(DialogResult.Ok(true));
-                snackbar.Add("Cập nhật thành công", Severity.Success);
+                snackbar.Add("Có phòng đang được đặt tại loại phòng này, không sửa được", Severity.Error);
             }
             else
             {
-                snackbar.Add("Sửa thất bại", Severity.Error);
+                List<AmenityRoomDetailCreateUpdateDelete> lstCreateUpdateDelete = new();
+                foreach (var item in lstAmenityRoomDetailSelected)
+                {
+                    if (item.IsExist)
+                    {
+                        lstCreateUpdateDelete.Add(new AmenityRoomDetailCreateUpdateDelete
+                            {
+                                RoomTypeId = idRoomType,
+                                AmenityId = item.AmenityId,
+                                Amount = item.Amount
+                            });
+                    }
+                }
+                var result = await amenityRoomDetailRespo.CreateUpdateDeleteAmenityRoomDetail(lstCreateUpdateDelete);
+                if (result)
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    snackbar.Add("Cập nhật thành công", Severity.Success);
+                }
+                else
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    snackbar.Add("Sửa thất bại", Severity.Error);
+                }
             }
+           
         }
     }
     private void OnClickCancel()

@@ -31,8 +31,6 @@
         }
         else
         {
-            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
-            <MudButton OnClick="@(async() => await Reset())">Khôi phục</MudButton>
             <MudButton OnClick="@(async() => await Update())">Lưu</MudButton>
         }
     </DialogActions>

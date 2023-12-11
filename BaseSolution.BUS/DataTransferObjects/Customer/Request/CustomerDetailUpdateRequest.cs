@@ -20,8 +20,8 @@ namespace BaseSolution.Application.DataTransferObjects.Customer.Request
                 RuleFor(x => x.IdentificationNumber).NotEmpty().WithMessage("IdentificationNumber cannot be empty.");
 
                 RuleFor(x => x.PhoneNumber).NotEmpty().WithMessage("Phone number cannot be empty.")
-                                           .Matches(@"^\d{10,}$").WithMessage("Invalid phone number format.");
-                RuleFor(x => x.Email).NotEmpty().WithMessage("Phone number cannot be empty.")
+                    .Matches(@"^\d+$").WithMessage("Please enter a valid phone number (digits only)."); ;
+                RuleFor(x => x.Email).NotEmpty().WithMessage("Email cannot be empty.")
                                           .EmailAddress(EmailValidationMode.Net4xRegex).WithMessage("Invalid email address.");
             }
         }

@@ -23,6 +23,7 @@
                         <HeaderContent>
                             <MudTh>STT</MudTh>
                             <MudTh>Thông tin phòng</MudTh>
+                            <MudTh>Ngày đặt</MudTh>
                             <MudTh>Checkin</MudTh>
                             <MudTh>Checkout</MudTh>
                             <MudTh>Thanh toán trước</MudTh>
@@ -30,6 +31,7 @@
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd>@(_lstRoomBooking.IndexOf(context) + 1)</MudTd>
+                            <MudTd>@context.CreatedTime.ToString("dd/MM/yyyy")</MudTd>
                                 <MudTd>@context.NameBuilding - @context.NameFloor - @context.NameRoom</MudTd>
                                 <MudTd>@context.CheckInBooking.ToString("dd/MM/yyyy")</MudTd>
                                 <MudTh>@context.CheckOutBooking.ToString("dd/MM/yyyy")</MudTh>

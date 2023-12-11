@@ -137,6 +137,8 @@
         {
             new Claim(ClaimTypes.Name,loginVm.UserName),
             new Claim(ClaimTypes.Role, loginVm.RoleCode),
+            new Claim("Id",loginVm.Id.ToString()),
+            new Claim("Ten",loginVm.Name),
         };
         var customAuth = (CustomAuthenticationStateProvider)_authProvider;
         await customAuth.UpdateAuthenticationState(lstClaim);

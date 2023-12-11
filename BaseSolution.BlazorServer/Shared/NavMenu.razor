@@ -1,7 +1,9 @@
 ﻿@using System.Security.Claims;
+@using BaseSolution.BlazorServer.Pages.Manager;
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 @inject AuthenticationStateProvider _authProvider;
 @inject NavigationManager _navManager;
-
+@inject ProtectedSessionStorage _session;
 <MudNavMenu Color="Color.Primary">
   
 
@@ -88,6 +90,8 @@
 </MudNavMenu>
 
 @code {
+    [Parameter]
+    public int LogOutNavByRole { get; set; }
     private MudTheme _customTheme = new()
         {
             Palette = new Palette()
@@ -117,7 +121,10 @@
 
     private async Task OnClickLogOut()
     {
-        _navManager.NavigateTo("/login");
-
+       
+        var customAuth = (CustomAuthenticationStateProvider)_authProvider;
+        await customAuth.UpdateAuthenticationState(null);
+        _navManager.NavigateTo("/customer/RoomType",forceLoad: true);
+      
     }
 }

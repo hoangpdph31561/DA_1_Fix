@@ -12,6 +12,7 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.User.Request
         [Required(ErrorMessage = "Trường này không được để trống")]
         [RegularExpression(@"^\d{10}$", ErrorMessage = "Vui lòng nhập số điện thoại 10 chữ số.")]
         public string PhoneNumber { get; set; }
+        public string Name { get; set; }
         public Guid UserRoleId { get; set; }
         public EntityStatus Status { get; set; }
     }

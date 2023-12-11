@@ -101,11 +101,9 @@
         roleVM = await roleRespo.GetAllRole(roleRequest);
         lstRole = roleVM.Data!.ToList();
         // update dữ liệu 
-        userRequest.Id = _userDto.Id;
-        userRequest.Status = _userDto.Status;
+        userRequest.Name = _userDto.Name;
         userRequest.Email = _userDto.Email;
         userRequest.PhoneNumber = _userDto.PhoneNumber;
-        userRequest.UserRoleId = _userDto.UserRoleId;
         isLoading = false;
     }
     private void OnClickCancel()

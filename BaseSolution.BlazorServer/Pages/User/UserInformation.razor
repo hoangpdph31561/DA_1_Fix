@@ -1,0 +1,147 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.User;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.User.Request;
+@using BaseSolution.BlazorServer.Respository.Interfaces
+@page "/UserInformation"
+
+<CustomListDisplayP2 IsLoading="_isLoadingAll" HideSearch="true">
+    <BodyContent>
+        <MudPaper Elevation="0" Class="custom-list-display-border">
+            @if (_isLoadingList)
+            {
+                <MudProgressLinear Color="Color.Primary" Indeterminate="true"></MudProgressLinear>
+            }
+            <MudGrid>
+                <MudItem xs="4">
+                    <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Elevation="0">
+                        <div class="mud-theme-primary pa-16 rounded-circle">@(_userDto?.Name?.Length > 0 ? _userDto.Name.Substring(0, 1) : string.Empty)</div>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="8">
+                    <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Elevation="0">
+                        <MudCard Class="p-3" Elevation="0">
+                            <MudCardContent>
+                                <MudForm Model="userRequestUpdate" @ref="@_form" @bind-IsValid="@_formIsValid">
+                                    <MudPaper Width="120%" Elevation="0">
+
+                                        <MudTextField @bind-Value="userRequestUpdate.Name" For="@(() => userRequestUpdate.Name)" Style="font-size: 24px; label-lg;" Label="Tên"></MudTextField>
+
+                                        <MudTextField @bind-Value="userRequestUpdate.PhoneNumber" For="@(() => userRequestUpdate.PhoneNumber)" Style="font-size: 24px; label-lg;" Label="Số điện thoại"></MudTextField>
+
+                                        <MudTextField @bind-Value="userRequestUpdate.Email" For="@(() => userRequestUpdate.Email)" Style="font-size: 24px; label-lg;" Label="Email"></MudTextField>
+
+                                    </MudPaper>
+                                </MudForm>
+                            </MudCardContent>
+                            <MudCardActions>
+                                @if (_userDto == null)
+                                {
+                                    <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+                                }
+                                else
+                                {
+                                    <MudButton OnClick="@(async() => await Update())">Lưu</MudButton>
+                                    <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+
+                                }
+                            </MudCardActions>
+                            @* <MudDivider /> *@
+                        </MudCard>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+
+        </MudPaper>
+    </BodyContent>
+</CustomListDisplayP2>
+@code {
+    [Parameter]
+    public Guid UserId { get; set; }
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    [Inject]
+    public IUserRepo userRepo { get; set; }
+    [Inject]
+    public IDialogService _dialogService { get; set; }
+    [Inject]
+    public ISnackbar _snackbar { get; set; }
+    private UserHotelDTO userVM;
+    private UserHotelDTO _userDto;
+    private bool _isLoadingAll = true;
+    private bool _isLoadingList = true;
+    private bool _isDisableControls = false;
+    private bool closeDetail = true;
+    private bool _formIsValid;
+    MudForm _form;
+    private ViewUsersHotelWithPaginationRequest userRequest = new();
+    private UserHotelUpdateRequest userRequestUpdate = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        try
+        {
+            _userDto = await userRepo.GetUserById(UserId);
+            userRequestUpdate.Name = _userDto.Name;
+            userRequestUpdate.Email = _userDto.Email;
+            userRequestUpdate.PhoneNumber = _userDto.PhoneNumber;
+            _isLoadingList = false;
+            _isLoadingAll = false;
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add("Không có thông tin cá nhân", Severity.Error);
+        }
+    }
+    private bool CheckChangeData()
+    {
+        return _userDto.Email != userRequestUpdate.Email || _userDto.PhoneNumber != userRequestUpdate.PhoneNumber || _userDto.Name != userRequestUpdate.Name;
+
+    }
+    private async Task Update()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+        var confirm = await _dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận sửa thông tin cá nhân",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            var result = await userRepo.UpdateUser(userRequestUpdate);
+            if (result)
+            {
+                if (CheckChangeData())
+                {
+
+                    _snackbar.Add("Sửa thành công", Severity.Success);
+                }
+                else
+                {
+                    OnClickCancel();
+                    _snackbar.Add("Không có thay đổi dữ liệu để cập nhật", Severity.Warning);
+                }
+            }
+            else
+            {
+                _snackbar.Add("Sửa thất bại", Severity.Error);
+            }
+            await Reset();
+        }
+    }
+    private void OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+    private async Task Reset()
+    {
+        await LoadData();
+    }
+}

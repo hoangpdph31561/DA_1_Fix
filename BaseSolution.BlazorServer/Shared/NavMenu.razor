@@ -62,7 +62,7 @@
             </MudNavGroup>
         </MudNavMenu>
     </AuthorizeView>
-    @if (!_lstrole.Any(x => x == "Nhân viên"))
+    @if (!_lstrole.Any(x => x == "Nhân viên" || x == "Admin"))
     {
         <MudNavMenu>
             <MudNavGroup Icon="@Icons.Material.Filled.PeopleOutline" Title="Khách hàng">

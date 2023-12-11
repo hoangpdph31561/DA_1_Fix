@@ -63,6 +63,7 @@
     private List<ServiceOrderDetailInfo> lstServiceOrderDetailSelectedOriginal = new();
     private PaginationResponse<ServiceDTO> serviceVM;
     private List<ServiceDTO> lstService;
+    List<ServiceDTO> _lstServiceNotNeedRoomBooking;
     private bool isLoadingList = true;
     private bool disableSave = true;
     #endregion
@@ -70,6 +71,8 @@
     private async Task LoadData()
     {
         lstService = await serviceRespo.GetServices(viewServiceWithPaginationRequest);
+
+        _lstServiceNotNeedRoomBooking = lstService.Where(x => !x.IsRoomBookingNeed).ToList();
 
         serviceOrderDetailRequest.ServiceOrderId = idServiceOrder;
 
@@ -95,9 +98,9 @@
             }
 
         }
-        if (lstService.Any())
+        if (_lstServiceNotNeedRoomBooking.Any())
         {
-            foreach (var item in lstService)
+            foreach (var item in _lstServiceNotNeedRoomBooking)
             {
                 if (!lstServiceOrderDetailSelected.Any(x => x.ServiceId == item.Id))
                 {
@@ -154,7 +157,7 @@
                             ServiceOrderId = idServiceOrder,
                             ServiceId = item.ServiceId,
                             Amount = item.Amount,
-                            Price = lstService.FirstOrDefault(x => x.Id == item.ServiceId)!.Price
+                            Price = _lstServiceNotNeedRoomBooking.FirstOrDefault(x => x.Id == item.ServiceId)!.Price
                         });
                 }
             }

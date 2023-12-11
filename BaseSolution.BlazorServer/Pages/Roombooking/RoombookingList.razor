@@ -45,7 +45,7 @@
                                 <MudTd>@context.NameCustomer</MudTd>
                                 <MudTh>@context.NameBuilding / @context.NameFloor / @context.NameRoom</MudTh>
                                 <MudTh>@context.BookingType</MudTh>
-                                <MudTh>@context.TotalService <MudChip Icon="@Icons.Material.Filled.ListAlt" OnClick="@(() => OpenService(context.RoomBookingDetailId,context.CustomerId))"></MudChip></MudTh>
+                                <MudTh>@context.TotalService <MudChip Icon="@Icons.Material.Filled.ListAlt" OnClick="@(() => OpenService(context.RoomBookingDetailId,context.CustomerId,context.ServiceOrderId))"></MudChip></MudTh>
                                 <MudTh>@context.TotalAmount</MudTh>
 
                                 <MudTd><BadgeRoomStatus Status="@context.StatusRoom"></BadgeRoomStatus></MudTd>
@@ -110,13 +110,14 @@
         await LoadData();
 
     }
-    private async Task OpenService(Guid idroomBookingDetail, Guid CustomerId)
+    private async Task OpenService(Guid idroomBookingDetail, Guid CustomerId,Guid idServiceOrder)
     {
         try
         {
             var parameters = new DialogParameters<GetServiceOrderByIdRoomBooking>();
             parameters.Add(x => x.idroomBookingDetail, idroomBookingDetail);
             parameters.Add(x => x.CustomerId, CustomerId);
+            parameters.Add(x => x.ServiceOrderId, idServiceOrder);
             var dialog = await _dialogService.ShowAsync<GetServiceOrderByIdRoomBooking>("Danh sách dịch vụ", parameters);
             var result = await dialog.Result;
             if (!result.Canceled)

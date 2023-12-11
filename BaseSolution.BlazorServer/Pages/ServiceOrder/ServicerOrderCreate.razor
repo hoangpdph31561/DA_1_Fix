@@ -29,7 +29,7 @@
                     <MudChip Icon="@Icons.Material.Filled.Add" @onclick="async() => await OpenAdd()" Color="Color.Primary">Thêm khách hàng mới</MudChip>
                     <MudSelect T="string" Label="Dịch vụ" Class="mb-2"
                                AnchorOrigin="Origin.BottomCenter" @bind-Value="@serviceId" For="@(() => serviceId)">
-                        @foreach (var item in lstService)
+                        @foreach (var item in _lstServiceNotNeedRoomBooking)
                         {
                             <MudSelectItem Value="@item.Id.ToString()">@item.Name</MudSelectItem>
                         }
@@ -77,7 +77,7 @@
     private List<ServiceDTO> lstService;
     private string customerId;
     private string serviceId;
-
+    List<ServiceDTO> _lstServiceNotNeedRoomBooking;
 
     private ViewCustomerWithPaginationRequest customer = new();
 
@@ -101,6 +101,8 @@
         lstCustomer = CustomerVM.Data!.ToList();
         lstService = await serviceRespo.GetServices(serviceViewRequest);
         _isLoadingList = false;
+
+       _lstServiceNotNeedRoomBooking = lstService.Where(x => !x.IsRoomBookingNeed).ToList();
     }
 
     private void OnClickCancel()

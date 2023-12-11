@@ -4,19 +4,16 @@
 <MudThemeProvider Theme="_customTheme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
-
 <MudLayout>
     <MudAppBar Color="Color.Primary" Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudSpacer />
-        <div class="row-auto">
-            <div>
-                <MudNavLink Href="/login-customer" Icon="@Icons.Material.Filled.Login"></MudNavLink>
-            </div>
-        </div>
         <div class="col-auto">
             <div>
-                <MudNavLink Href="/login">Nhân viên đăng nhập</MudNavLink>
+                <MudMenu Label="Đăng nhập" Variant="Variant.Filled" Color="Color.Primary">
+                    <MudMenuItem Href="/login">Quản trị </MudMenuItem>
+                    <MudMenuItem Href="/login-customer">Khách hàng</MudMenuItem>
+                </MudMenu>
             </div>
         </div>
     </MudAppBar>

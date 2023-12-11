@@ -12,7 +12,7 @@
     private IStatistic statisticRepo { get; set; }
     [Inject]
     IJSRuntime jsRuntime { get; set; }
-    private List<BillStatisticDto>? _lstBillStatisticDto { get; set; }
+    private List<BillStatisticDto> _lstBillStatisticDto = new();
     BillStatisticRequest billStatisticRequest = new();
 
     private string labels = "Doanh thu";
@@ -20,6 +20,11 @@
     private async Task LoadData()
     {
         _lstBillStatisticDto = await statisticRepo.GetBillStatisticsAsync(billStatisticRequest);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -36,6 +41,7 @@
     {
         if (_lstBillStatisticDto != null)
         {
+
             var s1 = _lstBillStatisticDto.Select(gs => gs.Month).ToList();
             var s2 = _lstBillStatisticDto.Select(gs => gs.TotalAll).ToList();
             await jsRuntime.InvokeVoidAsync("createBillStatistic", labels, s1, s2);

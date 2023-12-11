@@ -123,10 +123,8 @@
             if (!result.Canceled)
             {
                 await LoadData();
-
+                StateHasChanged();
             }
-
-            StateHasChanged();
         }
         catch (Exception)
         {

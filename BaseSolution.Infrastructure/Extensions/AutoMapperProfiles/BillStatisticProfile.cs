@@ -18,7 +18,6 @@ namespace BaseSolution.Infrastructure.Extensions.AutoMapperProfiles
                 .ForMember(des => des.TotalServiceForRoom, otp => otp.MapFrom(src => src.RoomBooking.RoomBookingDetails.SelectMany(x => x.ServiceOrders).SelectMany(x => x.ServiceOrderDetails).Select(x => x.ServiceId).Count()))
                 .ForMember(des => des.ServicePriceForRoom, otp => otp.MapFrom(src => src.RoomBooking.RoomBookingDetails.SelectMany(x => x.ServiceOrders).SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Price).FirstOrDefault()))
                 .ForMember(des => des.NameServiceForRoom, otp => otp.MapFrom(src => src.RoomBooking.RoomBookingDetails.SelectMany(x => x.ServiceOrders).SelectMany(x => x.ServiceOrderDetails).Select(x => x.Service.Name).FirstOrDefault()))
-                .ForMember(des => des.ServiceOrderId, otp => otp.MapFrom(src => src.RoomBooking.RoomBookingDetails.SelectMany(x => x.ServiceOrders.Select(x => x.Id)).FirstOrDefault()))
                  .ForMember(dest => dest.QuantityService, opt => opt.MapFrom(src => src.ServiceOrder.ServiceOrderDetails == null || !src.ServiceOrder.ServiceOrderDetails.Any() ? 0 : src.ServiceOrder.ServiceOrderDetails.Where(ard => !ard.Deleted).Sum(ard => ard.Amount)))
                 .ForMember(des => des.PriceService, opt => opt.MapFrom(src => src.ServiceOrder.ServiceOrderDetails.Select(x => x.Price).FirstOrDefault()))
                  .ForMember(des => des.ServiceOrderId, opt => opt.MapFrom(src => src.ServiceOrder.Id));

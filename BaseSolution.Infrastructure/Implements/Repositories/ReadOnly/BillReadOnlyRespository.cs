@@ -7,10 +7,7 @@ using BaseSolution.Application.Interfaces.Services;
 using BaseSolution.Application.ValueObjects.Common;
 using BaseSolution.Application.ValueObjects.Pagination;
 using BaseSolution.Application.ValueObjects.Response;
-
-using BaseSolution.Domain.Entities;
 using BaseSolution.Domain.Enums;
-
 using BaseSolution.Infrastructure.Database.AppDbContext;
 using BaseSolution.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -82,25 +79,22 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadOnly
             }
         }
 
-        public async Task<RequestResult<List<BillDtoForRoom>>> GetBillByIdCustomerAsync(Guid idCustomer, CancellationToken cancellationToken)
+        public async Task<RequestResult<List<BillDTO>>> GetBillByIdCustomerAsync(Guid idCustomer, CancellationToken cancellationToken)
         {
             try
             {
                 var bills = await _appReadOnlyDbContext.Bills.AsNoTracking()
                     .Where(c => c.CustomerId == idCustomer && !c.Deleted)
-                    .ProjectTo<BillDtoForRoom>(_mapper.ConfigurationProvider)
+                    .ProjectTo<BillDTO>(_mapper.ConfigurationProvider)
                     .ToListAsync(cancellationToken);
 
-                foreach (var bill in bills)
-                {
-                    bill.TotalAmount = bill.ServiceAmount + UtilityExtensions.TinhTien(bill.CheckInReality, bill.CheckOutReality, bill.RoomPrice, bill.PrePaid);
-                }
-                return RequestResult<List<BillDtoForRoom>>.Succeed(bills);
+
+                return RequestResult<List<BillDTO>>.Succeed(bills);
 
             }
             catch (Exception e)
             {
-                return RequestResult<List<BillDtoForRoom>>.Fail(_localizationService["Bill is not found"], new[]
+                return RequestResult<List<BillDTO>>.Fail(_localizationService["Bill is not found"], new[]
 
                 {
                     new ErrorItem

@@ -72,7 +72,7 @@ namespace BaseSolution.API.Controllers
             await vm.HandleAsync(idCustomer, cancellationToken);
             if (vm.Success)
             {
-                List<BillDtoForRoom> result = (List<BillDtoForRoom>)vm.Data;
+                List<BillDTO> result = (List<BillDTO>)vm.Data;
 
                 return Ok(result);
             }
@@ -92,7 +92,6 @@ namespace BaseSolution.API.Controllers
             }
             return Ok(vm);
         }
-
         [HttpGet("getBillsByAdmin")]
         public async Task<IActionResult> GetBillsByAdmin([FromQuery] ViewBillWithPaginationRequest request, CancellationToken cancellationToken)
         {

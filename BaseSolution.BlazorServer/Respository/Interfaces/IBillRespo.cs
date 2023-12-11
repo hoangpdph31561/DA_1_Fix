@@ -13,7 +13,7 @@ namespace BaseSolution.BlazorServer.Respository.Interfaces
         Task<PaginationResponse<BillDtoForService>> GetBillForService(ViewBillWithPaginationRequest request);
         Task<PaginationResponse<BillDtoForRoom>> GetBillForRoom(ViewBillWithPaginationRequest request);
 
-        Task<List<BillDtoForRoom>> GetBillByIdCustomer(Guid idCustomer);
+        Task<List<BillDTO>> GetBillByIdCustomer(Guid idCustomer);
 
         Task<bool> CreateNewBill(BillCreateRequest request);
         Task<BillDTO> GetBillById(Guid id);

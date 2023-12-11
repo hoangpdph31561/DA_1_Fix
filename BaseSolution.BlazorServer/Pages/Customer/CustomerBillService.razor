@@ -4,9 +4,9 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Customer.Request
 @using BaseSolution.BlazorServer.Respository.Implements
 @using BaseSolution.BlazorServer.Respository.Interfaces
-@page "/customer/Bill"
+@page "/customer/BillService"
 @inject IdCustomer idCustomer
-<CustomListDisplayP2 Label="Xem hóa đơn phòng" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" HideSearch="true">
+<CustomListDisplayP2 Label="Xem hóa đơn dịch vụ" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" HideSearch="true">
     <HeaderContent>
 
     </HeaderContent>
@@ -23,16 +23,13 @@
                     <HeaderContent>
                         <MudTh>STT</MudTh>
                         <MudTh>Ngày xuất</MudTh>
-                        <MudTh>Tên phòng</MudTh>
-                        <MudTh>Giá phòng</MudTh>
                         <MudTh>Tổng tiền</MudTh>
 
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd>@(_lstBill.IndexOf(context) + 1)</MudTd>
-                            <MudTd>@context.CreatedTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
-                            <MudTd>@context.RoomName</MudTd>
-                            <MudTd>@context.RoomPrice</MudTd>
+                        <MudTd>@context.CreatedTime.ToString("HH:mm dd/MM/yyyy")</MudTd>
+                            <MudTd>@context.ServiceName</MudTd>
                             <MudTd>@context.TotalAmount </MudTd>
 
                         </RowTemplate>
@@ -53,8 +50,8 @@
     [Inject]
     public ISnackbar snackbar { get; set; }
     private ViewBillWithPaginationRequest billRequest = new();
-    private List<BillDtoForRoom> _lstBill;
-    private PaginationResponse<BillDtoForRoom> _billVM;
+    private List<BillDtoForService> _lstBill;
+    private PaginationResponse<BillDtoForService> _billVM;
     private Guid _idBill = Guid.Empty;
     private bool _isLoadingAll = true;
     private bool _isLoadingList = true;
@@ -67,9 +64,9 @@
     }
     private async Task LoadData()
     {
-        _billVM = new PaginationResponse<BillDtoForRoom>
+        _billVM = new PaginationResponse<BillDtoForService>
             {
-                Data = new List<BillDtoForRoom>()
+                Data = new List<BillDtoForService>()
             };
 
         var bills = await billRepo.GetBillByIdCustomer(customerId);
@@ -78,7 +75,7 @@
         {
             if (bill.RoomBookingId != null)
             {
-                var billRoom = await billRepo.GetBillByIdForRoom(bill.Id);
+                var billRoom = await billRepo.GetBillByIdForService(bill.Id);
                 _billVM.Data.Add(billRoom);
             }
         }
@@ -94,5 +91,5 @@
         billRequest.PageNumber = pageNumber;
         await LoadData();
     }
-    
+
 }

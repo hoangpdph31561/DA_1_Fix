@@ -9,6 +9,7 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.Bill
         public Guid CustomerId { get; set; }
         public string CustomerName { get; set; }
         public string BillType { get; set; }
+        public Guid? RoomBookingId { get; set; }
         public Guid? ServiceOrderId { get; set; }
         public Guid? CreatedBy { get; set; }
         public string? CreatedUserName { get; set; }
@@ -21,7 +22,11 @@ namespace BaseSolution.BlazorServer.Data.DataTransferObjects.Bill
         public decimal ServicePrice { get; set; } // giá của dịch vụ 
         public float ServiceAmount { get; set; } // ServiceAmount = TotalService x ServicePrice
         public float RoomPrice { get; set; }
-        public float TotalAmount { get; set; } // TotalAmount = TotalService + RoomPrice
+        public float RoomAmount { get; set; }
+        public float TotalAmount { get; set; } // TotalAmount = TotalService + RoomPrice    
+        public DateTimeOffset CheckInReality { get; set; }
+        public DateTimeOffset CheckOutReality { get; set; }
+        public float PrePaid { get; set; }
 
     }
 }

@@ -68,7 +68,8 @@
     private List<RoomBookingDto> lstRoomBooking;
     private PaginationResponse<RoomBookingDto> roomBookingVM;
 
-    DateTime? ngayđat;
+    DateTime? ngayđat = DateTime.Now;
+
     DateTime now = DateTime.Now;
     private ServiceOrderCreateRequest serviceOderRequest = new();
     private ViewServiceWithPaginationRequest serviceViewRequest = new();

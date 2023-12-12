@@ -121,7 +121,7 @@
             var dialog = await _dialogService.ShowAsync<GetServiceOrderByIdRoomBooking>("Danh sách dịch vụ", parameters);
             var result = await dialog.Result;
               await LoadData();
-                StateHasChanged();
+              StateHasChanged();
         }
         catch (Exception)
         {

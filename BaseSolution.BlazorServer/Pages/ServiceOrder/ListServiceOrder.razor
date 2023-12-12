@@ -41,7 +41,7 @@
                         <RowTemplate>
                             <MudTd>@(lstServiceOrder.IndexOf(context) + 1)</MudTd>
                                 <MudTd>@context.CustomerName</MudTd>
-                                <MudTh>@context.CreatedTime.DateTime</MudTh>
+                                <MudTh >@context.CreatedTime.DateTime</MudTh>
                                 <MudTh>@context.Quantity <MudChip Icon="@Icons.Material.Filled.ListAlt" OnClick="@(() => OpenService(context.Id))"></MudChip></MudTh>
                                 <MudTh>@context.TotalAmount VNĐ</MudTh>
                                 <MudTd>
@@ -149,6 +149,7 @@
             if (!result.Canceled)
             {
                 await LoadData();
+                StateHasChanged();
             }
         }
         catch (Exception)

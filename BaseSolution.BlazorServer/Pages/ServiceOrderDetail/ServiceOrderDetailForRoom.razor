@@ -1,0 +1,185 @@
+﻿@using BaseSolution.BlazorServer.Data.DataTransferObjects.Amenity
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.AmenityRoomDetail
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.AmenityRoomDetail.Request
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Service;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.Service.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceOrderDetail.Request;
+@using BaseSolution.BlazorServer.Data.DataTransferObjects.ServiceOrderDetail;
+@using BaseSolution.BlazorServer.Respository.Interfaces
+@attribute [Authorize(Roles = "Admin")]
+<MudDialog>
+    <DialogContent>
+        @if (isLoadingList || lstService == null)
+        {
+            <MudText>Không có danh sách tiện ích</MudText>
+        }
+        else
+        {
+            <MudTable Items="lstServiceOrderDetailSelected" Style="height: 40vh; overflow: auto;" Hover="true">
+                <HeaderContent>
+                    <MudTd>Thêm</MudTd>
+                    <MudTd>Tên dịch vụ</MudTd>
+                    <MudTd>Số lượng</MudTd>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>
+
+                        <MudCheckBox T="bool" @bind-Checked="context.IsExist"></MudCheckBox>
+                    </MudTd>
+                    <MudTd>@context.ServiceName</MudTd>
+                    <MudNumericField @bind-Value="@context.Amount" Disabled="!context.IsExist" Max="@(!context.IsExist? 0: 500)" Min="@(!context.IsExist ? 0: 1)"></MudNumericField>
+                </RowTemplate>
+            </MudTable>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="OnClickCancel">Hủy</MudButton>
+        <MudButton OnClick="Reset">Khôi phục</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@(async() => await UpdateService())">Lưu</MudButton>
+
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #region Khai báo
+    [Parameter]
+    public Guid idServiceOrder { get; set; }
+    [Inject]
+    public IServiceRespo serviceRespo { get; set; }
+    [Inject]
+    public IServiceOrderDetailRespo serviceOrderDetailRespo { get; set; }
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    [Inject]
+    public IDialogService dialogService { get; set; }
+    [Inject]
+    public ISnackbar snackbar { get; set; }
+    private ViewServiceOrderDetailByIdServiceOderRequest serviceOrderDetailRequest = new();
+
+    private ViewServiceWithPaginationRequest viewServiceWithPaginationRequest = new();
+
+    private List<ServiceOrderDetailDto> lstServiceOrderDetail;
+    private List<ServiceOrderDetailInfo> lstServiceOrderDetailSelected = new();
+    private List<ServiceOrderDetailInfo> lstServiceOrderDetailSelectedOriginal = new();
+    private PaginationResponse<ServiceDTO> serviceVM;
+    private List<ServiceDTO> lstService;
+    private bool isLoadingList = true;
+    private bool disableSave = true;
+    #endregion
+    #region Code xử lý
+    private async Task LoadData()
+    {
+        lstService = await serviceRespo.GetServices(viewServiceWithPaginationRequest);
+
+
+        serviceOrderDetailRequest.ServiceOrderId = idServiceOrder;
+
+        lstServiceOrderDetail = await serviceOrderDetailRespo.GetServiceOrderDetailByServiceOrderId(serviceOrderDetailRequest);
+        if (lstServiceOrderDetail.Any())
+        {
+            foreach (var item in lstServiceOrderDetail)
+            {
+                lstServiceOrderDetailSelected.Add(new ServiceOrderDetailInfo
+                    {
+                        IsExist = true,
+                        ServiceId = item.ServiceId,
+                        ServiceName = item.ServiceName,
+                        Amount = item.Amount
+                    });
+                lstServiceOrderDetailSelectedOriginal.Add(new ServiceOrderDetailInfo
+                    {
+                        IsExist = true,
+                        ServiceId = item.ServiceId,
+                        ServiceName = item.ServiceName,
+                        Amount = item.Amount
+                    });
+            }
+
+        }
+        if (lstService.Any())
+        {
+            foreach (var item in lstService)
+            {
+                if (!lstServiceOrderDetailSelected.Any(x => x.ServiceId == item.Id))
+                {
+                    lstServiceOrderDetailSelected.Add(new ServiceOrderDetailInfo
+                        {
+                            IsExist = false,
+                            ServiceId = item.Id,
+                            ServiceName = item.Name,
+                            Amount = 0
+                        });
+                    lstServiceOrderDetailSelectedOriginal.Add(new ServiceOrderDetailInfo
+                        {
+                            IsExist = false,
+                            ServiceId = item.Id,
+                            ServiceName = item.Name,
+                            Amount = 0
+                        });
+                }
+            }
+        }
+        isLoadingList = false;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private bool GetAmenityCheckState(Guid idService)
+    {
+        if (lstServiceOrderDetailSelected.Any(c => c.ServiceId == idService))
+        {
+            return true;
+        }
+        return false;
+    }
+    private async Task UpdateService()
+    {
+
+        var confirm = await dialogService.ShowMessageBox
+        (
+            "Thông báo",
+            "Xác nhận thêm dịch vụ cho lần đặt này ? ",
+            "Xác nhận",
+            cancelText: "Hủy"
+        );
+        if (confirm == true)
+        {
+            List<ServiceOrderDetailCreateUpdateDelete> lstCreateUpdateDelete = new();
+            foreach (var item in lstServiceOrderDetailSelected)
+            {
+                if (item.IsExist)
+                {
+                    lstCreateUpdateDelete.Add(new ServiceOrderDetailCreateUpdateDelete
+                        {
+                            ServiceOrderId = idServiceOrder,
+                            ServiceId = item.ServiceId,
+                            Amount = item.Amount,
+                            Price = lstService.FirstOrDefault(x => x.Id == item.ServiceId)!.Price
+                        });
+                }
+            }
+            var result = await serviceOrderDetailRespo.CreateUpdateDeleteServiceOrder(lstCreateUpdateDelete);
+            if (result)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Cập nhật thành công", Severity.Success);
+            }
+            else
+            {
+                snackbar.Add("Sửa thất bại", Severity.Error);
+            }
+        }
+    }
+    private void OnClickCancel()
+    {
+        MudDialog.Cancel();
+    }
+    private async Task Reset()
+    {
+        lstServiceOrderDetailSelected = new();
+        lstServiceOrderDetailSelectedOriginal = new();
+        await LoadData();
+    }
+    #endregion
+}

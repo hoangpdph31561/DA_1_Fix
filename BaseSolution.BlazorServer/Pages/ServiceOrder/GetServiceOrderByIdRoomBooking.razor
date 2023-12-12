@@ -29,16 +29,7 @@
             }
         }
     </DialogContent>
-    <DialogActions>
-        @if (serviceOderInfo == null)
-        {
-            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
-        }
-        else
-        {
-            <MudButton OnClick="OnClickCancel">Hủy</MudButton>
-        }
-    </DialogActions>
+   
 </MudDialog>
 
 @code {
@@ -51,7 +42,6 @@
 
     [Parameter]
     public Guid ServiceOrderId { get; set; }
-
 
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
@@ -86,15 +76,36 @@
     }
     public async Task OpenAdd()
     {
-        var parameters = new DialogParameters<ServiceOrderDetailView>();
-        parameters.Add(x => x.idServiceOrder, ServiceOrderId);
-        var dialog = await _dialogService.ShowAsync<ServiceOrderDetailView>("Thêm dịch vụ", parameters);
-        var result = await dialog.Result;
-
-        if (!result.Canceled)
+        if(ServiceOrderId == Guid.Empty)
         {
-            await LoadData();
+            var parameters = new DialogParameters<ServiceOrderCreateForRoomBooking>();
+
+            parameters.Add(x => x.idroomBookingDetail, idroomBookingDetail);
+            parameters.Add(x => x.idCustomer, CustomerId);
+            var dialog = await _dialogService.ShowAsync<ServiceOrderCreateForRoomBooking>("Thêm dịch vụ", parameters);
+            var result = await dialog.Result;
+
+            if (!result.Canceled)
+            {
+                await LoadData();
+                StateHasChanged();
+            }
         }
+        else
+        {
+            var parameters = new DialogParameters<ServiceOrderDetailForRoom>();
+
+            parameters.Add(x => x.idServiceOrder, ServiceOrderId);
+            var dialog = await _dialogService.ShowAsync<ServiceOrderDetailForRoom>("Thêm dịch vụ", parameters);
+            var result = await dialog.Result;
+
+            if (!result.Canceled)
+            {
+                await LoadData();
+                StateHasChanged();
+            }
+        }
+      
     }
     private async Task OnClickCancel()
     {

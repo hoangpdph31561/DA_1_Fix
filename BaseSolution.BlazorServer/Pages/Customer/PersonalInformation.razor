@@ -69,6 +69,10 @@
         <MudTabPanel Text="Đặt phòng">
             
             <MudPaper Elevation="0" Class="custom-list-display-border pa-3">
+                @if (_RoomTypeVM == null)
+                {
+                    <MudText>Không có phòng</MudText>
+                }
                 @if (_isLoadingList)
                 {
                     <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="m-3" />
@@ -76,7 +80,7 @@
                 else
                 {
                     <MudSpacer />
-                    <MudTable Items="@_RoomTypeVM.Data" Style="position:relative;" Elevation="0">
+                    <MudTable Items="@_RoomTypeVM!.Data" Style="position:relative;" Elevation="0">
                         <HeaderContent>
                             <MudTh>STT</MudTh>
                             <MudTh>Tên loại phòng</MudTh>

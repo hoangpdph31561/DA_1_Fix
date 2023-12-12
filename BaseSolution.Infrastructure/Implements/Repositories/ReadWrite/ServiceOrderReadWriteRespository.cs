@@ -72,7 +72,7 @@ namespace BaseSolution.Infrastructure.Implements.Repositories.ReadWrite
                 {
                     var _LstIdCustomer = _appReadWriteDbContext.RoomBookingDetails.Select(x => x.RoomBooking.CustomerId).ToList();
                     var idCustomer = _LstIdCustomer.FirstOrDefault(x => x.Equals(entity.CustomerId));
-                    entity.CreatedTime = entity.CreatedTime;
+                    entity.CreatedTime = DateTimeOffset.UtcNow;
                     entity.RoomBookingDetailId = entity.RoomBookingDetailId;
                     entity.CustomerId = idCustomer;
                     await _appReadWriteDbContext.ServiceOrders.AddAsync(entity);

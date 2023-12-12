@@ -73,7 +73,9 @@
                 {
                     <MudText>Không có phòng</MudText>
                 }
-                @if (_isLoadingList)
+                else
+                {
+                    @if (_isLoadingList)
                 {
                     <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="m-3" />
                 }
@@ -101,6 +103,8 @@
                     <CustomPagination Class="my-1" HasNext="@_RoomTypeVM.HasNext" OnPageChange="@(async e => await OnPaginationButtonClick(e))" CurrentPageNumber="@_RoomTypeVM.PageNumber"></CustomPagination>
                     <MudDivider />
                 }
+                }
+                
             </MudPaper>
         </MudTabPanel>
         <MudTabPanel Text="Thông tin đặt phòng">
@@ -502,7 +506,7 @@
                 _roomBookingHistoryVM.Data.Add(roomBooking);
             }
         }
-        _lstRoomBookingHistory = _roomBookingHistoryVM.Data!.OrderByDescending(x => x.CreatedTime).ToList();
+        _lstRoomBookingHistory = _roomBookingHistoryVM.Data!.ToList();
         _isLoadingList = false;
         _isLoadingAll = false;
     }

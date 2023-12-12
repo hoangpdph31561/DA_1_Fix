@@ -119,9 +119,25 @@
             {
                 roomTypeDeleteRequest.Id = deleteId;
                 var removeConfirm = await roomTypeRespo.DeleteRoomType(roomTypeDeleteRequest);
+
                 if (removeConfirm)
                 {
                     _snackbar.Add("Xóa thành công", Severity.Success);
+                    if (lstRoomDetail.Any())
+                    {
+                        foreach (var item in lstRoomDetail)
+                        {
+                            var deleteRoomDetail = await roomDetailRespo.DeleteRoomDetail(new Data.DataTransferObjects.RoomDetail.Request.RoomDetailDeleteRequest
+                                {
+                                    Id = item.Id,
+                                });
+                            if (!deleteRoomDetail)
+                            {
+                                _snackbar.Add("Xóa phòng theo loại phòng không xóa được", Severity.Error);
+                                
+                            }
+                        }
+                    }
                 }
                 else
                 {

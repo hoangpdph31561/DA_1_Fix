@@ -120,11 +120,8 @@
             parameters.Add(x => x.ServiceOrderId, idServiceOrder);
             var dialog = await _dialogService.ShowAsync<GetServiceOrderByIdRoomBooking>("Danh sách dịch vụ", parameters);
             var result = await dialog.Result;
-            if (!result.Canceled)
-            {
-                await LoadData();
+              await LoadData();
                 StateHasChanged();
-            }
         }
         catch (Exception)
         {

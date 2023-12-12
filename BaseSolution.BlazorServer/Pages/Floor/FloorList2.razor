@@ -4,6 +4,7 @@
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.Floor.Request;
 @using BaseSolution.BlazorServer.Data.DataTransferObjects.RoomDetail
 @using BaseSolution.BlazorServer.Respository.Interfaces;
+<PageTitle>Danh sách tầng</PageTitle>
 @attribute [Authorize(Roles = "Admin")]
 <CustomListDisplayP2 Label="Danh sách tầng trong khách sạn" IsLoading="lstBuilding == null" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>

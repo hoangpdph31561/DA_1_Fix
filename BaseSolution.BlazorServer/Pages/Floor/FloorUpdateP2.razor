@@ -140,7 +140,7 @@
             else if(floorInfo!.NumberOfRoomRent > floorUpdateRequest.NumberOfRoom)
             {
                 MudDialog.Close(DialogResult.Ok(true));
-                snackbar.Add("Không thể giảm số lượng phòng", Severity.Error);
+                snackbar.Add("Không thể giảm số lượng phòng do chưa xóa phòng tại tầng", Severity.Error);
             }
             else
             {

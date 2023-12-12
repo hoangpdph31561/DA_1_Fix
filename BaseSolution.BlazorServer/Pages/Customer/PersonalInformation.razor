@@ -120,7 +120,7 @@
                 else
                 {
                     <MudCard Class="p-3" Elevation="0">
-                        <MudTable Items="@_roomBookingCustomerVM.Data">
+                        <MudTable Items="@_roomBookingCustomerVM.Data" Elevation="0">
                             <HeaderContent>
                                 <MudTh>STT</MudTh>
                                 <MudTh>Thời gian đặt</MudTh>
@@ -157,7 +157,7 @@
                 }
             </MudPaper>
         </MudTabPanel>
-        <MudTabPanel Text="Lịch sử dặt phòng">
+        <MudTabPanel Text="Lịch sử đặt phòng">
             <MudPaper Elevation="0" Class="custom-list-display-border">
                 @if (_isLoadingAll)
                 {
@@ -166,7 +166,7 @@
                 else
                 {
                     <MudCard Class="p-3" Elevation="0">
-                        <MudTable Items="@_roomBookingHistoryVM.Data">
+                        <MudTable Items="@_roomBookingHistoryVM.Data" Elevation="0">
                             <HeaderContent>
                                 <MudTh>STT</MudTh>
                                 <MudTh>Thông tin phòng</MudTh>

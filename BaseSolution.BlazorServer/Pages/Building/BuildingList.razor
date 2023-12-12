@@ -3,7 +3,7 @@
 @using Respository.Interfaces
 @using Data.DataTransferObjects.Building
 @using Data.DataTransferObjects.Building.Request
-
+<PageTitle>Danh sách tòa nhà</PageTitle>
 @attribute [Authorize(Roles = "Admin")]
 <CustomListDisplayP2 Label="@("Danh sách tòa nhà của khách sạn")" IsLoading="_isLoadingAll" DisableSearch="_isDisableControls" OnSearch="@OnSearch">
     <HeaderContent>

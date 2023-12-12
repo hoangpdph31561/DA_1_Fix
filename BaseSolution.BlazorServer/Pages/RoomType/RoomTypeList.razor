@@ -40,7 +40,7 @@
                                     @context.NumberOfRoomDetails
                                 <MudIconButton Icon="@Icons.Material.Filled.MeetingRoom" OnClick="@(async() => await OpenRoomDetail(context.Id))"></MudIconButton>
                                 </MudTh>
-                                <MudTh>@context.MinPriceOfRoom - @context.MaxPriceOfRoom</MudTh>
+                                <MudTh>@context.MinPriceOfRoom - @context.MaxPriceOfRoom VNĐ</MudTh>
                                 <MudTd><BadgeEntityStatus Status="@context.Status"></BadgeEntityStatus></MudTd>
                                 <MudTd>
                                     <MudChip Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Primary" OnClick="@(() => OpenDetail(context.Id))" Disabled="@_isDisableControls">Chi tiết</MudChip>
